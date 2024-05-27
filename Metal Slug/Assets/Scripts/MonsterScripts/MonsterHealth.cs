@@ -88,19 +88,35 @@ public class MonsterHealth : MonoBehaviour
         damageParticlesInstance = Instantiate(damageParticles,transform.position, rotation);
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
+
+        // Log pour débogage
+        Debug.Log($"{gameObject.name} collided with {collision.gameObject.name}");
+
+
         if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Enemy"))
         {
-            
+             // Log pour débogage
+            Debug.Log($"{gameObject.name} collided with Ground or Enemy");
+
             // Vérifie si la collision est suffisamment forte pour causer des dégâts supplémentaires
-            if (enemyRb != null && enemyRb.velocity.magnitude > 1f)
+            if (enemyRb != null && enemyRb.velocity.magnitude > 10f)
             {
                 float impactForce = collision.relativeVelocity.magnitude;
                 float additionalDamage = impactForce * additionalDamageMultiplier;
-                Debug.Log(impactForce);
+                // Log pour débogage
+                Debug.Log($"{gameObject.name} impact force: {impactForce}");
+                Debug.Log(additionalDamage);
                 // Applique les dégâts supplémentaires
-                TakeDamage(30f + additionalDamage);
+                TakeDamage(300f + additionalDamage);
+
+                // Si l'autre objet est également un ennemi, infliger des dégâts à cet autre ennemi
+                MonsterHealth otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
+                if (otherEnemy != null)
+                {
+                    otherEnemy.TakeDamage(300f + additionalDamage);
+                }
             }
 
         }

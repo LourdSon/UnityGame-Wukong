@@ -40,10 +40,12 @@ public class PlayerAttack : MonoBehaviour
     public Vector2 detectionRadiusSlam =new Vector2(15f,3f);
     public float timeBtwAttacksSlam = 2f;
     public float attackTimeCounterSlam;
-    private bool isSlamming = false;
+    
     public LayerMask groundLayerMask;
     public TileDestroyer tileDestroyer;
     private CinemachineImpulseSource impulseSource;
+    public float rayDistance = 5f;
+    public float doubleChocTimer = 0.2f;
 
     void Start()
     {
@@ -59,7 +61,6 @@ public class PlayerAttack : MonoBehaviour
     void Update()
     {
         Attackp();
-        IsGrounded();
         
     }
 
@@ -179,9 +180,8 @@ public class PlayerAttack : MonoBehaviour
         {
             //animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterSlam = 0;
-            isSlamming = true;
-            // Appliquer une force descendante aux ennemis
-            playerRb.AddForce(Vector2.down * slamForce, ForceMode2D.Impulse);
+            
+            
             StartCoroutine(WaitForLanding());
             
         }
@@ -192,42 +192,36 @@ public class PlayerAttack : MonoBehaviour
 
     private IEnumerator WaitForLanding()
     {
-        
-         // Attendre que la vitesse verticale du joueur soit proche de zéro
-        if (!IsGrounded())
+        BoxCollider2D playerBox = GetComponent<BoxCollider2D>();
+        // Appliquer une force descendante aux ennemis
+        playerRb.AddForce(Vector2.down * slamForce, ForceMode2D.Impulse);
+        CameraShakeManager.instance.CameraShake(impulseSource);
+        playerBox.enabled = false;
+        yield return new WaitUntil(() => IsGrounded());
+        playerBox.enabled = true;
+        yield return new WaitForSeconds(doubleChocTimer);
+        CameraShakeManager.instance.CameraShake(impulseSource);        
+        // Détecter les ennemis dans la zone d'attaque
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, detectionRadiusSlam, 0f, enemyLayerMask);
+        foreach (Collider2D collider in colliders)
         {
-            yield return null;
-        }
-
-        /*if (IsGrounded())
-        {*/
-        CameraShakeManager.instance.CameraShake(impulseSource);
-        yield return new WaitForSeconds(0.2f);
-        CameraShakeManager.instance.CameraShake(impulseSource);
-        
-            // Détecter les ennemis dans la zone d'attaque
-            Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, detectionRadiusSlam,0f, enemyLayerMask);
-            foreach (Collider2D collider in colliders)
+            Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+            if (enemyRb != null)
             {
-                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
-                if (enemyRb != null)
+                Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                enemyRb.AddForce(Vector2.right * directionVector * forceMagnitudeForward,ForceMode2D.Impulse);
+                // Infliger des dégâts aux ennemis
+                MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+                if (monsterHealth != null)
                 {
-                    Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
-                    enemyRb.AddForce(Vector2.right * directionVector * forceMagnitudeForward,ForceMode2D.Impulse);
-                    // Infliger des dégâts aux ennemis
-                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
-                    if (monsterHealth != null)
-                    {
-                        monsterHealth.TakeDamage(damage);
-                    }
+                    monsterHealth.TakeDamage(damage);
                 }
             }
-
-            tileDestroyer.OGDestructionMouse();
-            isSlamming = false;
-
-            yield return null;
-        //}
+            
+        }
+        tileDestroyer.OGDestructionMouse();
+        yield return null;
+        
     }
 
 
@@ -240,12 +234,14 @@ public class PlayerAttack : MonoBehaviour
         Gizmos.DrawWireCube(transform.position, detectionRadiusSlam);
     }
     
-    private bool IsGrounded()
+    public bool IsGrounded()
     {
         // Logique pour vérifier si le joueur est au sol
         // Cela peut être basé sur une vérification de collision avec le sol ou une vérification de la vitesse verticale
         // Par exemple, vous pouvez utiliser un Raycast vers le bas pour vérifier la collision avec le sol
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 5f, groundLayerMask);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayDistance, groundLayerMask);
+         // Dessiner le raycast dans la vue de scène pour le débogage
+        Debug.DrawRay(transform.position, Vector2.down * rayDistance, Color.red);
         return hit.collider != null;
     }
 }
