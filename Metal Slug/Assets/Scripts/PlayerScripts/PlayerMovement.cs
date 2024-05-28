@@ -279,6 +279,7 @@ public class PlayerMovement : MonoBehaviour
         SpawnDashParticles();
         // Déterminer la direction du dash en fonction des entrées du joueur
         Vector2 dashMovement = new Vector2(horizontalInput, playerRb.velocity.y);
+        moveSpeed += dashForce;
 
         
         playerRb.AddForce(Vector2.right * dashForce,ForceMode2D.Impulse);
@@ -291,8 +292,11 @@ public class PlayerMovement : MonoBehaviour
         // Arrêter le dash en réinitialisant la vélocité du joueur
         //playerRb.velocity = Vector2.zero;
         animator.SetBool("IsDashing", false);
+
+        
         isDashing = false;
         jumpCounter = 1;
+        moveSpeed -= dashForce;
     }
 
     private void ChargeKi()

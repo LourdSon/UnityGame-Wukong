@@ -66,8 +66,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: -0.0058499873, y: 0.39884996, z: 0}
-    m_Extent: {x: 0.71605, y: 0.70365, z: 0}
+    m_Center: {x: -0.008349985, y: 0.39919996, z: 0}
+    m_Extent: {x: 0.72145, y: 0.7068, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
@@ -305,8 +305,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: -0.2428, y: 0.40925002, z: 0}
-    m_Extent: {x: 0.7015, y: 0.71675, z: 0}
+    m_Center: {x: -0.24695, y: 0.41000003, z: 0}
+    m_Extent: {x: 0.70285, y: 0.7145, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
@@ -534,6 +534,7 @@ MonoBehaviour:
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 1024
+  impactParticles: {fileID: 5197920272909818295, guid: 72be00577ebc75e439a30525e336b9ba, type: 3}
 --- !u!114 &2014544144765135667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -574,6 +575,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 30
+  impactParticles: {fileID: 5704859988347745721, guid: 00af0f8b0b77e1145846592e6db7b5b8, type: 3}
 --- !u!114 &7389688462781611766
 MonoBehaviour:
   m_ObjectHideFlags: 0

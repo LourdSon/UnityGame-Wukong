@@ -25,6 +25,7 @@ public class MonsterHealth : MonoBehaviour
 
     public float rayDistance = 5f;
     public LayerMask groundLayerMask;
+    public ParticleSystem impactParticles;
     
 
     // Start is called before the first frame update
@@ -91,6 +92,7 @@ public class MonsterHealth : MonoBehaviour
         int direction = playerSpriteRenderer.flipX ? 1 : -1;
         Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 180f : 0f);  
         damageParticlesInstance = Instantiate(damageParticles,transform.position, rotation);
+        Instantiate(impactParticles,transform.position, rotation);
     }
 
     void OnCollisionEnter2D(Collision2D collision)

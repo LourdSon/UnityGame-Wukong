@@ -47,6 +47,8 @@ public class PlayerAttack : MonoBehaviour
     public float rayDistance = 5f;
     public float doubleChocTimer = 0.2f;
 
+    
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>(); // Récupérer le composant SpriteRenderer
@@ -112,10 +114,10 @@ public class PlayerAttack : MonoBehaviour
                     enemyRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
                     playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
                     
-                    
 
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                     monsterHealth.TakeDamage(damage);
+                    
                     
                     //Debug.Log("enemy velocity :" + enemyRb.velocity);
                     Debug.Log("enemy velocity :" + enemyRb.velocity.magnitude);
@@ -172,6 +174,8 @@ public class PlayerAttack : MonoBehaviour
                     monsterHealth.TakeDamage(damage);
                     monsterHealth.ContactDamage();
 
+                    
+                    
                     //Debug.Log("enemy velocity :" + enemyRb.velocity);
                     Debug.Log("enemy velocity :" + enemyRb.velocity.magnitude);
                 }
