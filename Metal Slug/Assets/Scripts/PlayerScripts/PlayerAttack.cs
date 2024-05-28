@@ -168,7 +168,9 @@ public class PlayerAttack : MonoBehaviour
                     enemyRb.AddForce(Vector2.down * forceMagnitudeDownward, ForceMode2D.Impulse);
                     playerRb.AddForce(Vector2.up * selfForceMagnitudeForward*2.5f, ForceMode2D.Impulse);
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+
                     monsterHealth.TakeDamage(damage);
+                    monsterHealth.ContactDamage();
 
                     //Debug.Log("enemy velocity :" + enemyRb.velocity);
                     Debug.Log("enemy velocity :" + enemyRb.velocity.magnitude);
@@ -236,9 +238,7 @@ public class PlayerAttack : MonoBehaviour
     
     public bool IsGrounded()
     {
-        // Logique pour vérifier si le joueur est au sol
-        // Cela peut être basé sur une vérification de collision avec le sol ou une vérification de la vitesse verticale
-        // Par exemple, vous pouvez utiliser un Raycast vers le bas pour vérifier la collision avec le sol
+        
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayDistance, groundLayerMask);
          // Dessiner le raycast dans la vue de scène pour le débogage
         Debug.DrawRay(transform.position, Vector2.down * rayDistance, Color.red);

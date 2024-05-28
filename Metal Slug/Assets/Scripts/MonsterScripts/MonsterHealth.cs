@@ -22,6 +22,9 @@ public class MonsterHealth : MonoBehaviour
 
     private Rigidbody2D enemyRb;
     public float additionalDamageMultiplier = 1f;
+
+    public float rayDistance = 5f;
+    public LayerMask groundLayerMask;
     
 
     // Start is called before the first frame update
@@ -54,6 +57,8 @@ public class MonsterHealth : MonoBehaviour
         CameraShakeManager.instance.CameraShake(impulseSource);
 
         SpawnDamageParticles();
+
+        //ContactDamage();
 
         health -= damage;
         healthBar.UpdateHealthBar(health,maxHealth);
@@ -92,34 +97,59 @@ public class MonsterHealth : MonoBehaviour
     {
 
         // Log pour débogage
-        Debug.Log($"{gameObject.name} collided with {collision.gameObject.name}");
+        //Debug.Log($"{gameObject.name} collided with {collision.gameObject.name}");
 
 
-        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy"))
         {
              // Log pour débogage
-            Debug.Log($"{gameObject.name} collided with Ground or Enemy");
+            //Debug.Log($"{gameObject.name} collided with Ground or Enemy");
 
             // Vérifie si la collision est suffisamment forte pour causer des dégâts supplémentaires
-            if (enemyRb != null && enemyRb.velocity.magnitude > 10f)
+            MonsterHealth otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
+            if (enemyRb != null && enemyRb.velocity.magnitude > 15f && otherEnemy != null)
             {
+                
                 float impactForce = collision.relativeVelocity.magnitude;
                 float additionalDamage = impactForce * additionalDamageMultiplier;
                 // Log pour débogage
-                Debug.Log($"{gameObject.name} impact force: {impactForce}");
-                Debug.Log(additionalDamage);
+                //Debug.Log($"{gameObject.name} impact force: {impactForce}");
+                //Debug.Log(additionalDamage);
                 // Applique les dégâts supplémentaires
-                TakeDamage(300f + additionalDamage);
+                otherEnemy.TakeDamage(300f + additionalDamage);
+                
 
-                // Si l'autre objet est également un ennemi, infliger des dégâts à cet autre ennemi
-                MonsterHealth otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
-                if (otherEnemy != null)
-                {
-                    otherEnemy.TakeDamage(300f + additionalDamage);
-                }
+                
             }
 
         }
+    }
+
+    public void ContactDamage()
+    {
+
+        if(enemyRb.velocity.magnitude > 15f && !IsGrounded())
+        {
+            StartCoroutine(DamageGrounded());
+        }
+    }
+
+    public IEnumerator DamageGrounded()
+    {
+        float impactForce = enemyRb.velocity.magnitude;
+        float additionalDamage =  impactForce * additionalDamageMultiplier;
+        yield return new WaitUntil(() => IsGrounded());
+        TakeDamage(300f + additionalDamage);
+        yield return null;
+    }
+
+    public bool IsGrounded()
+    {
+        
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayDistance, groundLayerMask);
+         // Dessiner le raycast dans la vue de scène pour le débogage
+        Debug.DrawRay(transform.position, Vector2.down * rayDistance, Color.red);
+        return hit.collider != null;
     }
 }
 
