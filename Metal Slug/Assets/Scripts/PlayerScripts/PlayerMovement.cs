@@ -11,6 +11,7 @@ using UnityEngineInternal;
 using UnityEngine.UI;
 using Cinemachine;
 
+
 public class PlayerMovement : MonoBehaviour
 {
 
@@ -46,6 +47,7 @@ public class PlayerMovement : MonoBehaviour
     public float dashDuration = 0.2f; // La durée du dash
     public float dashCooldown = 1f; // Le temps de recharge du dash
     private float nextDashTime; // Temps auquel le prochain dash sera autorisé
+    public bool isDashing = false;
 
     [Header("Instant Dash movement")]
     public float instantDashForce = 10f; // La force du dash
@@ -126,6 +128,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if(playerRb!= null)
         {
+            
             MovePlayer();
             Jump();
             ResetPosition();
@@ -142,31 +145,39 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
-        //Get Axis from Unity
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
-
-        //Move the character
-        transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
-        float horizontalMove = horizontalInput * moveSpeed;
-        animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
-
-        //Flip sprite
-        if (horizontalInput != 0)
+        if(!isDashing)
         {
-            animator.SetBool("IsWalking", true);
-            animator.SetBool("IsIdling", false);
-            if (horizontalInput < 0)
+            //Get Axis from Unity
+            horizontalInput = Input.GetAxis("Horizontal");
+            verticalInput = Input.GetAxis("Vertical");
+
+            //Move the character
+            //transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
+            //playerRb.AddForce(Vector2.right * horizontalInput * moveSpeed);
+
+            Vector2 movement = new Vector2(horizontalInput * moveSpeed, playerRb.velocity.y);
+            playerRb.velocity = movement;
+            float horizontalMove = horizontalInput * moveSpeed;
+            animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
+
+            //Flip sprite
+            if (horizontalInput != 0)
             {
-                spriteRenderer.flipX = true;
-            } else if (horizontalInput > 0)
+                animator.SetBool("IsWalking", true);
+                animator.SetBool("IsIdling", false);
+                if (horizontalInput < 0)
+                {
+                    spriteRenderer.flipX = true;
+                } else if (horizontalInput > 0)
+                {
+                    spriteRenderer.flipX = false;
+                }
+            } else
             {
-                spriteRenderer.flipX = false;
+                animator.SetBool("IsWalking", false);
+                animator.SetBool("IsIdling", true);
             }
-        } else
-        {
-            animator.SetBool("IsWalking", false);
-            animator.SetBool("IsIdling", true);
+
         }
     }
 
@@ -253,6 +264,7 @@ public class PlayerMovement : MonoBehaviour
         // Si le joueur appuie sur le bouton de dash et le dash est prêt
         if (Input.GetKeyDown(KeyCode.Q) && Time.time > nextDashTime)
         {
+            isDashing = true;
             animator.SetBool("IsDashing", true);
             StartCoroutine(Dash());
             nextDashTime = Time.time + dashCooldown; // Mettre à jour le temps de recharge du dash
@@ -262,13 +274,15 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator Dash()
     {
+
+
         CameraShakeManager.instance.CameraShake(impulseSource);
         SpawnDashParticles();
         // Déterminer la direction du dash en fonction des entrées du joueur
-        Vector2 dashDirection = new Vector2(horizontalInput, verticalInput).normalized;
+        Vector2 dashMovement = new Vector2(horizontalInput, verticalInput).normalized;
 
-        playerRb.velocity = dashDirection * dashForce;
-        
+        //playerRb.velocity = dashMovement;
+        playerRb.AddForce(new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce/2),ForceMode2D.Impulse);
         BoxCollider2D boxCollider = GetComponent<BoxCollider2D>();
         boxCollider.enabled = false;
         
@@ -278,6 +292,7 @@ public class PlayerMovement : MonoBehaviour
         // Arrêter le dash en réinitialisant la vélocité du joueur
         //playerRb.velocity = Vector2.zero;
         animator.SetBool("IsDashing", false);
+        isDashing = false;
         jumpCounter = 1;
     }
 
