@@ -145,8 +145,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
-        if(!isDashing)
-        {
+        
             //Get Axis from Unity
             horizontalInput = Input.GetAxis("Horizontal");
             verticalInput = Input.GetAxis("Vertical");
@@ -155,9 +154,9 @@ public class PlayerMovement : MonoBehaviour
             //transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
             //playerRb.AddForce(Vector2.right * horizontalInput * moveSpeed);
 
-            Vector2 movement = new Vector2(horizontalInput * moveSpeed, playerRb.velocity.y);
-            playerRb.velocity = movement;
             float horizontalMove = horizontalInput * moveSpeed;
+            Vector2 movement = new Vector2(horizontalMove, playerRb.velocity.y);
+            playerRb.velocity = movement;
             animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
 
             //Flip sprite
@@ -178,7 +177,7 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("IsIdling", true);
             }
 
-        }
+        
     }
 
 
@@ -279,10 +278,10 @@ public class PlayerMovement : MonoBehaviour
         CameraShakeManager.instance.CameraShake(impulseSource);
         SpawnDashParticles();
         // Déterminer la direction du dash en fonction des entrées du joueur
-        Vector2 dashMovement = new Vector2(horizontalInput, verticalInput).normalized;
+        Vector2 dashMovement = new Vector2(horizontalInput, playerRb.velocity.y);
 
-        //playerRb.velocity = dashMovement;
-        playerRb.AddForce(new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce/2),ForceMode2D.Impulse);
+        
+        playerRb.AddForce(Vector2.right * dashForce,ForceMode2D.Impulse);
         BoxCollider2D boxCollider = GetComponent<BoxCollider2D>();
         boxCollider.enabled = false;
         
