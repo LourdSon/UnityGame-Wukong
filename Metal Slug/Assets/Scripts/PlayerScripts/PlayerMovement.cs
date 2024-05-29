@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -147,8 +147,8 @@ public class PlayerMovement : MonoBehaviour
     {
         
             //Get Axis from Unity
-            horizontalInput = Input.GetAxis("Horizontal");
-            verticalInput = Input.GetAxis("Vertical");
+            horizontalInput = Input.GetAxisRaw("Horizontal");
+            verticalInput = Input.GetAxisRaw("Vertical");
 
             //Move the character
             //transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
@@ -439,4 +439,3 @@ public class PlayerMovement : MonoBehaviour
     }
     
 }
-#endif
