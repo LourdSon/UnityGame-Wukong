@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
@@ -17,7 +16,6 @@ public class MonsterHealth : MonoBehaviour
     public ParticleSystem damageParticles;
     private ParticleSystem damageParticlesInstance;
     public bool isTakingDamage;
-    public float knockBackDuration = 0.5f;
     public float knockBackCounter;
 
     private Rigidbody2D enemyRb;
@@ -26,6 +24,9 @@ public class MonsterHealth : MonoBehaviour
     public float rayDistance = 5f;
     public LayerMask groundLayerMask;
     public ParticleSystem impactParticles;
+
+    public Light impactLight;
+    public float flashDuration = 0.1f;
     
 
     // Start is called before the first frame update
@@ -60,6 +61,7 @@ public class MonsterHealth : MonoBehaviour
         SpawnDamageParticles();
 
         //ContactDamage();
+        StartCoroutine(FlashCoroutine());
 
         health -= damage;
         healthBar.UpdateHealthBar(health,maxHealth);
@@ -71,6 +73,8 @@ public class MonsterHealth : MonoBehaviour
         }
         
     }
+
+
 
     public void knockBackTest()
     {
@@ -98,14 +102,12 @@ public class MonsterHealth : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision)
     {
 
-        // Log pour débogage
-        //Debug.Log($"{gameObject.name} collided with {collision.gameObject.name}");
+        
 
 
         if (collision.gameObject.CompareTag("Enemy"))
         {
-             // Log pour débogage
-            //Debug.Log($"{gameObject.name} collided with Ground or Enemy");
+             
 
             // Vérifie si la collision est suffisamment forte pour causer des dégâts supplémentaires
             MonsterHealth otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
@@ -114,14 +116,8 @@ public class MonsterHealth : MonoBehaviour
                 
                 float impactForce = collision.relativeVelocity.magnitude;
                 float additionalDamage = impactForce * additionalDamageMultiplier;
-                // Log pour débogage
-                //Debug.Log($"{gameObject.name} impact force: {impactForce}");
-                //Debug.Log(additionalDamage);
-                // Applique les dégâts supplémentaires
                 otherEnemy.TakeDamage(300f + additionalDamage);
-                
-
-                
+                               
             }
 
         }
@@ -146,6 +142,13 @@ public class MonsterHealth : MonoBehaviour
         yield return null;
     }
 
+    public IEnumerator FlashCoroutine()
+    {
+        impactLight.enabled = true;  // Activer la lumière
+        yield return new WaitForSeconds(flashDuration);  // Attendre pendant la durée du flash
+        impactLight.enabled = false;  // Désactiver la lumière
+    }
+
     public bool IsGrounded()
     {
         
@@ -155,5 +158,3 @@ public class MonsterHealth : MonoBehaviour
         return hit.collider != null;
     }
 }
-
-#endif
