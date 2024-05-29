@@ -18,6 +18,7 @@ public class MonsterHealth : MonoBehaviour
     public bool isTakingDamage;
 
     public float knockBackCounter;
+    public float knockBackDuration;
 
     private Rigidbody2D enemyRb;
     public float additionalDamageMultiplier = 1f;
