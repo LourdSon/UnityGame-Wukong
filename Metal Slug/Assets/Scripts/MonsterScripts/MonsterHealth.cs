@@ -16,6 +16,7 @@ public class MonsterHealth : MonoBehaviour
     public ParticleSystem damageParticles;
     private ParticleSystem damageParticlesInstance;
     public bool isTakingDamage;
+
     public float knockBackCounter;
 
     private Rigidbody2D enemyRb;
