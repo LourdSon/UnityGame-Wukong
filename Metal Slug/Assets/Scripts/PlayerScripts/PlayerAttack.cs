@@ -79,7 +79,7 @@ public class PlayerAttack : MonoBehaviour
 
     private void Attackp()
     {
-        float upwardAttackKey = Input.GetAxis("Vertical");
+        float upwardAttackKey = Input.GetAxisRaw("Vertical");
         int upwardAttackKeyInt = Mathf.RoundToInt(upwardAttackKey);
 
         // Vérifier si la touche pour l'attaque vers le haut est maintenue enfoncée

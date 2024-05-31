@@ -48,6 +48,7 @@ public class PlayerMovement : MonoBehaviour
     public float dashCooldown = 1f; // Le temps de recharge du dash
     private float nextDashTime; // Temps auquel le prochain dash sera autorisé
     public bool isDashing = false;
+    public float speedReductionDuration = 0.5f;
 
     [Header("Instant Dash movement")]
     public float instantDashForce = 10f; // La force du dash
@@ -297,12 +298,27 @@ public class PlayerMovement : MonoBehaviour
         
         isDashing = false;
         jumpCounter = 1;
-        while(moveSpeed > defaultSpeed)
-        {
-            moveSpeed -= 1.1f*Time.deltaTime;
-
-        }
+        //moveSpeed -= dashForce;
+        
+        StartCoroutine(ReduceSpeedGradually(defaultSpeed, speedReductionDuration));
+        
     }
+
+    private IEnumerator ReduceSpeedGradually(float targetSpeed, float duration)
+    {
+        float startSpeed = moveSpeed;
+        float time = 0;
+
+        while (time < duration)
+        {
+            moveSpeed = Mathf.Lerp(startSpeed, targetSpeed, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        moveSpeed = targetSpeed;
+    }
+
 
     private void ChargeKi()
     {
