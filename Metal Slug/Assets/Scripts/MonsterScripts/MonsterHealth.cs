@@ -118,7 +118,7 @@ public class MonsterHealth : MonoBehaviour
                 
                 float impactForce = collision.relativeVelocity.magnitude;
                 float additionalDamage = impactForce * additionalDamageMultiplier;
-                otherEnemy.TakeDamage(300f + additionalDamage);
+                otherEnemy.TakeDamage(10f + additionalDamage);
                                
             }
 
@@ -140,7 +140,7 @@ public class MonsterHealth : MonoBehaviour
         float additionalDamage =  impactForce * additionalDamageMultiplier;
         yield return new WaitUntil(() => IsGrounded());
         CameraShakeManager.instance.CameraShake(impulseSource);
-        TakeDamage(300f + additionalDamage);
+        TakeDamage(10f + additionalDamage);
         yield return null;
     }
 

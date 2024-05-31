@@ -225,7 +225,7 @@ public class PlayerAttack : MonoBehaviour
             }
             
         }
-        tileDestroyer.OGDestructionMouse();
+        //tileDestroyer.OGDestructionMouse();
         yield return null;
         
     }

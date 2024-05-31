@@ -278,11 +278,12 @@ public class PlayerMovement : MonoBehaviour
         CameraShakeManager.instance.CameraShake(impulseSource);
         SpawnDashParticles();
         // Déterminer la direction du dash en fonction des entrées du joueur
-        Vector2 dashMovement = new Vector2(horizontalInput, playerRb.velocity.y);
+        Vector2 dashMovement = new Vector2(horizontalInput, verticalInput);
+        float defaultSpeed = moveSpeed;
         moveSpeed += dashForce;
 
-        
-        playerRb.AddForce(Vector2.right * dashForce,ForceMode2D.Impulse);
+        playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce/2);
+        //playerRb.AddForce(dashMovement * dashForce,ForceMode2D.Impulse);
         BoxCollider2D boxCollider = GetComponent<BoxCollider2D>();
         boxCollider.enabled = false;
         
@@ -296,7 +297,11 @@ public class PlayerMovement : MonoBehaviour
         
         isDashing = false;
         jumpCounter = 1;
-        moveSpeed -= dashForce;
+        while(moveSpeed > defaultSpeed)
+        {
+            moveSpeed -= 1.1f*Time.deltaTime;
+
+        }
     }
 
     private void ChargeKi()
@@ -318,7 +323,7 @@ public class PlayerMovement : MonoBehaviour
         currentKi = Mathf.Clamp(currentKi, 0, maxKi);
         UpdateKiBar();
         KiCharging.gameObject.SetActive(true);
-        tileDestroyer.DestructionMouse();
+        //tileDestroyer.DestructionMouse();
         if (KiCharging.gameObject.activeSelf)
         {
             audioSource.PlayOneShot(soundEffect, 0.25f);
