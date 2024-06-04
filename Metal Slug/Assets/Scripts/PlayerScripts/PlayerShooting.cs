@@ -14,12 +14,11 @@ public class PlayerShooting : MonoBehaviour
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
 
-    public float timeBtwAttacks = 0.15f;
+    public float timeBtwAttacks = 3f;
     public float attackTimeCounter;
     private Animator animator;
 
 
-    
     //public int damage = 10;
     //public MonsterHealth monsterHealth;
     public Vector3 offset = new Vector3(2.5f, 0f, 0f);
@@ -29,7 +28,7 @@ public class PlayerShooting : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        attackTimeCounter = timeBtwAttacks;
+        attackTimeCounter = 0f;
         animator = GetComponent<Animator>();
         
     }
@@ -54,7 +53,7 @@ public class PlayerShooting : MonoBehaviour
         float scaleMultiplier = 1 + (cKi / mkI);
 
         // Vérifie si l'entrée n'est pas nulle (si le joueur appuie sur les touches de direction)
-        if (horizontalInput != 0 && mouseRight && attackTimeCounter >= timeBtwAttacks || verticalInput != 0 && mouseRight && attackTimeCounter >= timeBtwAttacks)
+        if (horizontalInput != 0 && mouseRight && attackTimeCounter <= 0f || verticalInput != 0 && mouseRight && attackTimeCounter <= 0f)
         {
             animator.SetTrigger("SimpleShootingTrigger");
             // Calcule la direction de tir en fonction des entrées horizontales et verticales
@@ -66,9 +65,9 @@ public class PlayerShooting : MonoBehaviour
             Rigidbody2D rb = energyBall.GetComponent<Rigidbody2D>();
             // Applique une force à la boule d'énergie dans la direction de tir
             rb.velocity = shootDirection * energyBallSpeed;
-            attackTimeCounter = 0;
+            attackTimeCounter = timeBtwAttacks;
 
-        } else if(rb.velocity.x == 0 && mouseRight && attackTimeCounter >= timeBtwAttacks)
+        } else if(rb.velocity.x == 0 && mouseRight && attackTimeCounter <= 0f)
         {
             animator.SetTrigger("SimpleShootingTrigger");
             // Obtenir la direction actuelle du sprite du joueur
@@ -80,10 +79,14 @@ public class PlayerShooting : MonoBehaviour
             Rigidbody2D rb = energyBall.GetComponent<Rigidbody2D>();
             // Applique une force à la boule d'énergie dans la direction de tir sur l'axe x
             rb.velocity = direction * Vector2.right * energyBallSpeed;
-            attackTimeCounter = 0;
+            attackTimeCounter = timeBtwAttacks;
 
         }
-        attackTimeCounter += Time.deltaTime;
+
+        if (attackTimeCounter >= 0f)
+        {
+            attackTimeCounter -= Time.deltaTime;
+        }
     }
 
 
