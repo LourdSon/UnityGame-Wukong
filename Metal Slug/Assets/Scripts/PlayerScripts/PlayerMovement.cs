@@ -132,10 +132,10 @@ public class PlayerMovement : MonoBehaviour
             
             MovePlayer();
             Jump();
-            ResetPosition();
-            DashPress();
-            ChargeKi();   
-            InstantDash();
+            ResetPosition(); // P
+            DashPress(); // Q
+            ChargeKi(); // E
+            InstantDash(); // V
             ThorTest();
         } 
         //PunchAttack();
@@ -458,5 +458,5 @@ public class PlayerMovement : MonoBehaviour
                     thorHammer.ReturnObject();
                 }
     }
-    
+
 }
