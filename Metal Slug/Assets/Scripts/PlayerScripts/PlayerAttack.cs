@@ -85,16 +85,17 @@ public class PlayerAttack : MonoBehaviour
         int upwardAttackKeyInt = Mathf.RoundToInt(upwardAttackKey);
 
         // Vérifier si la touche pour l'attaque vers le haut est maintenue enfoncée
-        if (upwardAttackKey == 1)
+        if (upwardAttackKeyInt == 1)
         {
             isHoldingUpwardKey = true;
             isHoldingDownwardKey = false;
         }
-        else if (upwardAttackKey == -1)
+        else if (upwardAttackKeyInt == -1)
         {
             isHoldingUpwardKey = false;
             isHoldingDownwardKey = true;
         }
+    
 
 
         if (Input.GetKeyDown(forwardAttackKey) && isHoldingUpwardKey && attackTimeCounterUpward <= 0f)
@@ -108,7 +109,10 @@ public class PlayerAttack : MonoBehaviour
 
             Vector2 detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
-
+            if (colliders.Length >= 1)
+            {
+                playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
+            }
             // Appliquer une force pour projeter les ennemis vers le haut
             foreach (Collider2D collider in colliders)
             {
@@ -116,7 +120,7 @@ public class PlayerAttack : MonoBehaviour
                 if (enemyRb != null)
                 {
                     enemyRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
-                    playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
+                    //playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
 
 
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
@@ -139,7 +143,10 @@ public class PlayerAttack : MonoBehaviour
 
             Vector2 detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
-
+            if (colliders.Length >= 1)
+            {
+                playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
+            }
             // Appliquer une force pour projeter les ennemis vers l'avant
             foreach (Collider2D collider in colliders)
             {
@@ -149,7 +156,7 @@ public class PlayerAttack : MonoBehaviour
                     Vector2 directionVector =
                         ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
                     enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
-                    playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
+                    //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
 
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                     monsterHealth.TakeDamage(damage);
