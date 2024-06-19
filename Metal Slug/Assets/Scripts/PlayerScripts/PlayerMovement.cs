@@ -262,7 +262,7 @@ public class PlayerMovement : MonoBehaviour
     private void DashPress()
     {
         // Si le joueur appuie sur le bouton de dash et le dash est prêt
-        if (Input.GetKeyDown(KeyCode.Q) && Time.time > nextDashTime)
+        if (Input.GetAxis("Dash") == 1  && Time.time > nextDashTime)
         {
             isDashing = true;
             animator.SetBool("IsDashing", true);
@@ -322,7 +322,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void ChargeKi()
     {
-        if(Input.GetKeyDown(KeyCode.E) && Time.time > nextChargeTime && isGrounded)
+        if(Input.GetAxisRaw("Charging") == 1  && Time.time > nextChargeTime && isGrounded)
         {
             animator.SetBool("IsCharging", true);
             animator.SetTrigger("ChargingTrigger");

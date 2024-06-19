@@ -647,8 +647,8 @@ MonoBehaviour:
   healthBar: {fileID: 8625073265188582122}
   damageParticles: {fileID: 1132110526623212655, guid: 7476291775d6d264f8ad52f6dff1edb5, type: 3}
   isTakingDamage: 0
-  knockBackDuration: 1
   knockBackCounter: 0
+  knockBackDuration: 1
   additionalDamageMultiplier: 2
   rayDistance: 2
   groundLayerMask:
@@ -697,7 +697,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 30
-  impactParticles: {fileID: 5704859988347745721, guid: 00af0f8b0b77e1145846592e6db7b5b8, type: 3}
+  impactParticles: {fileID: 5197920272909818295, guid: 72be00577ebc75e439a30525e336b9ba, type: 3}
 --- !u!114 &7389688462781611766
 MonoBehaviour:
   m_ObjectHideFlags: 0

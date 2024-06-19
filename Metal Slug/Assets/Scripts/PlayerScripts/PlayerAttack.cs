@@ -24,12 +24,12 @@ public class PlayerAttack : MonoBehaviour
     public LayerMask enemyLayerMask; // Masque de layer pour les ennemis
 
     public SpriteRenderer spriteRenderer; // Référence au composant SpriteRenderer du joueur
-    private bool isHoldingUpwardKey = false; // Indique si la touche pour l'attaque vers le haut est maintenue enfoncée
-    private bool isHoldingDownwardKey = false;
 
 
     private Animator animator;
-    [Header("Attacks timer")] public float timeBtwAttacks = 2f;
+
+    [Header("Attacks timer")] 
+    public float timeBtwAttacks = 2f;
     public float attackTimeCounter;
 
     public float timeBtwAttacksUpward = 2f;
@@ -82,33 +82,21 @@ public class PlayerAttack : MonoBehaviour
     {
         float upwardAttackKey = Input.GetAxisRaw("Vertical");
 
-        int upwardAttackKeyInt = Mathf.RoundToInt(upwardAttackKey);
+        
 
-        // Vérifier si la touche pour l'attaque vers le haut est maintenue enfoncée
-        if (upwardAttackKeyInt == 1)
-        {
-            isHoldingUpwardKey = true;
-            isHoldingDownwardKey = false;
-        }
-        else if (upwardAttackKeyInt == -1)
-        {
-            isHoldingUpwardKey = false;
-            isHoldingDownwardKey = true;
-        }
+        
     
 
 
-        if (Input.GetKeyDown(forwardAttackKey) && isHoldingUpwardKey && attackTimeCounterUpward <= 0f)
+        if (Input.GetButtonDown("Fire1") && upwardAttackKey == 1 && attackTimeCounterUpward <= 0f)
         {
             // Obtenir la direction actuelle du sprite du joueur
             int direction = spriteRenderer.flipX ? -1 : 1;
-
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterUpward = timeBtwAttacksUpward;
-
-
             Vector2 detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
+
             if (colliders.Length >= 1)
             {
                 playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
@@ -133,16 +121,15 @@ public class PlayerAttack : MonoBehaviour
             }
         }
 
-        else if (Input.GetKeyDown(forwardAttackKey) && attackTimeCounter <= 0f)
+        else if (Input.GetButtonDown("Fire1")  && attackTimeCounter <= 0f)
         {
             // Obtenir la direction actuelle du sprite du joueur
             int direction = spriteRenderer.flipX ? -1 : 1;
-
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounter = timeBtwAttacks;
-
             Vector2 detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
+
             if (colliders.Length >= 1)
             {
                 playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
@@ -167,7 +154,7 @@ public class PlayerAttack : MonoBehaviour
             }
         }
 
-        else if (Input.GetKeyDown(forwardAttackKey) && isHoldingDownwardKey && attackTimeCounterDownward <= 0f)
+        else if (Input.GetButtonDown("Fire1") && upwardAttackKey == -1 && attackTimeCounterDownward <= 0f)
         {
             int direction = spriteRenderer.flipX ? -1 : 1;
             animator.SetTrigger("SimpleAttackTrigger");
@@ -175,11 +162,11 @@ public class PlayerAttack : MonoBehaviour
             Vector2 detectionPosition = (Vector2)transform.position + Vector2.down * detectionOffsetAir.y +
                                         Vector2.right * direction * detectionOffsetAir.x;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
+
             if (colliders.Length >= 1)
             {
                 playerRb.AddForce(Vector2.up * selfForceMagnitudeForward * 2.5f, ForceMode2D.Impulse);
             }
-
             foreach (Collider2D collider in colliders)
             {
                 Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
@@ -199,7 +186,7 @@ public class PlayerAttack : MonoBehaviour
             }
         }
 
-        else if (Input.GetKeyDown(KeyCode.C) && attackTimeCounterSlam <= 0f)
+        else if (Input.GetButtonDown("Fire2")  && attackTimeCounterSlam <= 0f)
         {
             //animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterSlam = timeBtwAttacksSlam;

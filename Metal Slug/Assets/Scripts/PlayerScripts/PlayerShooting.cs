@@ -45,7 +45,7 @@ public class PlayerShooting : MonoBehaviour
         // Obtient les valeurs des entrées horizontales et verticales
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
-        bool mouseRight = Input.GetMouseButtonDown(1);
+        bool mouseRight = Input.GetButtonDown("Shooting");
 
         PlayerMovement playerKi = GetComponent<PlayerMovement>();
         float cKi = playerKi.currentKi;
