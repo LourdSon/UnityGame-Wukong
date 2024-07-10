@@ -30,7 +30,7 @@ public class MonsterMovement : MonoBehaviour
         
     }
 
-    void Update()
+    void FixedUpdate()
     {
         
         DetectPlayer();

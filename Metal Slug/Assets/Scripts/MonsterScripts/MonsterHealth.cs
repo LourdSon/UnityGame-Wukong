@@ -103,25 +103,16 @@ public class MonsterHealth : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-
-        
-
-
         if (collision.gameObject.CompareTag("Enemy"))
         {
-             
-
             // Vérifie si la collision est suffisamment forte pour causer des dégâts supplémentaires
             MonsterHealth otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
             if (enemyRb != null && enemyRb.velocity.magnitude > 15f && otherEnemy != null)
-            {
-                
+            {               
                 float impactForce = collision.relativeVelocity.magnitude;
                 float additionalDamage = impactForce * additionalDamageMultiplier;
-                otherEnemy.TakeDamage(10f + additionalDamage);
-                               
+                otherEnemy.TakeDamage(10f + additionalDamage);                               
             }
-
         }
     }
 

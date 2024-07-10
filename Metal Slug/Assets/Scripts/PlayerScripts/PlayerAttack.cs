@@ -56,6 +56,15 @@ public class PlayerAttack : MonoBehaviour
     public float doubleChocTimer = 0.2f;
 
 
+    private Vector2 detectionPositionNew;
+    private Vector2 detectionPositionDownNew;
+
+    public bool attack1;
+    public bool attack2;
+    public bool attack3;
+    public bool attack4;
+
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>(); // Récupérer le composant SpriteRenderer
@@ -70,6 +79,11 @@ public class PlayerAttack : MonoBehaviour
         tileDestroyer = GetComponentInChildren<TileDestroyer>();
         impulseSource = GetComponent<CinemachineImpulseSource>();
 
+        attack1 = false;
+        attack2 = false;
+        attack3 = false;
+        attack4 = false;
+
     }
 
     void Update()
@@ -77,121 +91,54 @@ public class PlayerAttack : MonoBehaviour
         Attackp();
     }
 
+    void FixedUpdate()
+    {
+        Attack1234();
+    }
 
     private void Attackp()
     {
         float upwardAttackKey = Input.GetAxisRaw("Vertical");
-
+        int direction = spriteRenderer.flipX ? -1 : 1;
+        Vector2 detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
+        detectionPositionNew = new Vector2(detectionPosition.x, detectionPosition.y);
         
-
+        Vector2 detectionPositionDown = (Vector2)transform.position + Vector2.down * detectionOffsetAir.y + Vector2.right * direction * detectionOffsetAir.x;
+        detectionPositionDownNew = new Vector2(detectionPositionDown.x, detectionPositionDown.y);
         
-    
-
+        
 
         if (Input.GetButtonDown("Fire1") && upwardAttackKey == 1 && attackTimeCounterUpward <= 0f)
         {
             // Obtenir la direction actuelle du sprite du joueur
-            int direction = spriteRenderer.flipX ? -1 : 1;
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterUpward = timeBtwAttacksUpward;
-            Vector2 detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
-
-            if (colliders.Length >= 1)
-            {
-                playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
-            }
-            // Appliquer une force pour projeter les ennemis vers le haut
-            foreach (Collider2D collider in colliders)
-            {
-                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
-                if (enemyRb != null)
-                {
-                    enemyRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
-                    //playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
-
-
-                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
-                    monsterHealth.TakeDamage(damage);
-
-
-                    //Debug.Log("enemy velocity :" + enemyRb.velocity);
-                    Debug.Log("enemy velocity :" + enemyRb.velocity.magnitude);
-                }
-            }
+            attack1 = true;
+            
         }
 
         else if (Input.GetButtonDown("Fire1")  && attackTimeCounter <= 0f)
         {
-            // Obtenir la direction actuelle du sprite du joueur
-            int direction = spriteRenderer.flipX ? -1 : 1;
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounter = timeBtwAttacks;
-            Vector2 detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
-
-            if (colliders.Length >= 1)
-            {
-                playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
-            }
-            // Appliquer une force pour projeter les ennemis vers l'avant
-            foreach (Collider2D collider in colliders)
-            {
-                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
-                if (enemyRb != null)
-                {
-                    Vector2 directionVector =
-                        ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
-                    enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
-                    //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
-
-                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
-                    monsterHealth.TakeDamage(damage);
-
-                    //Debug.Log("enemy velocity :" + enemyRb.velocity);
-                    Debug.Log("enemy velocity :" + enemyRb.velocity.magnitude);
-                }
-            }
+            attack2 = true;
         }
 
         else if (Input.GetButtonDown("Fire1") && upwardAttackKey == -1 && attackTimeCounterDownward <= 0f)
         {
-            int direction = spriteRenderer.flipX ? -1 : 1;
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterDownward = timeBtwAttacksDownward;
-            Vector2 detectionPosition = (Vector2)transform.position + Vector2.down * detectionOffsetAir.y +
-                                        Vector2.right * direction * detectionOffsetAir.x;
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
-
-            if (colliders.Length >= 1)
-            {
-                playerRb.AddForce(Vector2.up * selfForceMagnitudeForward * 2.5f, ForceMode2D.Impulse);
-            }
-            foreach (Collider2D collider in colliders)
-            {
-                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
-                if (enemyRb != null)
-                {
-                    enemyRb.AddForce(Vector2.down * forceMagnitudeDownward, ForceMode2D.Impulse);
-
-                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
-
-                    monsterHealth.TakeDamage(damage);
-                    monsterHealth.ContactDamage();
-
-                    //Debug.Log("enemy velocity :" + enemyRb.velocity);
-                    Debug.Log("enemy velocity :" + enemyRb.velocity.magnitude);
-                }
-
-            }
+            attack3 = true;
+            
         }
 
         else if (Input.GetButtonDown("Fire2")  && attackTimeCounterSlam <= 0f)
         {
             //animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterSlam = timeBtwAttacksSlam;
-
-            StartCoroutine(WaitForLanding());
+            attack4 = true;
+            
+            
         }
 
         attackTimeCounter = TimerDecrement(attackTimeCounter);
@@ -230,9 +177,8 @@ public class PlayerAttack : MonoBehaviour
                     monsterHealth.TakeDamage(damage);
                 }
             }
-
         }
-
+        attack4 = false;
         //tileDestroyer.OGDestructionMouse();
         yield return null;
 
@@ -263,4 +209,98 @@ public class PlayerAttack : MonoBehaviour
         Debug.DrawRay(transform.position, Vector2.down * rayDistance, Color.red);
         return hit.collider != null;
     }
+
+    
+    private void Attack1234()
+    {
+        if (attack1 == true)
+        {
+            StartCoroutine(Attack1Co());
+        }
+        else if (attack2 == true)
+        {
+            StartCoroutine(Attack2Co());
+        }
+        else if (attack3 == true)
+        {
+            StartCoroutine(Attack3Co());
+        }else if (attack4 == true)
+        {
+            StartCoroutine(WaitForLanding());
+        }
+    }
+
+    private IEnumerator Attack1Co()
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionNew, detectionRadius, enemyLayerMask);
+        if (colliders.Length >= 1)
+            {
+                playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
+            }
+            // Appliquer une force pour projeter les ennemis vers le haut
+            foreach (Collider2D collider in colliders)
+            {
+                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+                if (enemyRb != null)
+                {
+                    enemyRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
+                    //playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
+                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+                    monsterHealth.TakeDamage(damage);
+                }
+            }
+            attack1 = false;
+            yield return null;
+    }
+
+    private IEnumerator Attack2Co()
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionNew, detectionRadius, enemyLayerMask);
+        if (colliders.Length >= 1)
+            {
+                playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
+            }
+            // Appliquer une force pour projeter les ennemis vers l'avant
+            foreach (Collider2D collider in colliders)
+            {
+                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+                if (enemyRb != null)
+                {
+                    Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                    enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
+                    //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
+
+                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+                    monsterHealth.TakeDamage(damage);
+                }
+            }
+            attack2 = false;
+            yield return null;
+    }
+
+    private IEnumerator Attack3Co()
+    {
+        Collider2D[] collidersDown = Physics2D.OverlapCircleAll(detectionPositionDownNew, detectionRadius, enemyLayerMask);
+        if (collidersDown.Length >= 1)
+            {
+                playerRb.AddForce(Vector2.up * selfForceMagnitudeForward * 2.5f, ForceMode2D.Impulse);
+            }
+            foreach (Collider2D collider in collidersDown)
+            {
+                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+                if (enemyRb != null)
+                {
+                    enemyRb.AddForce(Vector2.down * forceMagnitudeDownward, ForceMode2D.Impulse);
+
+                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+
+                    monsterHealth.TakeDamage(damage);
+                    monsterHealth.ContactDamage();
+                }
+
+            }
+            attack3 = false;
+            yield return null;
+    }
+
 }

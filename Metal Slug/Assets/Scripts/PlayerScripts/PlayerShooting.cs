@@ -34,7 +34,7 @@ public class PlayerShooting : MonoBehaviour
     }
 
     // Update est appelée une fois par frame
-    void Update()
+    void FixedUpdate()
     {
         Shooting();
 

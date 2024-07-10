@@ -30,7 +30,6 @@ public class Parallax : MonoBehaviour
     {
         float tempx = cam.transform.position.x * (1 - parallaxEffect);
         float distancex = cam.transform.position.x * parallaxEffect;
-
         float distancey = cam.transform.position.y * parallaxEffect;
 
         

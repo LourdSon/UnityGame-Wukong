@@ -125,7 +125,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if(playerRb!= null)
         {
@@ -182,26 +182,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    private void PunchAttack()
-    {
-        if (Input.GetKeyDown(KeyCode.T) && isGrounded && Time.time > nextPunchAttackTime)
-        {
-            
-            StartCoroutine(PunchCo());
-            nextPunchAttackTime = Time.time + punchAttackCooldown;
-
-        }
-    }
-
-
-    private IEnumerator PunchCo()
-    {
-        animator.SetBool("IsPunching", true);
-        yield return new WaitForSeconds(punchAttackDuration);
-        animator.SetBool("IsPunching", false);
-    }
-
-
     private void Jump()
     {
         //Jump
@@ -211,19 +191,13 @@ public class PlayerMovement : MonoBehaviour
             Vector2 jumpVelocity = new Vector2(playerRb.velocity.x, jumpForce);
             playerRb.velocity = Vector2.Lerp(playerRb.velocity, jumpVelocity, jumpCurve.Evaluate(jumpTime));
             animator.SetBool("IsJumping", true);
-            animator.SetTrigger("JumpingTrigger");
-            //float time = Map(playerRb.velocity.y, jumpForce, -jumpForce, 0, 1, true);
-            //animator.Play("Jumping", 0, time);
-            //animator.speed = 0;   
-                        
-            jumpCounter -=1;         
-            
+            animator.SetTrigger("JumpingTrigger");                         
+            jumpCounter -=1;                    
             if (jumpCounter == 0)
             {   
                 isGrounded = false;
                 jumpCounter = 2;   
             }
-
         }
     }
 
@@ -274,8 +248,6 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator Dash()
     {
-
-
         CameraShakeManager.instance.CameraShake(impulseSource);
         SpawnDashParticles();
         // Déterminer la direction du dash en fonction des entrées du joueur
