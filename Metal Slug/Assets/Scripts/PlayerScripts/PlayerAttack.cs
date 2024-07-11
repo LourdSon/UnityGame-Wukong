@@ -56,8 +56,8 @@ public class PlayerAttack : MonoBehaviour
     public float doubleChocTimer = 0.2f;
 
 
-    private Vector2 detectionPositionNew;
-    private Vector2 detectionPositionDownNew;
+    private Vector2 detectionPosition;
+    private Vector2 detectionPositionDown;
 
     public bool attack1;
     public bool attack2;
@@ -100,11 +100,11 @@ public class PlayerAttack : MonoBehaviour
     {
         float upwardAttackKey = Input.GetAxisRaw("Vertical");
         int direction = spriteRenderer.flipX ? -1 : 1;
-        Vector2 detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
-        detectionPositionNew = new Vector2(detectionPosition.x, detectionPosition.y);
+        detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
+        //detectionPositionNew = new Vector2(detectionPosition.x, detectionPosition.y);
         
-        Vector2 detectionPositionDown = (Vector2)transform.position + Vector2.down * detectionOffsetAir.y + Vector2.right * direction * detectionOffsetAir.x;
-        detectionPositionDownNew = new Vector2(detectionPositionDown.x, detectionPositionDown.y);
+        detectionPositionDown = (Vector2)transform.position + Vector2.down * detectionOffsetAir.y + Vector2.right * direction * detectionOffsetAir.x;
+        
         
         
 
@@ -216,46 +216,50 @@ public class PlayerAttack : MonoBehaviour
         if (attack1 == true)
         {
             StartCoroutine(Attack1Co());
+            attack1 = false;
         }
         else if (attack2 == true)
         {
             StartCoroutine(Attack2Co());
+            attack2 = false;
         }
         else if (attack3 == true)
         {
             StartCoroutine(Attack3Co());
-        }else if (attack4 == true)
+            attack3 = false;
+        }
+        else if (attack4 == true)
         {
             StartCoroutine(WaitForLanding());
+            attack4 = false;
         }
     }
 
     private IEnumerator Attack1Co()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionNew, detectionRadius, enemyLayerMask);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
         if (colliders.Length >= 1)
+        {
+            playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
+        }
+        // Appliquer une force pour projeter les ennemis vers le haut
+        foreach (Collider2D collider in colliders)
+        {
+            Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+            if (enemyRb != null)
             {
-                playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
+                enemyRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
+                MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+                monsterHealth.TakeDamage(damage);
             }
-            // Appliquer une force pour projeter les ennemis vers le haut
-            foreach (Collider2D collider in colliders)
-            {
-                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
-                if (enemyRb != null)
-                {
-                    enemyRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
-                    //playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
-                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
-                    monsterHealth.TakeDamage(damage);
-                }
-            }
-            attack1 = false;
-            yield return null;
+        }
+        attack1 = false;
+        yield return null;
     }
 
     private IEnumerator Attack2Co()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionNew, detectionRadius, enemyLayerMask);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
         if (colliders.Length >= 1)
             {
                 playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
@@ -280,7 +284,7 @@ public class PlayerAttack : MonoBehaviour
 
     private IEnumerator Attack3Co()
     {
-        Collider2D[] collidersDown = Physics2D.OverlapCircleAll(detectionPositionDownNew, detectionRadius, enemyLayerMask);
+        Collider2D[] collidersDown = Physics2D.OverlapCircleAll(detectionPositionDown, detectionRadius, enemyLayerMask);
         if (collidersDown.Length >= 1)
             {
                 playerRb.AddForce(Vector2.up * selfForceMagnitudeForward * 2.5f, ForceMode2D.Impulse);

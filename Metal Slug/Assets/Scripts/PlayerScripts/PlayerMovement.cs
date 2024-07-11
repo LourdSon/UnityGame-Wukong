@@ -96,7 +96,10 @@ public class PlayerMovement : MonoBehaviour
     public TileDestroyer tileDestroyer;
     
 
-    
+    private Vector2 movement;
+    private Vector2 jumpVelocity;
+    private bool jumpBool;
+    private bool isCharging;
     
 
     
@@ -119,9 +122,18 @@ public class PlayerMovement : MonoBehaviour
 
         impulseSource = GetComponent<CinemachineImpulseSource>();
 
-        tileDestroyer = GetComponentInChildren<TileDestroyer>();
+        //tileDestroyer = GetComponentInChildren<TileDestroyer>();
         
         
+    }
+
+
+    void Update()
+    {
+        ReadInputMove();
+        ReadInputJump();
+        ReadDashPress();
+        ReadChargeKi();
     }
 
     // Update is called once per frame
@@ -142,24 +154,15 @@ public class PlayerMovement : MonoBehaviour
             
     }
 
-
-
-    private void MovePlayer()
+    private void ReadInputMove()
     {
-        
+
             //Get Axis from Unity
             horizontalInput = Input.GetAxisRaw("Horizontal");
             verticalInput = Input.GetAxisRaw("Vertical");
-
-            //Move the character
-            //transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
-            //playerRb.AddForce(Vector2.right * horizontalInput * moveSpeed);
-
             float horizontalMove = horizontalInput * moveSpeed;
-            Vector2 movement = new Vector2(horizontalMove, playerRb.velocity.y);
-            playerRb.velocity = movement;
+            movement = new Vector2(horizontalMove, playerRb.velocity.y);
             animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
-
             //Flip sprite
             if (horizontalInput != 0)
             {
@@ -177,33 +180,42 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("IsWalking", false);
                 animator.SetBool("IsIdling", true);
             }
+    }
 
-        
+    private void MovePlayer()
+    {
+            //Move the character
+            //transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
+            //playerRb.AddForce(Vector2.right * horizontalInput * moveSpeed);
+            playerRb.velocity = movement;       
     }
 
 
     private void Jump()
     {
+        if (jumpBool)
+        {
+            playerRb.velocity = Vector2.Lerp(playerRb.velocity, jumpVelocity, jumpCurve.Evaluate(jumpTime));
+            jumpBool = false;
+        }
+    }
+    private void ReadInputJump()
+    {
         //Jump
         if(Input.GetButtonDown("Jump") && isGrounded)
         {
             CameraShakeManager.instance.CameraShake(impulseSource);
-            Vector2 jumpVelocity = new Vector2(playerRb.velocity.x, jumpForce);
-            playerRb.velocity = Vector2.Lerp(playerRb.velocity, jumpVelocity, jumpCurve.Evaluate(jumpTime));
+            jumpVelocity = new Vector2(playerRb.velocity.x, jumpForce);
             animator.SetBool("IsJumping", true);
-            animator.SetTrigger("JumpingTrigger");                         
+            animator.SetTrigger("JumpingTrigger");     
+            jumpBool = true;                    
             jumpCounter -=1;                    
             if (jumpCounter == 0)
             {   
                 isGrounded = false;
-                jumpCounter = 2;   
+                jumpCounter = 2;
             }
         }
-    }
-
-    private float Map(float y, float jumpForce, float v1, int v2, int v3, bool v4)
-    {
-        throw new NotImplementedException();
     }
 
 
@@ -227,22 +239,26 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = true;
             jumpCounter = 2;
             animator.SetBool("IsJumping", false);
-            
         }
     }
 
 
-    
     private void DashPress()
+    {
+        if(isDashing)
+        {
+            StartCoroutine(Dash());
+            isDashing = false;
+        }
+    }
+    private void ReadDashPress()
     {
         // Si le joueur appuie sur le bouton de dash et le dash est prêt
         if (Input.GetAxis("Dash") == 1  && Time.time > nextDashTime)
         {
             isDashing = true;
             animator.SetBool("IsDashing", true);
-            StartCoroutine(Dash());
             nextDashTime = Time.time + dashCooldown; // Mettre à jour le temps de recharge du dash
-            
         }
     }
 
@@ -291,14 +307,21 @@ public class PlayerMovement : MonoBehaviour
         moveSpeed = targetSpeed;
     }
 
-
     private void ChargeKi()
+    {
+        if(isCharging)
+        {
+            StartCoroutine(KiChargingCo());
+            isCharging = false;
+        }
+    }
+    private void ReadChargeKi()
     {
         if(Input.GetAxisRaw("Charging") == 1  && Time.time > nextChargeTime && isGrounded)
         {
             animator.SetBool("IsCharging", true);
             animator.SetTrigger("ChargingTrigger");
-            StartCoroutine(KiChargingCo());
+            isCharging = true;
             nextChargeTime = Time.time + chargeCooldown;
             
         }

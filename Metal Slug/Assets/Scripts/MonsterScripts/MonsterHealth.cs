@@ -63,7 +63,7 @@ public class MonsterHealth : MonoBehaviour
         SpawnDamageParticles();
 
         //ContactDamage();
-        StartCoroutine(FlashCoroutine());
+        //StartCoroutine(FlashCoroutine());
 
         health -= damage;
         healthBar.UpdateHealthBar(health,maxHealth);
