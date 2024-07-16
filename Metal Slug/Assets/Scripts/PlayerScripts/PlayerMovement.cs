@@ -139,17 +139,15 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(playerRb!= null)
-        {
+        
             
-            MovePlayer();
-            Jump();
-            ResetPosition(); // P
-            DashPress(); // Q
-            ChargeKi(); // E
-            InstantDash(); // V
-            ThorTest();
-        } 
+        MovePlayer();
+        Jump();
+        ResetPosition(); // P
+        DashPress(); // Q
+        ChargeKi(); // E
+        InstantDash(); // V
+        ThorTest();
         //PunchAttack();
             
     }
@@ -161,7 +159,7 @@ public class PlayerMovement : MonoBehaviour
             horizontalInput = Input.GetAxisRaw("Horizontal");
             verticalInput = Input.GetAxisRaw("Vertical");
             float horizontalMove = horizontalInput * moveSpeed;
-            movement = new Vector2(horizontalMove, playerRb.velocity.y);
+            movement = new Vector2(horizontalMove, 0);
             animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
             //Flip sprite
             if (horizontalInput != 0)
@@ -187,7 +185,7 @@ public class PlayerMovement : MonoBehaviour
             //Move the character
             //transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
             //playerRb.AddForce(Vector2.right * horizontalInput * moveSpeed);
-            playerRb.velocity = movement;       
+        playerRb.velocity = new Vector2(movement.x, playerRb.velocity.y);       
     }
 
 
@@ -204,7 +202,6 @@ public class PlayerMovement : MonoBehaviour
         //Jump
         if(Input.GetButtonDown("Jump") && isGrounded)
         {
-            CameraShakeManager.instance.CameraShake(impulseSource);
             jumpVelocity = new Vector2(playerRb.velocity.x, jumpForce);
             animator.SetBool("IsJumping", true);
             animator.SetTrigger("JumpingTrigger");     
@@ -270,7 +267,6 @@ public class PlayerMovement : MonoBehaviour
         Vector2 dashMovement = new Vector2(horizontalInput, verticalInput);
         float defaultSpeed = moveSpeed;
         moveSpeed += dashForce;
-
         playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce/2);
         //playerRb.AddForce(dashMovement * dashForce,ForceMode2D.Impulse);
         BoxCollider2D boxCollider = GetComponent<BoxCollider2D>();
@@ -295,16 +291,16 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator ReduceSpeedGradually(float targetSpeed, float duration)
     {
         float startSpeed = moveSpeed;
-        float time = 0;
+        //float time = 1;
 
-        while (time < duration)
+        if (/*time < duration &&*/ moveSpeed > targetSpeed)
         {
-            moveSpeed = Mathf.Lerp(startSpeed, targetSpeed, time / duration);
-            time += Time.deltaTime;
+            moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, /*time /*/ duration);
+            //time += Time.deltaTime;
             yield return null;
         }
 
-        moveSpeed = targetSpeed;
+        //moveSpeed = targetSpeed;
     }
 
     private void ChargeKi()

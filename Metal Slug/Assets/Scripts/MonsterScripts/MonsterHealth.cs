@@ -21,7 +21,8 @@ public class MonsterHealth : MonoBehaviour
     public float knockBackDuration;
 
     private Rigidbody2D enemyRb;
-    public float additionalDamageMultiplier = 1f;
+    public float additionalDamageMultiplier = 0.1f;
+    public float normalDamage = 10f;
 
     public float rayDistance = 5f;
     public LayerMask groundLayerMask;
@@ -111,7 +112,15 @@ public class MonsterHealth : MonoBehaviour
             {               
                 float impactForce = collision.relativeVelocity.magnitude;
                 float additionalDamage = impactForce * additionalDamageMultiplier;
-                otherEnemy.TakeDamage(10f + additionalDamage);                               
+                otherEnemy.TakeDamage(normalDamage + additionalDamage);                               
+            }
+        } else if(collision.gameObject.CompareTag("Ground"))
+        {
+            if(enemyRb.velocity.magnitude > 15f)
+            {
+                float impactForce = collision.relativeVelocity.magnitude;
+                float additionalDamage = impactForce * additionalDamageMultiplier;
+                TakeDamage(normalDamage + additionalDamage);
             }
         }
     }
@@ -131,7 +140,7 @@ public class MonsterHealth : MonoBehaviour
         float additionalDamage =  impactForce * additionalDamageMultiplier;
         yield return new WaitUntil(() => IsGrounded());
         CameraShakeManager.instance.CameraShake(impulseSource);
-        TakeDamage(10f + additionalDamage);
+        TakeDamage(normalDamage + additionalDamage);
         yield return null;
     }
 

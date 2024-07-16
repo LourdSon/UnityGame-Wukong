@@ -7,6 +7,7 @@ using Cinemachine;
 
 //using System.Numerics;
 using UnityEngine;
+using Unity.Mathematics;
 
 public class PlayerAttack : MonoBehaviour
 {
@@ -64,6 +65,8 @@ public class PlayerAttack : MonoBehaviour
     public bool attack3;
     public bool attack4;
 
+    public ParticleSystem slamParticles;
+    public Quaternion rotation;
 
     void Start()
     {
@@ -100,12 +103,10 @@ public class PlayerAttack : MonoBehaviour
     {
         float upwardAttackKey = Input.GetAxisRaw("Vertical");
         int direction = spriteRenderer.flipX ? -1 : 1;
-        detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
-        //detectionPositionNew = new Vector2(detectionPosition.x, detectionPosition.y);
-        
+        detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset; 
         detectionPositionDown = (Vector2)transform.position + Vector2.down * detectionOffsetAir.y + Vector2.right * direction * detectionOffsetAir.x;
         
-        
+        rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
         
 
         if (Input.GetButtonDown("Fire1") && upwardAttackKey == 1 && attackTimeCounterUpward <= 0f)
@@ -159,6 +160,7 @@ public class PlayerAttack : MonoBehaviour
         yield return new WaitUntil(() => IsGrounded());
         playerBox.enabled = true;
         yield return new WaitForSeconds(doubleChocTimer);
+        Instantiate(slamParticles,transform.position,rotation);
         CameraShakeManager.instance.CameraShake(impulseSource);
         // Détecter les ennemis dans la zone d'attaque
         Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, detectionRadiusSlam, 0f, enemyLayerMask);
@@ -167,8 +169,7 @@ public class PlayerAttack : MonoBehaviour
             Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
             if (enemyRb != null)
             {
-                Vector2 directionVector =
-                    ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
                 enemyRb.AddForce(Vector2.right * directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
                 // Infliger des dégâts aux ennemis
                 MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
@@ -193,13 +194,6 @@ public class PlayerAttack : MonoBehaviour
     }
 
 
-    // Afficher le rayon de détection dans l'éditeur Unity
-    private void OnDrawGizmosSelected()
-    {
-        // Dessiner le rayon de détection dans l'éditeur
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position, detectionRadiusSlam);
-    }
 
     public bool IsGrounded()
     {
@@ -299,7 +293,7 @@ public class PlayerAttack : MonoBehaviour
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
 
                     monsterHealth.TakeDamage(damage);
-                    monsterHealth.ContactDamage();
+                    //monsterHealth.ContactDamage();
                 }
 
             }
@@ -307,4 +301,11 @@ public class PlayerAttack : MonoBehaviour
             yield return null;
     }
 
+    // Afficher le rayon de détection dans l'éditeur Unity
+    private void OnDrawGizmosSelected()
+    {
+        // Dessiner le rayon de détection dans l'éditeur
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(detectionPositionDown, detectionRadius);
+    }
 }

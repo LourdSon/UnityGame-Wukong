@@ -54,8 +54,6 @@ public class PlayerHealth : MonoBehaviour
             health = Mathf.Clamp(health, 0, maxHealth);
             CameraShakeManager.instance.CameraShake(impulseSource);
         }
-        
-
         if (health <= 0)
         {
             Die();
@@ -92,8 +90,6 @@ public class PlayerHealth : MonoBehaviour
         {
             Destroy(gameObject);
             OnDeath.Invoke();
-            
-
         }
     }
 }
