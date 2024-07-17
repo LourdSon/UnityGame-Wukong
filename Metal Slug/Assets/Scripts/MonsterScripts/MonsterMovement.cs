@@ -14,6 +14,8 @@ public class MonsterMovement : MonoBehaviour
     private Transform playerTransform;
         
     private Rigidbody2D enemyRb;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
     
 
     void Start()
@@ -27,6 +29,9 @@ public class MonsterMovement : MonoBehaviour
         }
         
         enemyRb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        
         
     }
 
@@ -54,6 +59,15 @@ public class MonsterMovement : MonoBehaviour
                 // Déplace l'ennemi vers le joueur uniquement sur l'axe X
                 float newXPosition = Mathf.MoveTowards(transform.position.x, playerTransform.position.x, speed * Time.deltaTime);
                 transform.position = new Vector2(newXPosition, transform.position.y);
+                animator.SetFloat("Speed",Mathf.Abs(newXPosition));
+                animator.SetBool("IsWalking", true);
+                if(playerTransform.position.x > transform.position.x)
+                {
+                    spriteRenderer.flipX = false;
+                } else 
+                {
+                    spriteRenderer.flipX = true;
+                }
             }
         }
         
