@@ -37,7 +37,6 @@ public class MonsterDamage : MonoBehaviour
 
         if(collision.gameObject.tag == "Enemy")
         {
-            Debug.Log("touché");
             playerHealth.TakeDamage(damage);
 
             playerRb.AddForce(Vector2.right * forceMagnitudeForward * direction, ForceMode2D.Impulse);
