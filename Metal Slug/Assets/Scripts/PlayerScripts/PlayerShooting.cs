@@ -12,11 +12,19 @@ public class PlayerShooting : MonoBehaviour
     // Vitesse de la boule d'énergie
     public float energyBallSpeed = 5f;
     private Rigidbody2D rb;
+    private Rigidbody2D energyrb;
     private SpriteRenderer spriteRenderer;
 
     public float timeBtwAttacks = 3f;
     public float attackTimeCounter;
     private Animator animator;
+    private PlayerMovement playerKi;
+    private bool isShooting;
+    private bool isShooting2;
+    private Vector2 shootDirection;
+    private int direction;
+    private float scaleMultiplier;
+    private GameObject energyBall;
 
 
     //public int damage = 10;
@@ -30,56 +38,56 @@ public class PlayerShooting : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         attackTimeCounter = 0f;
         animator = GetComponent<Animator>();
-        
+        playerKi = GetComponent<PlayerMovement>();
+
+        // Obtenir la direction actuelle du sprite du joueur
+        direction = spriteRenderer.flipX ? -1 : 1;
     }
 
     // Update est appelée une fois par frame
     void Update()
     {
-        Shooting();
+        ReadInputShooting();
 
     }
+    void FixedUpdate()
+    {
+        Shooting();
+    }
 
-    public void Shooting()
+    public void ReadInputShooting()
     {
         // Obtient les valeurs des entrées horizontales et verticales
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        float verticalInput = Input.GetAxisRaw("Vertical");
         bool mouseRight = Input.GetButtonDown("Shooting");
 
-        PlayerMovement playerKi = GetComponent<PlayerMovement>();
+        
         float cKi = playerKi.currentKi;
         float mkI = playerKi.maxKi;
-        float scaleMultiplier = 1 + (cKi / mkI);
+        scaleMultiplier = 1 + (cKi / mkI);
+        // Calcule la direction de tir en fonction des entrées horizontales et verticales
+        shootDirection = new Vector2(horizontalInput, verticalInput).normalized;
+
 
         // Vérifie si l'entrée n'est pas nulle (si le joueur appuie sur les touches de direction)
         if (horizontalInput != 0 && mouseRight && attackTimeCounter <= 0f || verticalInput != 0 && mouseRight && attackTimeCounter <= 0f)
         {
-            animator.SetTrigger("SimpleShootingTrigger");
-            // Calcule la direction de tir en fonction des entrées horizontales et verticales
-            Vector2 shootDirection = new Vector2(horizontalInput, verticalInput).normalized;
-            // Crée une instance de la boule d'énergie
-            GameObject energyBall = Instantiate(energyBallPrefab, transform.position, Quaternion.identity);
+            energyBall = Instantiate(energyBallPrefab, transform.position, Quaternion.identity);
+            energyrb = energyBall.GetComponent<Rigidbody2D>();
             energyBall.transform.localScale *= scaleMultiplier;
-            // Obtient le composant Rigidbody2D de la boule d'énergie
-            Rigidbody2D rb = energyBall.GetComponent<Rigidbody2D>();
-            // Applique une force à la boule d'énergie dans la direction de tir
-            rb.velocity = shootDirection * energyBallSpeed;
+            animator.SetTrigger("SimpleShootingTrigger");
+            isShooting = true;
             attackTimeCounter = timeBtwAttacks;
 
         } else if(rb.velocity.x == 0 && mouseRight && attackTimeCounter <= 0f)
         {
-            animator.SetTrigger("SimpleShootingTrigger");
-            // Obtenir la direction actuelle du sprite du joueur
-            int direction = spriteRenderer.flipX ? -1 : 1;
-            // Crée une instance de la boule d'énergie
-            GameObject energyBall = Instantiate(energyBallPrefab, new Vector3(transform.position.x + (offset.x*direction), transform.position.y + offset.y, transform.position.z), Quaternion.identity);
+            energyBall = Instantiate(energyBallPrefab, new Vector2(transform.position.x + (offset.x*direction), transform.position.y + offset.y), Quaternion.identity);
+            energyrb = energyBall.GetComponent<Rigidbody2D>();
             energyBall.transform.localScale *= scaleMultiplier;
-            // Obtient le composant Rigidbody2D de la boule d'énergie
-            Rigidbody2D rb = energyBall.GetComponent<Rigidbody2D>();
-            // Applique une force à la boule d'énergie dans la direction de tir sur l'axe x
-            rb.velocity = direction * Vector2.right * energyBallSpeed;
+            animator.SetTrigger("SimpleShootingTrigger");
             attackTimeCounter = timeBtwAttacks;
+            isShooting2 = true;
 
         }
 
@@ -88,8 +96,30 @@ public class PlayerShooting : MonoBehaviour
             attackTimeCounter -= Time.deltaTime;
         }
     }
+    private void Shooting()
+    {     
+        if (isShooting)
+        {
+            StartCoroutine(Shooting1());
+        } else if(isShooting2)
+        {
+            
+            StartCoroutine(Shooting2());
+        }
+    }
 
-
+    private IEnumerator Shooting1()
+    {
+        energyrb.velocity = shootDirection * energyBallSpeed;
+        isShooting = false;
+        yield return null;
+    }
+    private IEnumerator Shooting2()
+    {
+        energyrb.velocity = direction * Vector2.right * energyBallSpeed;
+        isShooting2 = false;
+        yield return null;
+    }
     
 }
 #endif

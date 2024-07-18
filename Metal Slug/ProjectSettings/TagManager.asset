@@ -10,6 +10,7 @@ TagManager:
   - EnergyBall
   - GameManager
   - Ground
+  - EnergyBall2
   layers:
   - Default
   - TransparentFX

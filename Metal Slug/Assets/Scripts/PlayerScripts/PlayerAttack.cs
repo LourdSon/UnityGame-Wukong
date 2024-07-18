@@ -9,6 +9,7 @@ using Cinemachine;
 using UnityEngine;
 using Unity.Mathematics;
 
+
 public class PlayerAttack : MonoBehaviour
 {
     public float forceMagnitudeForward = 10f; // Magnitude de la force à appliquer pour la projection vers l'avant
@@ -16,7 +17,7 @@ public class PlayerAttack : MonoBehaviour
     public float forceMagnitudeUpward = 10f; // Magnitude de la force à appliquer pour la projection vers le haut
     public float forceMagnitudeDownward = 50f;
     public float detectionOffset = 1f; // Décalage du rayon de détection par rapport au joueur
-    public Vector2 detectionOffsetAir = new Vector2(1f, -1f);
+    public Vector2 detectionOffsetAir = new Vector2(1f, 1.5f);
     public float detectionRadius = 2f; // Rayon de détection des ennemis
     public float detectionRadiusTP = 20f;
     public float offsetTP = 2f;
@@ -67,7 +68,7 @@ public class PlayerAttack : MonoBehaviour
 
     public ParticleSystem slamParticles;
     public Quaternion rotation;
-
+    
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>(); // Récupérer le composant SpriteRenderer
@@ -81,6 +82,7 @@ public class PlayerAttack : MonoBehaviour
         playerRb = GetComponent<Rigidbody2D>();
         tileDestroyer = GetComponentInChildren<TileDestroyer>();
         impulseSource = GetComponent<CinemachineImpulseSource>();
+        
 
         attack1 = false;
         attack2 = false;
@@ -116,31 +118,23 @@ public class PlayerAttack : MonoBehaviour
             attackTimeCounterUpward = timeBtwAttacksUpward;
             attack1 = true;
             
-        }
-
-        else if (Input.GetButtonDown("Fire1")  && attackTimeCounter <= 0f)
+        } else if (Input.GetButtonDown("Fire1")  && upwardAttackKey == 0 && attackTimeCounter <= 0f)
         {
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounter = timeBtwAttacks;
             attack2 = true;
-        }
-
-        else if (Input.GetButtonDown("Fire1") && upwardAttackKey == -1 && attackTimeCounterDownward <= 0f)
+        } else if (Input.GetButtonDown("Fire1") && upwardAttackKey == -1 && attackTimeCounterDownward <= 0f)
         {
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterDownward = timeBtwAttacksDownward;
-            attack3 = true;
-            
-        }
-
-        else if (Input.GetButtonDown("Fire2")  && attackTimeCounterSlam <= 0f)
+            attack3 = true;  
+        } else if (Input.GetButtonDown("Fire2")  && attackTimeCounterSlam <= 0f)
         {
             //animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterSlam = timeBtwAttacksSlam;
-            attack4 = true;
-            
-            
+            attack4 = true;  
         }
+
 
         attackTimeCounter = TimerDecrement(attackTimeCounter);
         attackTimeCounterSlam = TimerDecrement(attackTimeCounterSlam);
@@ -256,7 +250,9 @@ public class PlayerAttack : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
         if (colliders.Length >= 1)
             {
-                playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
+                int direction = spriteRenderer.flipX ? -1 : 1;
+                //playerRb.velocity = new Vector2(diagonal.x * selfForceMagnitudeForward,playerRb.velocity.y);
+                playerRb.AddForce(Vector2.right * selfForceMagnitudeForward * -direction, ForceMode2D.Impulse);
             }
             // Appliquer une force pour projeter les ennemis vers l'avant
             foreach (Collider2D collider in colliders)
@@ -281,7 +277,7 @@ public class PlayerAttack : MonoBehaviour
         Collider2D[] collidersDown = Physics2D.OverlapCircleAll(detectionPositionDown, detectionRadius, enemyLayerMask);
         if (collidersDown.Length >= 1)
             {
-                playerRb.AddForce(Vector2.up * selfForceMagnitudeForward * 2.5f, ForceMode2D.Impulse);
+                playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
             }
             foreach (Collider2D collider in collidersDown)
             {

@@ -6,7 +6,7 @@ public class ThorHammer : MonoBehaviour
 {
 
     public Transform player;
-    public float throwSpeed = 10f;
+    public float throwSpeed = 20f;
     public float returnSpeed = 20f;
 
     private Rigidbody2D rb;
@@ -14,21 +14,24 @@ public class ThorHammer : MonoBehaviour
     private bool isStuck = false;
     private bool isReturning = false;
     private Vector2 initialPosition;
+    public GameObject Hammer;
+    private GameObject hammerInstance;
+    public SpriteRenderer spriteRenderer;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        //rb = GetComponent<Rigidbody2D>();
         initialPosition = transform.position;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.K) && !isThrown)
+        if (Input.GetButtonDown("Boomerang") && !isThrown)
         {
             ThrowObject();
         }
 
-        if (Input.GetKeyDown(KeyCode.R) && isStuck)
+        if (Input.GetButtonDown("Return Boomerang") && (isStuck || isThrown))
         {
             ReturnObject();
         }
@@ -39,10 +42,13 @@ public class ThorHammer : MonoBehaviour
         }
     }
 
-    void ThrowObject()
+    public void ThrowObject()
     {
-        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 throwDirection = (mousePos - (Vector2)transform.position).normalized;
+        int direction2 = spriteRenderer.flipX ? -1 : 1;
+        Vector2 throwDirection = (Vector2.right * direction2).normalized;
+
+        hammerInstance = Instantiate(Hammer, transform.position, Quaternion.identity);
+        rb = hammerInstance.GetComponent<Rigidbody2D>();
         rb.velocity = throwDirection * throwSpeed;
         isThrown = true;
     }
@@ -55,26 +61,27 @@ public class ThorHammer : MonoBehaviour
 
     void MoveTowardsPlayer()
     {
-        Vector2 direction = ((Vector2)player.position - rb.position).normalized;
+        Vector2 direction = ((Vector2)transform.position - rb.position).normalized;
         rb.velocity = direction * returnSpeed;
 
-        if (Vector2.Distance(rb.position, player.position) < 0.5f)
+        if (Vector2.Distance(rb.position, transform.position) < 0.5f)
         {
             isReturning = false;
             isThrown = false;
             rb.velocity = Vector2.zero;
-            transform.position = player.position;
+            Destroy(hammerInstance);
+            ResetObject();
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D other)
     {
-        if (isThrown && !isStuck)
+        if ((isThrown || isReturning) && !isStuck && other.gameObject.tag == "Enemy")
         {
             rb.velocity = Vector2.zero;
             isThrown = false;
             isStuck = true;
-            transform.position = collision.contacts[0].point;
+            hammerInstance.transform.position = other.transform.position;
             rb.isKinematic = true; // Make the object stick
         }
     }
@@ -85,7 +92,7 @@ public class ThorHammer : MonoBehaviour
         isStuck = false;
         isReturning = false;
         rb.isKinematic = false;
-        transform.position = initialPosition;
+        //transform.position = initialPosition;
     }
 }
 

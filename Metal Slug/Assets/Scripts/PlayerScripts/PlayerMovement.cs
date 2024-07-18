@@ -159,7 +159,7 @@ public class PlayerMovement : MonoBehaviour
             horizontalInput = Input.GetAxisRaw("Horizontal");
             verticalInput = Input.GetAxisRaw("Vertical");
             float horizontalMove = horizontalInput * moveSpeed;
-            movement = new Vector2(horizontalMove, 0);
+            movement = new Vector2(horizontalMove, verticalInput);
             animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
             //Flip sprite
             if (horizontalInput != 0)
@@ -182,10 +182,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
-            //Move the character
-            //transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
-            //playerRb.AddForce(Vector2.right * horizontalInput * moveSpeed);
-        playerRb.velocity = new Vector2(movement.x, playerRb.velocity.y);       
+
+        //Move the character
+        transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
+        //playerRb.AddForce(Vector2.right * movement.x);
+        //playerRb.velocity = new Vector2(movement.x, playerRb.velocity.y);       
+        //playerRb.MovePosition((Vector2) transform.position + movement * Time.deltaTime);
+    
     }
 
 
@@ -365,9 +368,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void EnemiesStepBackCharging()
     {
-        // Obtenir la direction actuelle du sprite du joueur
-        
-
          // Détecter les ennemis dans la zone d'attaque
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, detectionBoxKi, enemyLayerMask);
         foreach (Collider2D collider in colliders)

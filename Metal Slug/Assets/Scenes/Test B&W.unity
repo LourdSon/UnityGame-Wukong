@@ -2688,7 +2688,7 @@ Transform:
   m_GameObject: {fileID: 856845353}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 26.343193, y: 0.13609028, z: -10}
+  m_LocalPosition: {x: 85.28405, y: 0.13609028, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3128,7 +3128,7 @@ Transform:
   m_GameObject: {fileID: 985383729}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 26.343193, y: 0.13609028, z: -10}
+  m_LocalPosition: {x: 85.28405, y: 0.13609028, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -28076,7 +28076,7 @@ Transform:
   m_GameObject: {fileID: 783027960897221129}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 20, y: -7, z: 0}
+  m_LocalPosition: {x: 78.94086, y: -7, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -28235,13 +28235,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd081e69c925f4f43b53da9479496edf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forceMagnitudeForward: 75
-  selfForceMagnitudeForward: 30
+  forceMagnitudeForward: 50
+  selfForceMagnitudeForward: 20
   forceMagnitudeUpward: 35
   forceMagnitudeDownward: 75
-  detectionOffset: 5
-  detectionOffsetAir: {x: 1, y: 2}
-  detectionRadius: 2
+  detectionOffset: 0.7
+  detectionOffsetAir: {x: 1, y: 1.5}
+  detectionRadius: 5
   detectionRadiusTP: 20
   offsetTP: 2
   forwardAttackKey: 323
@@ -28547,7 +28547,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  dashForce: 50
+  dashForce: 35
   dashDuration: 0.2
   dashCooldown: 1
   isDashing: 0
@@ -28659,7 +28659,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 1
+  m_LinearDrag: 2
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
@@ -28686,7 +28686,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
-  forceMagnitudeForward: 74.4
+  forceMagnitudeForward: 30
   playerRb: {fileID: 8467768669592782884}
   spriteRenderer: {fileID: 4675542948925680700}
   playerHealth: {fileID: 7012354962525120578}
@@ -28750,14 +28750,16 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 783027960897221129}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 307a2a60ddb47d84fac809d97f3bb553, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  throwSpeed: 10
-  returnSpeed: 20
+  player: {fileID: 3236515591816997604}
+  throwSpeed: 50
+  returnSpeed: 50
+  Hammer: {fileID: 8430373969313254213, guid: 2a7ad662ac778074e834f6250e4e5db3, type: 3}
+  spriteRenderer: {fileID: 4675542948925680700}
 --- !u!114 &8467768669592782888
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -34,6 +34,14 @@ public class PlayerDamage : MonoBehaviour
             Destroy(other.gameObject);
 
             
+        } if(other.gameObject.tag == "EnergyBall2")
+        {
+            SpriteRenderer enemyRb = GetComponent<SpriteRenderer>();
+            MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
+            monsterHealth.TakeDamage(damage);
+            int direction = enemyRb.flipX ? 1 : -1;
+            Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
+            Instantiate(impactParticles,other.transform.position, rotation);
         }
     }
 }

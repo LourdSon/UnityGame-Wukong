@@ -34,12 +34,13 @@ public class MonsterDamage : MonoBehaviour
     {
 
         int direction = spriteRenderer.flipX ? -1 : 1;
+        
 
         if(collision.gameObject.tag == "Enemy")
         {
             playerHealth.TakeDamage(damage);
 
-            playerRb.AddForce(Vector2.right * forceMagnitudeForward * direction, ForceMode2D.Impulse);
+            playerRb.AddForce(Vector2.right * forceMagnitudeForward * -direction, ForceMode2D.Impulse);
         }
     }
 }
