@@ -12,6 +12,12 @@ public class EndMission : MonoBehaviour
     public Button restartButton;
     private Vector2 defaultGravityR;
     public GameObject[] enemies;
+    public GameObject[] bosses;
+    public GameObject bossPrefab;
+
+    public Transform playerTransform;
+    public Vector3 offset = new Vector3(2f,0f,0f);
+
 
 
     // Start is called before the first frame update
@@ -22,6 +28,9 @@ public class EndMission : MonoBehaviour
         defaultGravityR = Physics2D.gravity;
         // Ajoute un écouteur d'événements de clic sur le bouton de redémarrage
         restartButton.onClick.AddListener(RestartGame);
+
+        
+
     }
 
     // Update is called once per frame
@@ -56,14 +65,29 @@ public class EndMission : MonoBehaviour
     public void EnemyNumber()
     {
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        bosses = GameObject.FindGameObjectsWithTag("Boss");
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        playerTransform = player.GetComponent<Transform>();
         int count = enemies.Length;
+        int countB = bosses.Length;
         if(count == 0)
         {
-            // Arrêter le temps du jeu
+            if(countB < 1)
+            {
+                Instantiate(bossPrefab, new Vector3(playerTransform.position.x + offset.x,0f,0f), Quaternion.identity);
+                /*if (countB == 0)
+                {
+                    YouWinScreen();
+                }*/
+            }
+        }
+    }
+    public void YouWinScreen()
+    {
+        // Arrêter le temps du jeu
             Time.timeScale = 0f;
             winText.text = "Mission Complete";
             winScreen.SetActive(true);
-        }
     }
 
 }

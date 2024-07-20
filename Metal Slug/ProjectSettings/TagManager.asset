@@ -11,6 +11,7 @@ TagManager:
   - GameManager
   - Ground
   - EnergyBall2
+  - Boss
   layers:
   - Default
   - TransparentFX
