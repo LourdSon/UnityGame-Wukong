@@ -41,7 +41,6 @@ public class PlayerShooting : MonoBehaviour
         playerKi = GetComponent<PlayerMovement>();
 
         // Obtenir la direction actuelle du sprite du joueur
-        direction = spriteRenderer.flipX ? -1 : 1;
     }
 
     // Update est appelée une fois par frame
@@ -61,6 +60,7 @@ public class PlayerShooting : MonoBehaviour
         float horizontalInput = Input.GetAxisRaw("Horizontal");
         float verticalInput = Input.GetAxisRaw("Vertical");
         bool mouseRight = Input.GetButtonDown("Shooting");
+        direction = spriteRenderer.flipX ? -1 : 1;
 
         
         float cKi = playerKi.currentKi;

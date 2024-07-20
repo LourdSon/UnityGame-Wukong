@@ -9,13 +9,13 @@ public class ThorHammer : MonoBehaviour
     public float throwSpeed = 20f;
     public float returnSpeed = 20f;
 
-    private Rigidbody2D rb;
-    private bool isThrown = false;
-    private bool isStuck = false;
-    private bool isReturning = false;
-    private Vector2 initialPosition;
+    public Rigidbody2D rb;
+    public bool isThrown = false;
+    public bool isStuck = false;
+    public bool isReturning = false;
+    public Vector2 initialPosition;
     public GameObject Hammer;
-    private GameObject hammerInstance;
+    public GameObject hammerInstance;
     public SpriteRenderer spriteRenderer;
 
     void Start()
@@ -40,6 +40,8 @@ public class ThorHammer : MonoBehaviour
         {
             MoveTowardsPlayer();
         }
+
+        
     }
 
     public void ThrowObject()
@@ -74,18 +76,27 @@ public class ThorHammer : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter2D(Collision2D other)
+    /*void OnCollisionEnter2D(Collision2D other)
     {
         if ((isThrown || isReturning) && !isStuck && other.gameObject.tag == "Enemy")
         {
-            rb.velocity = Vector2.zero;
+            
             isThrown = false;
             isStuck = true;
-            hammerInstance.transform.position = other.transform.position;
+            onStuck();
+            
+        }
+    }
+    public void onStuck()
+    {
+        if(isStuck)
+        {
+            rb.velocity = Vector2.zero;
+            //rb.transform.position = other.transform.position;
             rb.isKinematic = true; // Make the object stick
         }
     }
-
+*/
     public void ResetObject()
     {
         isThrown = false;

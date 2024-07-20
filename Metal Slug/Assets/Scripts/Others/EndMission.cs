@@ -11,6 +11,7 @@ public class EndMission : MonoBehaviour
     public Text winText;
     public Button restartButton;
     private Vector2 defaultGravityR;
+    public GameObject[] enemies;
 
 
     // Start is called before the first frame update
@@ -24,9 +25,9 @@ public class EndMission : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        EnemyNumber();
     }
 
     void RestartGame()
@@ -52,4 +53,17 @@ public class EndMission : MonoBehaviour
             winScreen.SetActive(true);
         }
     }
+    public void EnemyNumber()
+    {
+        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        int count = enemies.Length;
+        if(count == 0)
+        {
+            // Arrêter le temps du jeu
+            Time.timeScale = 0f;
+            winText.text = "Mission Complete";
+            winScreen.SetActive(true);
+        }
+    }
+
 }
