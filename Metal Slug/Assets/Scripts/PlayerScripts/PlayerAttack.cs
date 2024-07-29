@@ -150,9 +150,10 @@ public class PlayerAttack : MonoBehaviour
         // Appliquer une force descendante aux ennemis
         playerRb.AddForce(Vector2.down * slamForce, ForceMode2D.Impulse);
         CameraShakeManager.instance.CameraShake(impulseSource);
-        playerBox.enabled = false;
+        Physics2D.IgnoreLayerCollision(9,11,true);
         yield return new WaitUntil(() => IsGrounded());
-        playerBox.enabled = true;
+ 
+        
         yield return new WaitForSeconds(doubleChocTimer);
         Instantiate(slamParticles,transform.position,rotation);
         CameraShakeManager.instance.CameraShake(impulseSource);
@@ -174,6 +175,7 @@ public class PlayerAttack : MonoBehaviour
             }
         }
         attack4 = false;
+        Physics2D.IgnoreLayerCollision(9,11,false);
         //tileDestroyer.OGDestructionMouse();
         yield return null;
 

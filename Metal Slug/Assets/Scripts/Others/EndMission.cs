@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -13,10 +14,14 @@ public class EndMission : MonoBehaviour
     private Vector2 defaultGravityR;
     public GameObject[] enemies;
     public GameObject[] bosses;
-    public GameObject bossPrefab;
+    public GameObject boss;
 
     public Transform playerTransform;
     public Vector3 offset = new Vector3(2f,0f,0f);
+
+    public Animator camAnimBoss;
+    public static bool isCutsceneon;
+    public bool playedOnce;
 
 
 
@@ -28,9 +33,10 @@ public class EndMission : MonoBehaviour
         defaultGravityR = Physics2D.gravity;
         // Ajoute un écouteur d'événements de clic sur le bouton de redémarrage
         restartButton.onClick.AddListener(RestartGame);
-
-        
-
+        bosses = GameObject.FindGameObjectsWithTag("Boss");
+        boss.SetActive(false);
+        isCutsceneon = false;
+        playedOnce = false;
     }
 
     // Update is called once per frame
@@ -56,10 +62,7 @@ public class EndMission : MonoBehaviour
         // Vérifie si le collider entrant est celui du joueur
         if (collision.CompareTag("Player"))
         {
-            // Arrêter le temps du jeu
-            Time.timeScale = 0f;
-            winText.text = "Mission Complete";
-            winScreen.SetActive(true);
+            YouWinScreen();
         }
     }
     public void EnemyNumber()
@@ -70,24 +73,33 @@ public class EndMission : MonoBehaviour
         playerTransform = player.GetComponent<Transform>();
         int count = enemies.Length;
         int countB = bosses.Length;
-        if(count == 0)
+        
+        if(!playedOnce && count == 0)
         {
-            if(countB < 1)
+            boss.SetActive(true);
+            if(countB == 1)
             {
-                Instantiate(bossPrefab, new Vector3(playerTransform.position.x + offset.x,0f,0f), Quaternion.identity);
-                /*if (countB == 0)
-                {
-                    YouWinScreen();
-                }*/
-            }
+                isCutsceneon = true;
+                camAnimBoss.SetBool("cutscene1", true);
+                Invoke(nameof(StopCutscene), 7.30f);
+                playedOnce = true;
+            } 
+        }else if (countB == 0 && playedOnce)
+        {
+            YouWinScreen();
         }
+    }
+    public void StopCutscene()
+    {
+        isCutsceneon = false;
+        camAnimBoss.SetBool("cutscene1", false);
     }
     public void YouWinScreen()
     {
         // Arrêter le temps du jeu
-            Time.timeScale = 0f;
-            winText.text = "Mission Complete";
-            winScreen.SetActive(true);
+        Time.timeScale = 0f;
+        winText.text = "Mission Complete";
+        winScreen.SetActive(true);
     }
 
 }

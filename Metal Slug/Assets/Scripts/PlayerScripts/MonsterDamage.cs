@@ -36,7 +36,7 @@ public class MonsterDamage : MonoBehaviour
         int direction = spriteRenderer.flipX ? -1 : 1;
         
 
-        if(collision.gameObject.tag == "Enemy")
+        if(collision.gameObject.tag == "Enemy" || collision.gameObject.tag == "Boss")
         {
             playerHealth.TakeDamage(damage);
 

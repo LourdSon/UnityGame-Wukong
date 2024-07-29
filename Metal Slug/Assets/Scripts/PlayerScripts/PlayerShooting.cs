@@ -80,7 +80,7 @@ public class PlayerShooting : MonoBehaviour
             isShooting = true;
             attackTimeCounter = timeBtwAttacks;
 
-        } else if(rb.velocity.x == 0 && mouseRight && attackTimeCounter <= 0f)
+        } else if(horizontalInput == 0 && verticalInput == 0 && mouseRight && attackTimeCounter <= 0f)
         {
             energyBall = Instantiate(energyBallPrefab, new Vector2(transform.position.x + (offset.x*direction), transform.position.y + offset.y), Quaternion.identity);
             energyrb = energyBall.GetComponent<Rigidbody2D>();

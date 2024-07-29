@@ -25,7 +25,7 @@ public class PlayerDamage : MonoBehaviour
     {
         if(other.gameObject.tag == "EnergyBall")
         {
-            SpriteRenderer enemyRb = GetComponent<SpriteRenderer>();
+            SpriteRenderer enemyRb = GetComponentInChildren<SpriteRenderer>();
             MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
             monsterHealth.TakeDamage(damage);
             int direction = enemyRb.flipX ? 1 : -1;
@@ -36,7 +36,7 @@ public class PlayerDamage : MonoBehaviour
             
         } if(other.gameObject.tag == "EnergyBall2")
         {
-            SpriteRenderer enemyRb = GetComponent<SpriteRenderer>();
+            SpriteRenderer enemyRb = GetComponentInChildren<SpriteRenderer>();
             MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
             monsterHealth.TakeDamage(damage);
             int direction = enemyRb.flipX ? 1 : -1;

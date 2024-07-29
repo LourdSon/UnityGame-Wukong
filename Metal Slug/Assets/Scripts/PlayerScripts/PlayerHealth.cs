@@ -20,7 +20,8 @@ public class PlayerHealth : MonoBehaviour
     public bool isTakingDamage = false;
 
     private CinemachineImpulseSource impulseSource;
-
+    public float fade = 1f;
+    Material material;
     
     
     // Start is called before the first frame update
@@ -31,13 +32,15 @@ public class PlayerHealth : MonoBehaviour
         isTakingDamage = false;
 
         impulseSource = GetComponent<CinemachineImpulseSource>();
-
+        material = GetComponent<SpriteRenderer>().material;
         
     }
 
     // Update is called once per frame
     void Update()
     {
+        
+        material.SetFloat("_Fade", fade);
         DamageCheck();
     }
 
@@ -56,7 +59,9 @@ public class PlayerHealth : MonoBehaviour
         }
         if (health <= 0)
         {
+            
             Die();
+            
         }
     }
 
@@ -69,11 +74,13 @@ public class PlayerHealth : MonoBehaviour
     {
         if (isTakingDamage)
         {
+            Physics2D.IgnoreLayerCollision(9,11,true);
             knockBackCounter += Time.deltaTime;
             if (knockBackCounter >= knockBackDuration)
             {
                 isTakingDamage = false;
                 knockBackCounter = 0;
+                Physics2D.IgnoreLayerCollision(9,11,false);
             }
         }
     }
@@ -82,14 +89,21 @@ public class PlayerHealth : MonoBehaviour
     {
         float targetFillAmount = health / maxHealth;
         healthBarFill.fillAmount = targetFillAmount;
+        
     }
 
     public void Die()
     {
+        
         if (OnDeath != null)
         {
+            
+            
             Destroy(gameObject);
             OnDeath.Invoke();
         }
     }
+
+    
+    
 }

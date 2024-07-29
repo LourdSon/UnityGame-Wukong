@@ -12,6 +12,7 @@ using UnityEngine.UI;
 using Cinemachine;
 
 
+
 public class PlayerMovement : MonoBehaviour
 {
 
@@ -100,6 +101,10 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 jumpVelocity;
     private bool jumpBool;
     private bool isCharging;
+
+    public LayerMask playerLayerMask;
+    public float detectionRadius = 5f;
+    Material material;
     
 
     
@@ -125,31 +130,35 @@ public class PlayerMovement : MonoBehaviour
         //tileDestroyer = GetComponentInChildren<TileDestroyer>();
         
         
+        
     }
 
 
     void Update()
     {
-        ReadInputMove();
-        ReadInputJump();
-        ReadDashPress();
-        ReadChargeKi();
+        if(!EndMission.isCutsceneon)  
+        {  
+            ReadInputMove();
+            ReadInputJump();
+            ReadDashPress();
+            ReadChargeKi();
+        }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        
-            
-        MovePlayer();
-        Jump();
-        ResetPosition(); // P
-        DashPress(); // Q
-        ChargeKi(); // E
-        InstantDash(); // V
-        ThorTest();
-        //PunchAttack();
-            
+        if(!EndMission.isCutsceneon)  
+        {     
+            MovePlayer();
+            Jump();
+            ResetPosition(); // P
+            DashPress(); // Q
+            ChargeKi(); // E
+            InstantDash(); // V
+            ThorTest();
+            //PunchAttack();
+        }
     }
 
     private void ReadInputMove()
@@ -247,6 +256,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if(isDashing)
         {
+            
             StartCoroutine(Dash());
             isDashing = false;
         }
@@ -264,6 +274,7 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator Dash()
     {
+        
         CameraShakeManager.instance.CameraShake(impulseSource);
         SpawnDashParticles();
         // Déterminer la direction du dash en fonction des entrées du joueur
@@ -271,22 +282,17 @@ public class PlayerMovement : MonoBehaviour
         float defaultSpeed = moveSpeed;
         moveSpeed += dashForce;
         playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce/2);
-        //playerRb.AddForce(dashMovement * dashForce,ForceMode2D.Impulse);
-        BoxCollider2D boxCollider = GetComponent<BoxCollider2D>();
-        boxCollider.enabled = false;
-        
+        //playerRb.AddForce(dashMovement * dashForce,ForceMode2D.Impulse);       
+        Physics2D.IgnoreLayerCollision(9,11,true);      
         yield return new WaitForSeconds(dashDuration);
-        boxCollider.enabled = true;
-
+        //boxCollider.enabled = true;
+        Physics2D.IgnoreLayerCollision(9,11,false);
         // Arrêter le dash en réinitialisant la vélocité du joueur
         //playerRb.velocity = Vector2.zero;
-        animator.SetBool("IsDashing", false);
-
-        
+        animator.SetBool("IsDashing", false);       
         isDashing = false;
         jumpCounter = 1;
         //moveSpeed -= dashForce;
-        
         StartCoroutine(ReduceSpeedGradually(defaultSpeed, speedReductionDuration));
         
     }

@@ -28,7 +28,7 @@ public class MonsterMovement : MonoBehaviour
             playerTransform = player.transform;
         }
         
-        enemyRb = GetComponent<Rigidbody2D>();
+        enemyRb = GetComponentInChildren<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         

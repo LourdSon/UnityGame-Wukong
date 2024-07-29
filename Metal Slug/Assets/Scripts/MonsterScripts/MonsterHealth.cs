@@ -39,11 +39,11 @@ public class MonsterHealth : MonoBehaviour
         healthBar = GetComponentInChildren<MonsterHealthBar>();
         healthBar.UpdateHealthBar(health, maxHealth);
         
-        impulseSource = GetComponent<CinemachineImpulseSource>();
+        impulseSource = GetComponentInChildren<CinemachineImpulseSource>();
         isTakingDamage = false;
         
         knockBackCounter = 0;
-        enemyRb = GetComponent<Rigidbody2D>();
+        enemyRb = GetComponentInChildren<Rigidbody2D>();
         
     }
 

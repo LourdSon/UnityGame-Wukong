@@ -13,7 +13,7 @@ public class BehaviourBoss : MonoBehaviour
     void Start()
     {
         
-        GeneralBehaviour();
+        
     }
 
     // Update is called once per frame
@@ -23,6 +23,5 @@ public class BehaviourBoss : MonoBehaviour
     }
     public void GeneralBehaviour()
     {
-
     }
 }
