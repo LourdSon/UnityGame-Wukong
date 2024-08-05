@@ -38,9 +38,10 @@ public class MonsterDamage : MonoBehaviour
 
         if(collision.gameObject.tag == "Enemy" || collision.gameObject.tag == "Boss")
         {
-            playerHealth.TakeDamage(damage);
-
-            playerRb.AddForce(Vector2.right * forceMagnitudeForward * -direction, ForceMode2D.Impulse);
+            //playerHealth.TakeDamage(damage);
+            //playerRb.AddForce(Vector2.right * forceMagnitudeForward * -direction, ForceMode2D.Impulse);
         }
     }
+    
+    
 }

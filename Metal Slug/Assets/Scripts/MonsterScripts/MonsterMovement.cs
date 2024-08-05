@@ -8,7 +8,8 @@ using UnityEngine;
 public class MonsterMovement : MonoBehaviour
 {
 
-    public float detectionRange = 50f; // Portée de détection de l'ennemi
+    public float detectionRange = 30f;
+    public float detectionRangeAttack = 10f; // Portée de détection de l'ennemi
     public float speed = 5f; // Vitesse de déplacement de l'ennemi
 
     private Transform playerTransform;
@@ -16,6 +17,7 @@ public class MonsterMovement : MonoBehaviour
     private Rigidbody2D enemyRb;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+
     
 
     void Start()
@@ -45,11 +47,12 @@ public class MonsterMovement : MonoBehaviour
     private void DetectPlayer()
     {
         MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
+        AttackHitBoxSide hitBox = GetComponentInChildren<AttackHitBoxSide>(); 
         if (playerTransform == null)
         {
             return;
         }
-        if(!monsterHealth.isTakingDamage)
+        if(!monsterHealth.isTakingDamage && hitBox.isAttacking == false)
         {
             
             // Vérifie la distance entre l'ennemi et le joueur
@@ -68,6 +71,7 @@ public class MonsterMovement : MonoBehaviour
                 {
                     spriteRenderer.flipX = true;
                 }
+                
             }
         }
         
