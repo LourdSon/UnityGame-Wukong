@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: bf5cfdb7964cf4042850ba746c168d8e
+guid: ecf40aa0350c8964ea3783cfc2e7b52b
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,190 +97,106 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Angel_0
-      rect:
-        serializedVersion: 2
-        x: 100
-        y: 694
-        width: 478
-        height: 376
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: de88ed6b7f0762c44b6cc8996077f917
-      internalID: -1516393812
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Angel_1
+      name: FlyingAngel
       rect:
         serializedVersion: 2
         x: 35
-        y: 149
-        width: 342
-        height: 414
+        y: 695
+        width: 610
+        height: 374
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4226bf610e9d6bd45ab5e882320adb9a
-      internalID: 1731938478
+      spriteID: 8ce4f6a1205f6ee4b8853d2efcbbe0ab
+      internalID: 976009178
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MainAngel_0
+      name: BallAngel
       rect:
         serializedVersion: 2
-        x: 381
-        y: 64
-        width: 209
-        height: 593
+        x: 10
+        y: 141
+        width: 419
+        height: 431
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1e852d6abcf068447b7044622cdbf1c1
-      internalID: -58233401
+      spriteID: 395aa05b6ca51d746870ff8fbe96aece
+      internalID: -1596492460
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MainAngel_1
+      name: FlyingDemon
       rect:
         serializedVersion: 2
-        x: 599
-        y: 69
-        width: 224
-        height: 584
+        x: 1391
+        y: 611
+        width: 524
+        height: 434
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 93366bbbd75a98541af23858af99fdbd
-      internalID: 610573503
+      spriteID: 1e108d99d14f52c468c3378a0f5b7c67
+      internalID: -2071002418
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MainAngel_2
+      name: BallDemon
       rect:
         serializedVersion: 2
-        x: 844
-        y: 71
-        width: 245
-        height: 580
+        x: 1424
+        y: 112
+        width: 471
+        height: 413
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 70569f110dd11af4ebb0fd15b78e2321
-      internalID: 1341746694
+      spriteID: 850613195ac313a40bc2ac0edad6359a
+      internalID: 1925785176
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MainAngel_3
+      name: NormalDemon
       rect:
         serializedVersion: 2
-        x: 1096
-        y: 76
-        width: 220
-        height: 572
+        x: 998
+        y: 129
+        width: 359
+        height: 555
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6f71d58cf54abea4da5fa37abd6e051b
-      internalID: -1220420005
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: MainAngel_4
-      rect:
-        serializedVersion: 2
-        x: 1320
-        y: 74
-        width: 217
-        height: 576
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f05cc30e3e45c634087e4e44f0405cfc
-      internalID: -1745253585
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Demon_0
-      rect:
-        serializedVersion: 2
-        x: 1480
-        y: 652
-        width: 397
-        height: 346
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 66c9de3264848024bb6e93f2a4c2017d
-      internalID: 1646124445
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Demon_1
-      rect:
-        serializedVersion: 2
-        x: 1538
-        y: 132
-        width: 319
-        height: 388
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6087d16b20f1b8b47b1372952cfad3eb
-      internalID: -1188632531
+      spriteID: 8cc3edd64f658ea46b4f224dff234b43
+      internalID: -1108933331
       vertices: []
       indices: 
       edges: []
@@ -296,15 +212,19 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Angel_0: -1516393812
-      Angel_1: 1731938478
-      Demon_0: 1646124445
-      Demon_1: -1188632531
-      MainAngel_0: -58233401
-      MainAngel_1: 610573503
-      MainAngel_2: 1341746694
-      MainAngel_3: -1220420005
-      MainAngel_4: -1745253585
+      BallAngel: -1596492460
+      BallDemon: 1925785176
+      CharactersOrEnemies2_1: 1976914461
+      CharactersOrEnemies2_2: 1866841545
+      CharactersOrEnemies2_3: 1438601163
+      CharactersOrEnemies2_4: -1032598092
+      CharactersOrEnemies2_5: 1103244678
+      CharactersOrEnemies2_6: 961686217
+      CharactersOrEnemies2_7: 1621991670
+      CharactersOrEnemies2_8: -1814667198
+      FlyingAngel: 976009178
+      FlyingDemon: -2071002418
+      NormalDemon: -1108933331
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
