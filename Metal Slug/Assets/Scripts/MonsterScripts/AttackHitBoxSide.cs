@@ -4,58 +4,54 @@ using UnityEngine;
 
 public class AttackHitBoxSide : MonoBehaviour
 {
-    public SpriteRenderer enemySpriteRenderer;
+    public MonsterAttack2 monsterAttack2;
+    public float waitingForAttack = 3f;
+    
+    public SpriteRenderer spriteRenderer;
     public GameObject meleeHitbox;
-    private PlayerHealth playerHealth;
-    public int damage;
+    public float xGauche = 0f;
+    public float xDroite = 1f;
+    private Animator anim;
     public bool isAttacking;
 
     void Start()
     {
-        
-        //playerHealth = GetComponent<PlayerHealth>();
+        spriteRenderer = GetComponentInParent<SpriteRenderer>();
+        anim = GetComponentInParent<Animator>();
         isAttacking = false;
     }
 
     // Update est appelée une fois par frame
     void Update()
     {
-        
-        
-        if (enemySpriteRenderer.flipX)
+        monsterAttack2 = GetComponentInParent<MonsterAttack2>(); 
+        if (spriteRenderer.flipX)
         {
             // Si le joueur est retourné, positionne la hitbox de mêlée à gauche du joueur
-            meleeHitbox.transform.localPosition = new Vector3(-1f, 0f, 0f);
+            meleeHitbox.transform.localPosition = new Vector3(xGauche, 0f, 0f);
         }
         else
         {
             // Si le joueur n'est pas retourné, positionne la hitbox de mêlée à droite du joueur
-            meleeHitbox.transform.localPosition = new Vector3(1f, 0f, 0f);
+            meleeHitbox.transform.localPosition = new Vector3(xDroite, 0f, 0f);
+        }
+        
+    }
+
+    public void OnTriggerEnter2D(Collider2D coll)
+    {                
+        if(coll.gameObject.CompareTag("Player"))
+        {
+            StartCoroutine(AttackSpe());         
         }
     }
 
-    public void  OnTriggerEnter2D(Collider2D coll)
+    private IEnumerator AttackSpe()
     {
-        
-        if(coll.gameObject.CompareTag("Player"))
-        {
-            playerHealth = coll.gameObject.GetComponent<PlayerHealth>();
-            
-            isAttacking = true;
-            StartCoroutine(EnemyAttack());
-            
-            
-        }else {
-            isAttacking = false;
-        }
-        
-    }
-    private IEnumerator EnemyAttack()
-    {   
-        
-        yield return new WaitForSeconds(5);
-        if(isAttacking == true)
-        playerHealth.TakeDamage(damage);
+        isAttacking = true;
+        anim.SetTrigger("SimpleAttackTrigger");
+        yield return new WaitForSeconds(waitingForAttack);
+        monsterAttack2.Attack();
         yield return null;
         isAttacking = false;
     }

@@ -35,6 +35,7 @@ public class MonsterMovement : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         
         
+        
     }
 
     void FixedUpdate()
@@ -43,16 +44,20 @@ public class MonsterMovement : MonoBehaviour
         DetectPlayer();
         
     }
+    void Update()
+    {
+        
+    }
 
     private void DetectPlayer()
     {
         MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
-        AttackHitBoxSide hitBox = GetComponentInChildren<AttackHitBoxSide>(); 
+        AttackHitBoxSide attackHitBoxSide = GetComponentInChildren<AttackHitBoxSide>();
         if (playerTransform == null)
         {
             return;
         }
-        if(!monsterHealth.isTakingDamage && hitBox.isAttacking == false)
+        if(!monsterHealth.isTakingDamage  && attackHitBoxSide.isAttacking == false)
         {
             
             // Vérifie la distance entre l'ennemi et le joueur
@@ -72,7 +77,11 @@ public class MonsterMovement : MonoBehaviour
                     spriteRenderer.flipX = true;
                 }
                 
+            } else
+            {
+                animator.SetBool("IsWalking", false);
             }
+            
         }
         
     }

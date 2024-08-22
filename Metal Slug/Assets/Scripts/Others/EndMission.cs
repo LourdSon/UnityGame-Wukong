@@ -77,6 +77,7 @@ public class EndMission : MonoBehaviour
         if(!playedOnce && count == 0)
         {
             boss.SetActive(true);
+            
             if(countB == 1)
             {
                 isCutsceneon = true;

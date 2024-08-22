@@ -355,7 +355,7 @@ public class PlayerMovement : MonoBehaviour
         {
             audioSource.loop = true;
             audioSource.clip = KiAura;
-            audioSource.volume = 0.25f;
+            audioSource.volume = 0.10f;
             audioSource.Play();
             KiCharging.gameObject.SetActive(true);
             yield return new WaitForSeconds(100f);
