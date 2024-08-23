@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviour
     private PlayerHealth playerHealth;
 
     private Vector2 defaultGravityR; // Déplacez ici la définition de defaultGravity
+
+    public GameObject gameOverEventSystem;
+    public GameObject EventSystem;
+    
     
 
 
@@ -26,8 +30,8 @@ public class GameManager : MonoBehaviour
         defaultGravityR = Physics2D.gravity;
         // Ajoute un écouteur d'événements de clic sur le bouton de redémarrage
         restartButton.onClick.AddListener(RestartGame);
-        
-        
+        gameOverEventSystem.SetActive(false);
+        EventSystem.SetActive(true);
 
     }
 
@@ -36,7 +40,8 @@ public class GameManager : MonoBehaviour
         gameOverText.text = "Game Over";
         gameOverScreen.SetActive(true);
         Time.timeScale = 0f;
-        
+        EventSystem.SetActive(false);
+        gameOverEventSystem.SetActive(true);
     }
 
     void Update()

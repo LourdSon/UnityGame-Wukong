@@ -23,6 +23,9 @@ public class EndMission : MonoBehaviour
     public static bool isCutsceneon;
     public bool playedOnce;
 
+    public GameObject winningEventSystem;
+    public GameObject EventSystem;
+
 
 
     // Start is called before the first frame update
@@ -37,6 +40,8 @@ public class EndMission : MonoBehaviour
         boss.SetActive(false);
         isCutsceneon = false;
         playedOnce = false;
+        winningEventSystem.SetActive(false);
+        EventSystem.SetActive(true);
     }
 
     // Update is called once per frame
@@ -50,6 +55,11 @@ public class EndMission : MonoBehaviour
         ResetPlayer(defaultGravityR);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Time.timeScale = 1f;
+        bosses = GameObject.FindGameObjectsWithTag("Boss");
+        boss.SetActive(false);
+        isCutsceneon = false;
+        playedOnce = false;
+    
     }
     void ResetPlayer(Vector2 defaultGravity)
     {
@@ -74,7 +84,7 @@ public class EndMission : MonoBehaviour
         int count = enemies.Length;
         int countB = bosses.Length;
         
-        if(!playedOnce && count == 0)
+        if(!playedOnce && count == 0 && GetComponent<WaveManager>().currentWaveIndex == GetComponent<WaveManager>().waves.Count)
         {
             boss.SetActive(true);
             
@@ -101,6 +111,9 @@ public class EndMission : MonoBehaviour
         Time.timeScale = 0f;
         winText.text = "Mission Complete";
         winScreen.SetActive(true);
+        EventSystem.SetActive(false);
+        winningEventSystem.SetActive(true);
+        
     }
 
 }

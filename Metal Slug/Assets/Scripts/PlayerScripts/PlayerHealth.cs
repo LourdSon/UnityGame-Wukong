@@ -42,6 +42,7 @@ public class PlayerHealth : MonoBehaviour
         
         material.SetFloat("_Fade", fade);
         DamageCheck();
+        GetMyHealthBack();
     }
 
 
@@ -101,6 +102,15 @@ public class PlayerHealth : MonoBehaviour
             
             Destroy(gameObject);
             OnDeath.Invoke();
+        }
+    }
+    public void GetMyHealthBack()
+    {
+        if (Input.GetButtonDown("Boomerang"))
+        {
+            health += 10;
+            UpdateHealthBar();
+            health = Mathf.Clamp(health, 0, maxHealth);
         }
     }
 
