@@ -348,6 +348,7 @@ MonoBehaviour:
   meleeHitbox: {fileID: 1351379063942119374}
   xGauche: 0
   xDroite: 2.5
+  isAttacking: 0
 --- !u!1 &1933107785421029597
 GameObject:
   m_ObjectHideFlags: 0
@@ -982,7 +983,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6755bf1604999904ab38933a211ab5eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 30
+  detectionRange: 500
   detectionRangeAttack: 10
   speed: 10
 --- !u!114 &8594349544192959685

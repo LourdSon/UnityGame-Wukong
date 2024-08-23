@@ -753,10 +753,10 @@ GameObject:
   - component: {fileID: 1772965690234640812}
   - component: {fileID: 3630895117633536326}
   - component: {fileID: 2014544144765135667}
-  - component: {fileID: 5468096939401336954}
   - component: {fileID: 8594349544192959685}
   - component: {fileID: 7389688462781611766}
   - component: {fileID: 794596186134732681}
+  - component: {fileID: 4969293471802933271}
   m_Layer: 11
   m_Name: FlyingEnemy
   m_TagString: Enemy
@@ -892,7 +892,7 @@ Rigidbody2D:
   m_GameObject: {fileID: 5567756841379581898}
   m_BodyType: 0
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 1
@@ -971,21 +971,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _teamIndex: 2
---- !u!114 &5468096939401336954
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5567756841379581898}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6755bf1604999904ab38933a211ab5eb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  detectionRange: 30
-  detectionRangeAttack: 10
-  speed: 10
 --- !u!114 &8594349544192959685
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1078,6 +1063,20 @@ MonoBehaviour:
   detectionOffset: {x: 1.9, y: 0}
   direction: 0
   anim: {fileID: 0}
+--- !u!114 &4969293471802933271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5567756841379581898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63c4ea2e8faf9604693f88ed0f0a471c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRange: 500
+  speed: 20
 --- !u!1 &5897392115981162590
 GameObject:
   m_ObjectHideFlags: 0

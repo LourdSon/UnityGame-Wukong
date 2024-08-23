@@ -8,14 +8,14 @@ public class WaveManager : MonoBehaviour
     public class Wave
     {
         public int numberOfEnemies;
-        public GameObject enemyPrefab;
+        public GameObject[] enemyPrefab;
         public float spawnRate;
     }
 
     public List<Wave> waves;
     public Transform[] spawnPoints;
 
-    private int currentWaveIndex = 0;
+    public int currentWaveIndex = 0;
     private int enemiesRemainingToSpawn;
     private GameObject[] enemiesRemainingAlive;
     private bool spawningEnemies = false;
@@ -42,7 +42,7 @@ public class WaveManager : MonoBehaviour
 
         for (int i = 0; i < enemiesRemainingToSpawn; i++)
         {
-            SpawnEnemy(wave.enemyPrefab);
+            SpawnEnemy(wave.enemyPrefab[Random.Range(0, wave.enemyPrefab.Length)]);
             yield return new WaitForSeconds(1f / wave.spawnRate);
         }
 

@@ -15,7 +15,7 @@ public class BossMovement : MonoBehaviour
     private MonsterHealth monsterHealth;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
-    private float offset = 5f;
+    //private float offset = 5f;
     void Start()
     {
         playerRb = player.GetComponent<Rigidbody2D>();

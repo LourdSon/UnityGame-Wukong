@@ -325,6 +325,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectionRange: 50
+  detectionRangeAttack: 10
   speed: 10
 --- !u!114 &7839351361050763519
 MonoBehaviour:
