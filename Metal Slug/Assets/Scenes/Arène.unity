@@ -4234,6 +4234,21 @@ MonoBehaviour:
     - {fileID: 5567756841379581898, guid: 1d9eacfa668d01949aafca34add70daf, type: 3}
     - {fileID: 5567756841379581898, guid: 1c36b51e18ba1864283e56085404345d, type: 3}
     spawnRate: 2
+  - numberOfEnemies: 60
+    enemyPrefab:
+    - {fileID: 5567756841379581898, guid: 1d9eacfa668d01949aafca34add70daf, type: 3}
+    - {fileID: 5567756841379581898, guid: 1c36b51e18ba1864283e56085404345d, type: 3}
+    spawnRate: 2
+  - numberOfEnemies: 70
+    enemyPrefab:
+    - {fileID: 5567756841379581898, guid: 1d9eacfa668d01949aafca34add70daf, type: 3}
+    - {fileID: 5567756841379581898, guid: 1c36b51e18ba1864283e56085404345d, type: 3}
+    spawnRate: 2
+  - numberOfEnemies: 80
+    enemyPrefab:
+    - {fileID: 5567756841379581898, guid: 1d9eacfa668d01949aafca34add70daf, type: 3}
+    - {fileID: 5567756841379581898, guid: 1c36b51e18ba1864283e56085404345d, type: 3}
+    spawnRate: 2
   spawnPoints:
   - {fileID: 1011896715}
   - {fileID: 1734512903}
@@ -15216,9 +15231,9 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 10986b90304ae7f4d818bf5d73b1c512, type: 3}
+  m_audioClip: {fileID: 8300000, guid: e49a9a974b812c84eb109258c40b0d2c, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 1
   Mute: 0
