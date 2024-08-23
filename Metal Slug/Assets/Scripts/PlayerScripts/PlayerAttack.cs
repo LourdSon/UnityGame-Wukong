@@ -43,6 +43,12 @@ public class PlayerAttack : MonoBehaviour
     public float timeBtwAttacksSlam = 2f;
     public float attackTimeCounterSlam;
 
+    public float timeBtwAttacksAttract = 2f;
+    public float attackTimeCounterAttract = 0f;
+    public float attractForce = 50f;
+    public Vector2 detectionPositionAttract;
+    public float detectionOffsetAttract = 2f;
+    public float detectionRadiusAttract = 5f;
 
 
     public int damage = 10;
@@ -60,15 +66,20 @@ public class PlayerAttack : MonoBehaviour
 
     private Vector2 detectionPosition;
     private Vector2 detectionPositionDown;
+    
 
     public bool attack1;
     public bool attack2;
     public bool attack3;
     public bool attack4;
+    public bool attack5;
 
     public ParticleSystem slamParticles;
     public Quaternion rotation;
-    
+
+    private AudioSource audioSource;
+    public AudioClip punchSoundEffect;
+    public float volumeSoundEffect = 0.25f;
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>(); // Récupérer le composant SpriteRenderer
@@ -77,17 +88,18 @@ public class PlayerAttack : MonoBehaviour
         attackTimeCounterUpward = 0f;
         attackTimeCounterDownward = 0f;
         attackTimeCounterSlam = 0f;
-
-        attackTimeCounterSlam = timeBtwAttacksSlam;
+        attackTimeCounterAttract = 0f;
+        
         playerRb = GetComponent<Rigidbody2D>();
         tileDestroyer = GetComponentInChildren<TileDestroyer>();
         impulseSource = GetComponent<CinemachineImpulseSource>();
-        
+        audioSource = GetComponent<AudioSource>();
 
         attack1 = false;
         attack2 = false;
         attack3 = false;
         attack4 = false;
+        attack5 = false;
 
     }
 
@@ -107,6 +119,7 @@ public class PlayerAttack : MonoBehaviour
         int direction = spriteRenderer.flipX ? -1 : 1;
         detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset; 
         detectionPositionDown = (Vector2)transform.position + Vector2.down * detectionOffsetAir.y + Vector2.right * direction * detectionOffsetAir.x;
+        detectionPositionAttract = (Vector2)transform.position + Vector2.right * direction * detectionOffsetAttract; 
         
         rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
         
@@ -133,6 +146,10 @@ public class PlayerAttack : MonoBehaviour
             //animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterSlam = timeBtwAttacksSlam;
             attack4 = true;  
+        } else if(Input.GetButtonDown("Boomerang") && attackTimeCounterAttract <= 0f)
+        {
+            attackTimeCounterAttract = timeBtwAttacksAttract;
+            attack5 = true;
         }
 
 
@@ -140,6 +157,7 @@ public class PlayerAttack : MonoBehaviour
         attackTimeCounterSlam = TimerDecrement(attackTimeCounterSlam);
         attackTimeCounterDownward = TimerDecrement(attackTimeCounterDownward);
         attackTimeCounterUpward = TimerDecrement(attackTimeCounterUpward);
+        attackTimeCounterAttract = TimerDecrement(attackTimeCounterAttract);
     }
 
 
@@ -222,6 +240,10 @@ public class PlayerAttack : MonoBehaviour
         {
             StartCoroutine(WaitForLanding());
             attack4 = false;
+        } else if (attack5 == true)
+        {
+            StartCoroutine(Attack5Co());
+            attack5 = false;
         }
     }
 
@@ -231,6 +253,7 @@ public class PlayerAttack : MonoBehaviour
         if (colliders.Length >= 1)
         {
             playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
+            audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
         }
         // Appliquer une force pour projeter les ennemis vers le haut
         foreach (Collider2D collider in colliders)
@@ -255,6 +278,7 @@ public class PlayerAttack : MonoBehaviour
                 int direction = spriteRenderer.flipX ? -1 : 1;
                 //playerRb.velocity = new Vector2(diagonal.x * selfForceMagnitudeForward,playerRb.velocity.y);
                 playerRb.AddForce(Vector2.right * selfForceMagnitudeForward * -direction, ForceMode2D.Impulse);
+                audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
             }
             // Appliquer une force pour projeter les ennemis vers l'avant
             foreach (Collider2D collider in colliders)
@@ -280,6 +304,7 @@ public class PlayerAttack : MonoBehaviour
         if (collidersDown.Length >= 1)
             {
                 playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
+                audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
             }
             foreach (Collider2D collider in collidersDown)
             {
@@ -299,11 +324,38 @@ public class PlayerAttack : MonoBehaviour
             yield return null;
     }
 
+    private IEnumerator Attack5Co()
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionAttract, detectionRadiusAttract, enemyLayerMask);
+        int direction = spriteRenderer.flipX ? -1 : 1;
+        if (colliders.Length >= 1)
+            {
+                //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
+                audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
+            }
+            foreach (Collider2D collider in colliders)
+            {
+                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+                if (enemyRb != null)
+                {
+                    enemyRb.AddForce(Vector2.right * forceMagnitudeForward * -direction, ForceMode2D.Impulse);
+
+                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+
+                    monsterHealth.TakeDamage(damage);
+                    //monsterHealth.ContactDamage();
+                }
+
+            }
+            attack5 = false;
+            yield return null;
+    }
+
     // Afficher le rayon de détection dans l'éditeur Unity
     private void OnDrawGizmosSelected()
     {
         // Dessiner le rayon de détection dans l'éditeur
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(detectionPositionDown, detectionRadius);
+        Gizmos.DrawWireSphere(detectionPositionAttract, detectionRadiusAttract);
     }
 }

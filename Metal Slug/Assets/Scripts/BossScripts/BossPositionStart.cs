@@ -35,10 +35,7 @@ public class BossPositionStart : MonoBehaviour
                 StartCoroutine(Intro());
             }else if(animator.GetCurrentAnimatorStateInfo(0).IsName("BossOnGround"))
             {
-                /*Vector3 bossPosition = bossTr.position;
-                bossPosition.x = playerTr.position.x + offset;
-                bossTr.position = bossPosition;
-                Debug.Log("Alors");*/
+                
             }else if(animator.GetCurrentAnimatorStateInfo(0).IsName("Walking"))
             {
                 

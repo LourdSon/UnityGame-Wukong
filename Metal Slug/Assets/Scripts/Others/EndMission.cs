@@ -55,10 +55,7 @@ public class EndMission : MonoBehaviour
         ResetPlayer(defaultGravityR);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Time.timeScale = 1f;
-        bosses = GameObject.FindGameObjectsWithTag("Boss");
-        boss.SetActive(false);
-        isCutsceneon = false;
-        playedOnce = false;
+        
     
     }
     void ResetPlayer(Vector2 defaultGravity)

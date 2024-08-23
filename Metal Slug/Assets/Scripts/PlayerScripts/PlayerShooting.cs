@@ -31,6 +31,10 @@ public class PlayerShooting : MonoBehaviour
     //public MonsterHealth monsterHealth;
     public Vector3 offset = new Vector3(2.5f, 0f, 0f);
 
+    private AudioSource audioSource;
+    public AudioClip energySoundEffect;
+    public float volumeSoundEffect = 0.25f;
+
 
     void Start()
     {
@@ -39,6 +43,7 @@ public class PlayerShooting : MonoBehaviour
         attackTimeCounter = 0f;
         animator = GetComponent<Animator>();
         playerKi = GetComponent<PlayerMovement>();
+        audioSource = GetComponent<AudioSource>();
 
         // Obtenir la direction actuelle du sprite du joueur
     }
@@ -110,12 +115,14 @@ public class PlayerShooting : MonoBehaviour
 
     private IEnumerator Shooting1()
     {
+        audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
         energyrb.velocity = shootDirection * energyBallSpeed;
         isShooting = false;
         yield return null;
     }
     private IEnumerator Shooting2()
     {
+        audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
         energyrb.velocity = direction * Vector2.right * energyBallSpeed;
         isShooting2 = false;
         yield return null;

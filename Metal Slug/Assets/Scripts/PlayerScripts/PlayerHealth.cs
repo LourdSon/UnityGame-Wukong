@@ -106,7 +106,7 @@ public class PlayerHealth : MonoBehaviour
     }
     public void GetMyHealthBack()
     {
-        if (Input.GetButtonDown("Boomerang"))
+        if (Input.GetButtonDown("Return Boomerang"))
         {
             health += 10;
             UpdateHealthBar();
