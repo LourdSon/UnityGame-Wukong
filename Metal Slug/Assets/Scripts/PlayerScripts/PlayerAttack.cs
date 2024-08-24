@@ -141,12 +141,12 @@ public class PlayerAttack : MonoBehaviour
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterDownward = timeBtwAttacksDownward;
             attack3 = true;  
-        } else if (Input.GetButtonDown("Fire2")  && attackTimeCounterSlam <= 0f)
+        } /*else if (Input.GetButtonDown("Fire2")  && attackTimeCounterSlam <= 0f)
         {
             //animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterSlam = timeBtwAttacksSlam;
             attack4 = true;  
-        } else if(Input.GetButtonDown("Boomerang") && attackTimeCounterAttract <= 0f)
+        } */else if(Input.GetButtonDown("Boomerang") && attackTimeCounterAttract <= 0f)
         {
             attackTimeCounterAttract = timeBtwAttacksAttract;
             attack5 = true;
@@ -162,42 +162,6 @@ public class PlayerAttack : MonoBehaviour
 
 
 
-    private IEnumerator WaitForLanding()
-    {
-        BoxCollider2D playerBox = GetComponent<BoxCollider2D>();
-        // Appliquer une force descendante aux ennemis
-        playerRb.AddForce(Vector2.down * slamForce, ForceMode2D.Impulse);
-        CameraShakeManager.instance.CameraShake(impulseSource);
-        Physics2D.IgnoreLayerCollision(9,11,true);
-        yield return new WaitUntil(() => IsGrounded());
- 
-        
-        yield return new WaitForSeconds(doubleChocTimer);
-        Instantiate(slamParticles,transform.position,rotation);
-        CameraShakeManager.instance.CameraShake(impulseSource);
-        // Détecter les ennemis dans la zone d'attaque
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, detectionRadiusSlam, 0f, enemyLayerMask);
-        foreach (Collider2D collider in colliders)
-        {
-            Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
-            if (enemyRb != null)
-            {
-                Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
-                enemyRb.AddForce(Vector2.right * directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
-                // Infliger des dégâts aux ennemis
-                MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
-                if (monsterHealth != null)
-                {
-                    monsterHealth.TakeDamage(damage);
-                }
-            }
-        }
-        attack4 = false;
-        Physics2D.IgnoreLayerCollision(9,11,false);
-        //tileDestroyer.OGDestructionMouse();
-        yield return null;
-
-    }
 
     private float TimerDecrement(float timeCounter)
     {
@@ -254,6 +218,7 @@ public class PlayerAttack : MonoBehaviour
         {
             playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
             audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
+            CameraShakeManager.instance.CameraShake(impulseSource);
         }
         // Appliquer une force pour projeter les ennemis vers le haut
         foreach (Collider2D collider in colliders)
@@ -279,6 +244,7 @@ public class PlayerAttack : MonoBehaviour
                 //playerRb.velocity = new Vector2(diagonal.x * selfForceMagnitudeForward,playerRb.velocity.y);
                 playerRb.AddForce(Vector2.right * selfForceMagnitudeForward * -direction, ForceMode2D.Impulse);
                 audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
+                CameraShakeManager.instance.CameraShake(impulseSource);
             }
             // Appliquer une force pour projeter les ennemis vers l'avant
             foreach (Collider2D collider in colliders)
@@ -305,6 +271,7 @@ public class PlayerAttack : MonoBehaviour
             {
                 playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
                 audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
+                CameraShakeManager.instance.CameraShake(impulseSource);
             }
             foreach (Collider2D collider in collidersDown)
             {
@@ -323,6 +290,47 @@ public class PlayerAttack : MonoBehaviour
             attack3 = false;
             yield return null;
     }
+    private IEnumerator WaitForLanding()
+    {
+        BoxCollider2D playerBox = GetComponent<BoxCollider2D>();
+        // Appliquer une force descendante aux ennemis
+        playerRb.AddForce(Vector2.down * slamForce, ForceMode2D.Impulse);
+        CameraShakeManager.instance.CameraShake(impulseSource);
+        Physics2D.IgnoreLayerCollision(9,11,true);
+        yield return new WaitUntil(() => IsGrounded());
+ 
+        
+        yield return new WaitForSeconds(doubleChocTimer);
+        Instantiate(slamParticles,transform.position,rotation);
+        CameraShakeManager.instance.CameraShake(impulseSource);
+        // Détecter les ennemis dans la zone d'attaque
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, detectionRadiusSlam, 0f, enemyLayerMask);
+        if (colliders.Length >= 1)
+            {
+                audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
+                CameraShakeManager.instance.CameraShake(impulseSource);
+            }
+        foreach (Collider2D collider in colliders)
+        {
+            Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+            if (enemyRb != null)
+            {
+                Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                enemyRb.AddForce(Vector2.right * directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
+                // Infliger des dégâts aux ennemis
+                MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+                if (monsterHealth != null)
+                {
+                    monsterHealth.TakeDamage(damage);
+                }
+            }
+        }
+        attack4 = false;
+        Physics2D.IgnoreLayerCollision(9,11,false);
+        //tileDestroyer.OGDestructionMouse();
+        yield return null;
+
+    }
 
     private IEnumerator Attack5Co()
     {
@@ -332,13 +340,15 @@ public class PlayerAttack : MonoBehaviour
             {
                 //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
                 audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
+                CameraShakeManager.instance.CameraShake(impulseSource);
             }
             foreach (Collider2D collider in colliders)
             {
                 Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
                 if (enemyRb != null)
                 {
-                    enemyRb.AddForce(Vector2.right * forceMagnitudeForward * -direction, ForceMode2D.Impulse);
+                    Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                    enemyRb.AddForce(directionVector * -forceMagnitudeForward , ForceMode2D.Impulse);
 
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
 

@@ -8,8 +8,8 @@ using UnityEngine;
 public class FlyingMonsterMovement : MonoBehaviour
 {
 
-    public float detectionRange = 30f;
-    public float speed = 5f; // Vitesse de déplacement de l'ennemi
+    public float detectionRange = 500f;
+    public float speed = 20f; // Vitesse de déplacement de l'ennemi
 
     private Transform playerTransform;
         

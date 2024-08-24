@@ -59,7 +59,7 @@ public class MonsterHealth : MonoBehaviour
         knockBackCounter = 0;
         isTakingDamage = true;
         knockBackTest();
-        CameraShakeManager.instance.CameraShake(impulseSource);
+        //CameraShakeManager.instance.CameraShake(impulseSource);
 
         SpawnDamageParticles();
 

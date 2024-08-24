@@ -105,6 +105,9 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask playerLayerMask;
     public float detectionRadius = 5f;
     Material material;
+
+    public Quaternion rotation;
+    public ParticleSystem slamParticles;
     
 
     
@@ -343,6 +346,7 @@ public class PlayerMovement : MonoBehaviour
         if (KiCharging.gameObject.activeSelf)
         {
             audioSource.PlayOneShot(soundEffect, 0.25f);
+            Instantiate(slamParticles,transform.position,Quaternion.identity);
         }
         playerRb.velocity = new Vector2(0f,0f);
         EnemiesStepBackCharging();

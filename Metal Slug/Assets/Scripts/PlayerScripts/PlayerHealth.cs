@@ -22,6 +22,9 @@ public class PlayerHealth : MonoBehaviour
     private CinemachineImpulseSource impulseSource;
     public float fade = 1f;
     Material material;
+
+    public float healCost = 25f;
+    private PlayerMovement playerKi;
     
     
     // Start is called before the first frame update
@@ -33,6 +36,8 @@ public class PlayerHealth : MonoBehaviour
 
         impulseSource = GetComponent<CinemachineImpulseSource>();
         material = GetComponent<SpriteRenderer>().material;
+
+        playerKi = GetComponent<PlayerMovement>();
         
     }
 
@@ -106,11 +111,13 @@ public class PlayerHealth : MonoBehaviour
     }
     public void GetMyHealthBack()
     {
-        if (Input.GetButtonDown("Return Boomerang"))
+        if (Input.GetButtonDown("Return Boomerang") && playerKi.currentKi >= healCost && health != maxHealth)
         {
             health += 10;
             UpdateHealthBar();
             health = Mathf.Clamp(health, 0, maxHealth);
+            playerKi.currentKi -= healCost;
+            playerKi.UpdateKiBar();
         }
     }
 

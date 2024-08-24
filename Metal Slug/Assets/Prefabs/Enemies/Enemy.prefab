@@ -757,6 +757,7 @@ GameObject:
   - component: {fileID: 8594349544192959685}
   - component: {fileID: 7389688462781611766}
   - component: {fileID: 794596186134732681}
+  - component: {fileID: 3862819490114158466}
   m_Layer: 11
   m_Name: Enemy
   m_TagString: Enemy
@@ -897,7 +898,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 1
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -978,14 +979,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5567756841379581898}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6755bf1604999904ab38933a211ab5eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   detectionRange: 500
   detectionRangeAttack: 10
-  speed: 10
+  speed: 20
 --- !u!114 &8594349544192959685
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -999,7 +1000,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 20
+  multipUltim: 3
   impactParticles: {fileID: 1132110526623212655, guid: 7476291775d6d264f8ad52f6dff1edb5, type: 3}
+  forceMagnitudeUpward: 10
 --- !u!114 &7389688462781611766
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1078,6 +1081,20 @@ MonoBehaviour:
   detectionOffset: {x: 1.9, y: 0}
   direction: 0
   anim: {fileID: 0}
+--- !u!114 &3862819490114158466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5567756841379581898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63c4ea2e8faf9604693f88ed0f0a471c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRange: 500
+  speed: 20
 --- !u!1 &5897392115981162590
 GameObject:
   m_ObjectHideFlags: 0
@@ -1242,7 +1259,7 @@ RectTransform:
   m_Father: {fileID: 3837520205761598105}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1491,7 +1508,7 @@ MonoBehaviour:
   slider: {fileID: 7751046286461655918}
   camera: {fileID: 0}
   target: {fileID: 1662570305902000126}
-  offset: {x: 0, y: 3, z: 0}
+  offset: {x: 0, y: 2, z: 0}
 --- !u!1 &8680836937455192407
 GameObject:
   m_ObjectHideFlags: 0

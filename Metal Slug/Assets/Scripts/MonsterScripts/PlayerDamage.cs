@@ -7,7 +7,9 @@ public class PlayerDamage : MonoBehaviour
 {
 
     public int damage = 30;
+    public int multipUltim = 3;
     public ParticleSystem impactParticles;
+    public float forceMagnitudeUpward;
     
     // Start is called before the first frame update
     void Start()
@@ -25,23 +27,31 @@ public class PlayerDamage : MonoBehaviour
     {
         if(other.gameObject.tag == "EnergyBall")
         {
-            SpriteRenderer enemyRb = GetComponentInChildren<SpriteRenderer>();
+            SpriteRenderer enemySr = GetComponentInChildren<SpriteRenderer>();
             MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
             monsterHealth.TakeDamage(damage);
-            int direction = enemyRb.flipX ? 1 : -1;
+            int direction = enemySr.flipX ? 1 : -1;
             Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
-            Instantiate(impactParticles,other.transform.position, rotation);
+            Instantiate(impactParticles, other.transform.position, rotation);
             Destroy(other.gameObject);
 
             
         } if(other.gameObject.tag == "EnergyBall2")
         {
-            SpriteRenderer enemyRb = GetComponentInChildren<SpriteRenderer>();
+            SpriteRenderer enemySr = GetComponentInChildren<SpriteRenderer>();
+            Rigidbody2D enemyRb = GetComponentInChildren<Rigidbody2D>();
             MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
-            monsterHealth.TakeDamage(damage);
-            int direction = enemyRb.flipX ? 1 : -1;
+            monsterHealth.TakeDamage(damage*multipUltim);
+            int direction = enemySr.flipX ? 1 : -1;
             Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
-            Instantiate(impactParticles,other.transform.position, rotation);
+            int upOrDown = Random.Range(-1,1);
+            if (upOrDown == 0)
+            { 
+                upOrDown = -1;
+            }
+            enemyRb.AddForce(Vector2.up * forceMagnitudeUpward * upOrDown, ForceMode2D.Impulse);
+            Instantiate(impactParticles, other.transform.position, rotation);
+
         }
     }
 }

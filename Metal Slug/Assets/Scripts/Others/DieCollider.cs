@@ -16,11 +16,11 @@ public class DieCollider : MonoBehaviour
     // Fonction appelée lorsqu'un autre collider entre en contact avec ce collider
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player"))
+        /*if (collision.CompareTag("Player"))
         {
             RespawnPlayer(collision.gameObject);
-        }
-        else if (collision.CompareTag("Enemy") || collision.CompareTag("EnergyBall"))
+        }*/
+        /*else*/ if (collision.CompareTag("Enemy") || collision.CompareTag("EnergyBall"))
         {
             Destroy(collision.gameObject);
         }
