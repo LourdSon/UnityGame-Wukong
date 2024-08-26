@@ -774,7 +774,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 45, y: 2, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1.25}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4506786597140600698}
@@ -986,7 +986,7 @@ MonoBehaviour:
   damage: 20
   multipUltim: 3
   impactParticles: {fileID: 1132110526623212655, guid: 7476291775d6d264f8ad52f6dff1edb5, type: 3}
-  forceMagnitudeUpward: 10
+  forceMagnitudeUpward: 30
 --- !u!114 &7389688462781611766
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1078,7 +1078,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectionRange: 500
-  speed: 20
+  speed: 30
 --- !u!1 &5897392115981162590
 GameObject:
   m_ObjectHideFlags: 0

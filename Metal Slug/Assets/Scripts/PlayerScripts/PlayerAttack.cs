@@ -7,7 +7,8 @@ using Cinemachine;
 
 //using System.Numerics;
 using UnityEngine;
-using Unity.Mathematics;
+using JetBrains.Annotations;
+//using Unity.Mathematics;
 
 
 public class PlayerAttack : MonoBehaviour
@@ -80,6 +81,7 @@ public class PlayerAttack : MonoBehaviour
     private AudioSource audioSource;
     public AudioClip punchSoundEffect;
     public float volumeSoundEffect = 0.25f;
+    public ParticleSystem hitEffect;
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>(); // Récupérer le composant SpriteRenderer
@@ -216,6 +218,9 @@ public class PlayerAttack : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
         if (colliders.Length >= 1)
         {
+            float newPitch = UnityEngine.Random.Range(0.6f,1f);
+            audioSource.pitch = newPitch;
+            Instantiate(hitEffect, detectionPosition, Quaternion.identity);
             playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
             audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
             CameraShakeManager.instance.CameraShake(impulseSource);
@@ -240,6 +245,9 @@ public class PlayerAttack : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
         if (colliders.Length >= 1)
             {
+                float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+                audioSource.pitch = newPitch;
+                Instantiate(hitEffect, detectionPosition, Quaternion.identity);
                 int direction = spriteRenderer.flipX ? -1 : 1;
                 //playerRb.velocity = new Vector2(diagonal.x * selfForceMagnitudeForward,playerRb.velocity.y);
                 playerRb.AddForce(Vector2.right * selfForceMagnitudeForward * -direction, ForceMode2D.Impulse);
@@ -269,6 +277,9 @@ public class PlayerAttack : MonoBehaviour
         Collider2D[] collidersDown = Physics2D.OverlapCircleAll(detectionPositionDown, detectionRadius, enemyLayerMask);
         if (collidersDown.Length >= 1)
             {
+                float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+                audioSource.pitch = newPitch;
+                Instantiate(hitEffect, detectionPosition, Quaternion.identity);
                 playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
                 audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
                 CameraShakeManager.instance.CameraShake(impulseSource);
@@ -307,6 +318,7 @@ public class PlayerAttack : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, detectionRadiusSlam, 0f, enemyLayerMask);
         if (colliders.Length >= 1)
             {
+                Instantiate(hitEffect, detectionPosition, Quaternion.identity);
                 audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
                 CameraShakeManager.instance.CameraShake(impulseSource);
             }
@@ -338,8 +350,12 @@ public class PlayerAttack : MonoBehaviour
         int direction = spriteRenderer.flipX ? -1 : 1;
         if (colliders.Length >= 1)
             {
+                Instantiate(hitEffect, detectionPosition, Quaternion.identity);
                 //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
+                float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+                audioSource.pitch = newPitch;
                 audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
+                
                 CameraShakeManager.instance.CameraShake(impulseSource);
             }
             foreach (Collider2D collider in colliders)

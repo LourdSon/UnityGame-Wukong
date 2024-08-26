@@ -1002,7 +1002,7 @@ MonoBehaviour:
   damage: 20
   multipUltim: 3
   impactParticles: {fileID: 1132110526623212655, guid: 7476291775d6d264f8ad52f6dff1edb5, type: 3}
-  forceMagnitudeUpward: 10
+  forceMagnitudeUpward: 30
 --- !u!114 &7389688462781611766
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -31,6 +31,7 @@ public class EndMission : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 1f;
         winScreen.SetActive(false);
         // Sauvegarder la gravité par défaut
         defaultGravityR = Physics2D.gravity;
