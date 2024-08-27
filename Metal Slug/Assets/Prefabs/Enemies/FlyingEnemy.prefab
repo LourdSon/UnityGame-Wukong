@@ -343,7 +343,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   monsterAttack2: {fileID: 794596186134732681}
-  waitingForAttack: 1
+  waitingForAttack: 0.5
   spriteRenderer: {fileID: 1864695746995217935}
   meleeHitbox: {fileID: 1351379063942119374}
   xGauche: -1.2

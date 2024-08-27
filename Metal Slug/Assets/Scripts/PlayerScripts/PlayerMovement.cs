@@ -284,11 +284,15 @@ public class PlayerMovement : MonoBehaviour
         Vector2 dashMovement = new Vector2(horizontalInput, verticalInput);
         float defaultSpeed = moveSpeed;
         moveSpeed += dashForce;
+        
         //playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce);
         playerRb.AddForce(dashMovement * dashForce,ForceMode2D.Impulse);       
         Physics2D.IgnoreLayerCollision(9,11,true);      
+        //playerRb.gravityScale = 0;
         yield return new WaitForSeconds(dashDuration);
-        //boxCollider.enabled = true;
+        //boxCollider.enabled = true,
+        //playerRb.gravityScale = 1;
+
         Physics2D.IgnoreLayerCollision(9,11,false);
         // Arrêter le dash en réinitialisant la vélocité du joueur
         //playerRb.velocity = Vector2.zero;

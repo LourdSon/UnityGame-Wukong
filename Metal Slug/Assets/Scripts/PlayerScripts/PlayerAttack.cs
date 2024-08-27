@@ -8,6 +8,7 @@ using Cinemachine;
 //using System.Numerics;
 using UnityEngine;
 using JetBrains.Annotations;
+using Unity.VisualScripting;
 //using Unity.Mathematics;
 
 
@@ -82,6 +83,17 @@ public class PlayerAttack : MonoBehaviour
     public AudioClip punchSoundEffect;
     public float volumeSoundEffect = 0.25f;
     public ParticleSystem hitEffect;
+    public float horizontalInput;
+
+    [Header("HoldingSelect")]
+    public bool isHoldingSelect = false;
+    public float holdingTime = 0f;
+    public float requiredHoldingTime = 0.5f;
+    public bool attack6 = false;
+    public float distancePique = 0.5f;
+    public float attackTimeCounterPique = 0f;
+    public float timeBtwAttacksPique = 0.5f;
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>(); // Récupérer le composant SpriteRenderer
@@ -91,7 +103,8 @@ public class PlayerAttack : MonoBehaviour
         attackTimeCounterDownward = 0f;
         attackTimeCounterSlam = 0f;
         attackTimeCounterAttract = 0f;
-        
+        attackTimeCounterPique = 0f;
+
         playerRb = GetComponent<Rigidbody2D>();
         tileDestroyer = GetComponentInChildren<TileDestroyer>();
         impulseSource = GetComponent<CinemachineImpulseSource>();
@@ -102,12 +115,14 @@ public class PlayerAttack : MonoBehaviour
         attack3 = false;
         attack4 = false;
         attack5 = false;
+        attack6 = false;
 
     }
 
     void Update()
     {
         Attackp();
+        HoldingSelectF();
     }
 
     void FixedUpdate()
@@ -118,6 +133,7 @@ public class PlayerAttack : MonoBehaviour
     private void Attackp()
     {
         float upwardAttackKey = Input.GetAxisRaw("Vertical");
+        horizontalInput = Input.GetAxisRaw("Horizontal");
         int direction = spriteRenderer.flipX ? -1 : 1;
         detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset; 
         detectionPositionDown = (Vector2)transform.position + Vector2.down * detectionOffsetAir.y + Vector2.right * direction * detectionOffsetAir.x;
@@ -148,22 +164,43 @@ public class PlayerAttack : MonoBehaviour
             //animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterSlam = timeBtwAttacksSlam;
             attack4 = true;  
-        } */else if(Input.GetButtonDown("Boomerang") && attackTimeCounterAttract <= 0f)
+        }*/ else if(Input.GetButtonDown("Boomerang") && attackTimeCounterAttract <= 0f && !isHoldingSelect)
         {
             attackTimeCounterAttract = timeBtwAttacksAttract;
             attack5 = true;
         }
 
+        else if(holdingTime >= requiredHoldingTime && Input.GetButtonDown("Boomerang") && attackTimeCounterPique <= 0f)
+        {
+            attackTimeCounterPique = timeBtwAttacksPique;
+            attack6 = true;
+        } 
 
         attackTimeCounter = TimerDecrement(attackTimeCounter);
         attackTimeCounterSlam = TimerDecrement(attackTimeCounterSlam);
         attackTimeCounterDownward = TimerDecrement(attackTimeCounterDownward);
         attackTimeCounterUpward = TimerDecrement(attackTimeCounterUpward);
         attackTimeCounterAttract = TimerDecrement(attackTimeCounterAttract);
+        attackTimeCounterPique = TimerDecrement(attackTimeCounterPique);
     }
+        
 
-
-
+    private void HoldingSelectF()
+    {
+        if(Input.GetButtonDown("Select"))
+        {   
+            isHoldingSelect = true;
+        }
+        if(Input.GetButtonUp("Select"))
+        {
+            isHoldingSelect = false;
+            holdingTime = 0f;
+        }
+        if(isHoldingSelect)
+        {
+            holdingTime += Time.deltaTime;
+        }
+    }
 
     private float TimerDecrement(float timeCounter)
     {
@@ -202,14 +239,18 @@ public class PlayerAttack : MonoBehaviour
             StartCoroutine(Attack3Co());
             attack3 = false;
         }
-        else if (attack4 == true)
+        /*else if (attack4 == true)
         {
             StartCoroutine(WaitForLanding());
             attack4 = false;
-        } else if (attack5 == true)
+        } */else if (attack5 == true)
         {
             StartCoroutine(Attack5Co());
             attack5 = false;
+        } else if (attack6 == true)
+        {
+            StartCoroutine(WaitForLanding());
+            attack6 = false;
         }
     }
 
@@ -296,7 +337,7 @@ public class PlayerAttack : MonoBehaviour
                     monsterHealth.TakeDamage(damage);
                     //monsterHealth.ContactDamage();
                 }
-
+            
             }
             attack3 = false;
             yield return null;
@@ -304,31 +345,32 @@ public class PlayerAttack : MonoBehaviour
     private IEnumerator WaitForLanding()
     {
         BoxCollider2D playerBox = GetComponent<BoxCollider2D>();
+        int direction = spriteRenderer.flipX ? -1 : 1;
         // Appliquer une force descendante aux ennemis
-        playerRb.AddForce(Vector2.down * slamForce, ForceMode2D.Impulse);
+        playerRb.AddForce((Vector2.right * direction * slamForce + Vector2.down * slamForce), ForceMode2D.Impulse);
         CameraShakeManager.instance.CameraShake(impulseSource);
         Physics2D.IgnoreLayerCollision(9,11,true);
-        yield return new WaitUntil(() => IsGrounded());
- 
+        yield return new WaitForSeconds(distancePique);
         
-        yield return new WaitForSeconds(doubleChocTimer);
+        playerRb.velocity = Vector2.zero;
+        // yield return new WaitForSeconds(doubleChocTimer);
         Instantiate(slamParticles,transform.position,rotation);
         CameraShakeManager.instance.CameraShake(impulseSource);
-        // Détecter les ennemis dans la zone d'attaque
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, detectionRadiusSlam, 0f, enemyLayerMask);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, detectionRadius, enemyLayerMask);
         if (colliders.Length >= 1)
-            {
-                Instantiate(hitEffect, detectionPosition, Quaternion.identity);
-                audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
-                CameraShakeManager.instance.CameraShake(impulseSource);
-            }
+        {
+            //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
+            Instantiate(hitEffect, detectionPosition, Quaternion.identity);
+            audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
+            CameraShakeManager.instance.CameraShake(impulseSource);
+        }
         foreach (Collider2D collider in colliders)
         {
             Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
             if (enemyRb != null)
             {
                 Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
-                enemyRb.AddForce(Vector2.right * directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
+                enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
                 // Infliger des dégâts aux ennemis
                 MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                 if (monsterHealth != null)
@@ -337,7 +379,7 @@ public class PlayerAttack : MonoBehaviour
                 }
             }
         }
-        attack4 = false;
+        attack6 = false;
         Physics2D.IgnoreLayerCollision(9,11,false);
         //tileDestroyer.OGDestructionMouse();
         yield return null;
