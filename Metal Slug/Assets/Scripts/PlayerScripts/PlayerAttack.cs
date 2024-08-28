@@ -93,6 +93,7 @@ public class PlayerAttack : MonoBehaviour
     public float distancePique = 0.5f;
     public float attackTimeCounterPique = 0f;
     public float timeBtwAttacksPique = 0.5f;
+    public float detectionRadiusPique = 10f;
 
     void Start()
     {
@@ -353,10 +354,11 @@ public class PlayerAttack : MonoBehaviour
         yield return new WaitForSeconds(distancePique);
         
         playerRb.velocity = Vector2.zero;
+        Physics2D.IgnoreLayerCollision(9,11,false);
         // yield return new WaitForSeconds(doubleChocTimer);
         Instantiate(slamParticles,transform.position,rotation);
         CameraShakeManager.instance.CameraShake(impulseSource);
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, detectionRadius, enemyLayerMask);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, detectionRadiusPique, enemyLayerMask);
         if (colliders.Length >= 1)
         {
             //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
@@ -380,7 +382,7 @@ public class PlayerAttack : MonoBehaviour
             }
         }
         attack6 = false;
-        Physics2D.IgnoreLayerCollision(9,11,false);
+        
         //tileDestroyer.OGDestructionMouse();
         yield return null;
 
@@ -424,6 +426,6 @@ public class PlayerAttack : MonoBehaviour
     {
         // Dessiner le rayon de détection dans l'éditeur
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(detectionPositionAttract, detectionRadiusAttract);
+        Gizmos.DrawWireSphere(transform.position, detectionRadiusPique);
     }
 }
