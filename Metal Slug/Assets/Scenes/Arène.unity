@@ -1313,7 +1313,7 @@ MonoBehaviour:
   m_TargetMovementOnly: 1
   m_ScreenX: 0.5
   m_ScreenY: 0.6
-  m_CameraDistance: 25
+  m_CameraDistance: 20
   m_DeadZoneWidth: 0.1
   m_DeadZoneHeight: 0.1
   m_DeadZoneDepth: 0
@@ -2607,7 +2607,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 88.50715
+  field of view: 114.189575
   orthographic: 0
   orthographic size: 15
   m_Depth: -1
@@ -2634,7 +2634,7 @@ Transform:
   m_GameObject: {fileID: 856845353}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 39.24, y: -2.1286068, z: -25}
+  m_LocalPosition: {x: 96.7, y: 0.48182678, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3126,7 +3126,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 3236515591816997604}
   m_Lens:
-    FieldOfView: 88.50715
+    FieldOfView: 114.189575
     OrthographicSize: 15
     NearClipPlane: 0.01
     FarClipPlane: 1000
@@ -3153,7 +3153,7 @@ Transform:
   m_GameObject: {fileID: 985383729}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -63.76, y: -17.128607, z: -20.486546}
+  m_LocalPosition: {x: -6.300003, y: -14.518173, z: -15.4865465}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15211,7 +15211,7 @@ Transform:
   m_GameObject: {fileID: 1749036948}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 20.2, y: 2.4875011, z: 0}
+  m_LocalPosition: {x: 20.2, y: -2.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15231,11 +15231,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1316749816014414143, guid: 2a7ad662ac778074e834f6250e4e5db3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -304.3
+      value: -304.29
       objectReference: {fileID: 0}
     - target: {fileID: 1316749816014414143, guid: 2a7ad662ac778074e834f6250e4e5db3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.51
+      value: -1.5013
       objectReference: {fileID: 0}
     - target: {fileID: 1316749816014414143, guid: 2a7ad662ac778074e834f6250e4e5db3, type: 3}
       propertyPath: m_LocalPosition.z
@@ -15512,7 +15512,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: e49a9a974b812c84eb109258c40b0d2c, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.4
+  m_Volume: 0.15
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -15645,7 +15645,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1023.41473, y: -811.0089}
+  m_AnchoredPosition: {x: 1023.4147, y: -811.0089}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2046788807
@@ -21024,7 +21024,7 @@ Transform:
   m_GameObject: {fileID: 783027960897221129}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 39.24, y: -7, z: 0}
+  m_LocalPosition: {x: 96.7, y: -5.7, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -21389,7 +21389,7 @@ MonoBehaviour:
   forceMagnitudeDownward: 75
   detectionOffset: 0.7
   detectionOffsetAir: {x: 1, y: 1.5}
-  detectionRadius: 5
+  detectionRadius: 3
   detectionRadiusTP: 20
   offsetTP: 2
   forwardAttackKey: 323
@@ -21429,7 +21429,7 @@ MonoBehaviour:
   slamParticles: {fileID: 5909879965691084440, guid: 15635b093eecf7d4fa066b66271938d4, type: 3}
   rotation: {x: 0, y: 0, z: 0, w: 0}
   punchSoundEffect: {fileID: 8300000, guid: a024fa42502ccdb47bec076ec33d9b99, type: 3}
-  volumeSoundEffect: 1.25
+  volumeSoundEffect: 0.5
   hitEffect: {fileID: 5197920272909818295, guid: 72be00577ebc75e439a30525e336b9ba, type: 3}
   horizontalInput: 0
   isHoldingSelect: 0
@@ -21439,7 +21439,8 @@ MonoBehaviour:
   distancePique: 0.1
   attackTimeCounterPique: 0
   timeBtwAttacksPique: 2
-  detectionRadiusPique: 10
+  detectionRadiusPique: 20
+  piqueRatio: 1.35
 --- !u!1 &5584074201186556014 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6784112320445133838, guid: 77f85ad0b193f0041872821463c164a1, type: 3}
@@ -21536,9 +21537,9 @@ MonoBehaviour:
   timeBtwAttacks: 0.1
   attackTimeCounter: 0
   energyBallPrefab2: {fileID: 8430373969313254213, guid: 2a7ad662ac778074e834f6250e4e5db3, type: 3}
-  energyBallSpeed2: 0.1
+  energyBallSpeed2: 0.05
   selfForceMagnitudeForward: 10
-  offsetGenki: {x: 5, y: 0, z: 0}
+  offsetGenki: {x: 5, y: 5, z: 0}
   offset: {x: 4, y: 1, z: 0}
   energySoundEffect: {fileID: 8300000, guid: a749cb40da38518419454670ade7da09, type: 3}
   volumeSoundEffect: 1
@@ -21932,7 +21933,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ImpulseDefinition:
-    m_ImpulseChannel: 1
+    m_ImpulseChannel: -1
     m_ImpulseShape: 2
     m_CustomImpulseShape:
       serializedVersion: 2
@@ -21971,7 +21972,7 @@ MonoBehaviour:
     m_DissipationMode: 2
     m_DissipationDistance: 100
     m_PropagationSpeed: 343
-  m_DefaultVelocity: {x: 0, y: -2, z: 0}
+  m_DefaultVelocity: {x: 0, y: -1, z: 0}
 --- !u!114 &8467768669592782887
 MonoBehaviour:
   m_ObjectHideFlags: 0

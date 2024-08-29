@@ -94,6 +94,7 @@ public class PlayerAttack : MonoBehaviour
     public float attackTimeCounterPique = 0f;
     public float timeBtwAttacksPique = 0.5f;
     public float detectionRadiusPique = 10f;
+    public float piqueRatio = 1.35f;
 
     void Start()
     {
@@ -412,7 +413,7 @@ public class PlayerAttack : MonoBehaviour
 
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
 
-                    monsterHealth.TakeDamage(damage);
+                    monsterHealth.TakeDamage(damage * piqueRatio);
                     //monsterHealth.ContactDamage();
                 }
 
@@ -426,6 +427,6 @@ public class PlayerAttack : MonoBehaviour
     {
         // Dessiner le rayon de détection dans l'éditeur
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, detectionRadiusPique);
+        Gizmos.DrawWireSphere(detectionPosition, detectionRadius);
     }
 }

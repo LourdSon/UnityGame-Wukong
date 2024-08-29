@@ -14,6 +14,7 @@ public class PlayerShooting : MonoBehaviour
     public float energyBallSpeed = 5f;
     private Rigidbody2D rb;
     private Rigidbody2D energyrb;
+    private Rigidbody2D energyrb2;
     private SpriteRenderer spriteRenderer;
 
     public float timeBtwAttacks = 3f;
@@ -117,9 +118,9 @@ public class PlayerShooting : MonoBehaviour
         } else if(horizontalInput != 0 && Input.GetButtonDown("Fire2") && attackTimeCounter2 <= 0f  && cKi >= costUltimate || verticalInput != 0 && Input.GetButtonDown("Fire2") && attackTimeCounter2 <= 0f && cKi >= costUltimate)
         {
             //energyBall2 = Instantiate(energyBallPrefab2, transform.position + offsetGenki, Quaternion.identity);
-            energyBall2.transform.position = transform.position + offsetGenki;
+            energyBall2.transform.position = new Vector3(transform.position.x + offsetGenki.x * horizontalInput, transform.position.y + offsetGenki.y * verticalInput, transform.position.z);
             energyBall2.SetActive(true);
-            energyrb = energyBall2.GetComponent<Rigidbody2D>();
+            energyrb2 = energyBall2.GetComponent<Rigidbody2D>();
             energyBall2.transform.localScale *= scaleMultiplier;
             animator.SetTrigger("SimpleShootingTrigger");
             isShooting3 = true;
@@ -182,7 +183,7 @@ public class PlayerShooting : MonoBehaviour
         {
             playerRb.AddForce(Vector2.right * selfForceMagnitudeForward/5 * -direction, ForceMode2D.Impulse);
             audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
-            energyrb.AddForce(shootDirection * energyBallSpeed2, ForceMode2D.Impulse);
+            energyrb2.AddForce(shootDirection * energyBallSpeed2, ForceMode2D.Impulse);
             CameraShakeManager.instance.CameraShake(impulseSource);
             isShooting3 = false;
             energyBall2.transform.localScale = new Vector3(3,3,3);
@@ -192,7 +193,7 @@ public class PlayerShooting : MonoBehaviour
         }else if(shootDirection == null)
         {
             playerRb.AddForce(Vector2.right * selfForceMagnitudeForward/5 * -direction, ForceMode2D.Impulse);
-            energyrb.AddForce(direction * Vector2.right * energyBallSpeed2, ForceMode2D.Impulse);
+            energyrb2.AddForce(direction * Vector2.right * energyBallSpeed2, ForceMode2D.Impulse);
             audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
             CameraShakeManager.instance.CameraShake(impulseSource);
             isShooting3 = false;
