@@ -21432,6 +21432,7 @@ MonoBehaviour:
   volumeSoundEffect: 0.5
   hitEffect: {fileID: 5197920272909818295, guid: 72be00577ebc75e439a30525e336b9ba, type: 3}
   horizontalInput: 0
+  upwardAttackKey: 0
   isHoldingSelect: 0
   holdingTime: 0
   requiredHoldingTime: 0.5
@@ -21441,6 +21442,12 @@ MonoBehaviour:
   timeBtwAttacksPique: 2
   detectionRadiusPique: 20
   piqueRatio: 1.35
+  attackTimeCounterIcePic: 0
+  timeBtwAttacksIcePic: 0.5
+  attack7: 0
+  samouraiRatio: 1.5
+  positionTemp: {x: 0, y: 0, z: 0}
+  sizeAttack: {x: 0, y: 0}
 --- !u!1 &5584074201186556014 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6784112320445133838, guid: 77f85ad0b193f0041872821463c164a1, type: 3}

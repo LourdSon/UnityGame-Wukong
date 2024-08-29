@@ -1,14 +1,9 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Security;
-using Unity.VisualScripting;
-using UnityEditor.Callbacks;
+
 using UnityEngine;
-using UnityEngineInternal;
-using UnityEngine.UI;
+
 using Cinemachine;
 
 

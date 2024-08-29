@@ -264,7 +264,7 @@ GameObject:
   - component: {fileID: 2002163146189489534}
   - component: {fileID: 5405364017464982039}
   m_Layer: 11
-  m_Name: GameObject
+  m_Name: AttackHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -343,7 +343,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   monsterAttack2: {fileID: 794596186134732681}
-  waitingForAttack: 0.5
+  waitingForAttack: 0.75
   spriteRenderer: {fileID: 1864695746995217935}
   meleeHitbox: {fileID: 1351379063942119374}
   xGauche: 0

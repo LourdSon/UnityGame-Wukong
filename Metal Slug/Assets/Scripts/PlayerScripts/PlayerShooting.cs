@@ -1,10 +1,9 @@
-#if UNITY_EDITOR
+
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Callbacks;
+
 using UnityEngine;
 using Cinemachine;
-using UnityEngine.Rendering;
+
 
 public class PlayerShooting : MonoBehaviour
 {
@@ -121,6 +120,7 @@ public class PlayerShooting : MonoBehaviour
             energyBall2.transform.position = new Vector3(transform.position.x + offsetGenki.x * horizontalInput, transform.position.y + offsetGenki.y * verticalInput, transform.position.z);
             energyBall2.SetActive(true);
             energyrb2 = energyBall2.GetComponent<Rigidbody2D>();
+            energyBall2.transform.localScale = new Vector3(3f,3f,3f);
             energyBall2.transform.localScale *= scaleMultiplier;
             animator.SetTrigger("SimpleShootingTrigger");
             isShooting3 = true;
@@ -186,7 +186,7 @@ public class PlayerShooting : MonoBehaviour
             energyrb2.AddForce(shootDirection * energyBallSpeed2, ForceMode2D.Impulse);
             CameraShakeManager.instance.CameraShake(impulseSource);
             isShooting3 = false;
-            energyBall2.transform.localScale = new Vector3(3,3,3);
+            //energyBall2.transform.localScale = new Vector3(3,3,3);
             yield return new WaitForSeconds(1f);
             energyBall2.SetActive(false);
 
@@ -197,7 +197,7 @@ public class PlayerShooting : MonoBehaviour
             audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
             CameraShakeManager.instance.CameraShake(impulseSource);
             isShooting3 = false;
-            energyBall2.transform.localScale = new Vector3(3,3,3);
+            //energyBall2.transform.localScale = new Vector3(3,3,3);
             yield return new WaitForSeconds(1f);
             energyBall2.SetActive(false);
 
@@ -206,4 +206,3 @@ public class PlayerShooting : MonoBehaviour
     }
     
 }
-#endif

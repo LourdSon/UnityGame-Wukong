@@ -1,3 +1,5 @@
+
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -38,3 +40,4 @@ public class DieCollider : MonoBehaviour
         player.transform.position = respawnPosition;
     }
 }
+

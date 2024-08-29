@@ -1,10 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
+
+
+
 using UnityEngine;
-using TMPro;
+
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Unity.Burst.Intrinsics;
+
 public class GameManager : MonoBehaviour
 {
     public GameObject gameOverScreen;

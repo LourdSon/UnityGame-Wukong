@@ -1,3 +1,5 @@
+
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,3 +34,4 @@ public class TeamComponent : MonoBehaviour
         get { return _teamIndex; }
     }
 }
+

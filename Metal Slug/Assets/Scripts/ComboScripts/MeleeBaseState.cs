@@ -1,7 +1,7 @@
-#if UNITY_EDITOR
+
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Callbacks;
+
 using UnityEngine;
 
 public class MeleeBaseState : State
@@ -122,4 +122,3 @@ public class MeleeBaseState : State
 
 }
 
-#endif

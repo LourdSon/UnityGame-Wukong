@@ -1,14 +1,13 @@
+
+
 using System;
 using System.Collections;
-using System.Collections.Generic;
-//using System.Numerics;
-using UnityEditor.Experimental.GraphView;
+
 using Cinemachine;
 
 //using System.Numerics;
 using UnityEngine;
-using JetBrains.Annotations;
-using Unity.VisualScripting;
+
 //using Unity.Mathematics;
 
 
@@ -84,6 +83,7 @@ public class PlayerAttack : MonoBehaviour
     public float volumeSoundEffect = 0.25f;
     public ParticleSystem hitEffect;
     public float horizontalInput;
+    public float upwardAttackKey;
 
     [Header("HoldingSelect")]
     public bool isHoldingSelect = false;
@@ -95,6 +95,12 @@ public class PlayerAttack : MonoBehaviour
     public float timeBtwAttacksPique = 0.5f;
     public float detectionRadiusPique = 10f;
     public float piqueRatio = 1.35f;
+    public float attackTimeCounterIcePic = 0f;
+    public float timeBtwAttacksIcePic = 0.5f;
+    public bool attack7;
+    public float samouraiRatio = 1.5f;
+    public Vector3 positionTemp;
+    public Vector2 sizeAttack;
 
     void Start()
     {
@@ -106,6 +112,7 @@ public class PlayerAttack : MonoBehaviour
         attackTimeCounterSlam = 0f;
         attackTimeCounterAttract = 0f;
         attackTimeCounterPique = 0f;
+        attackTimeCounterIcePic = 0f;
 
         playerRb = GetComponent<Rigidbody2D>();
         tileDestroyer = GetComponentInChildren<TileDestroyer>();
@@ -118,6 +125,7 @@ public class PlayerAttack : MonoBehaviour
         attack4 = false;
         attack5 = false;
         attack6 = false;
+        attack7 = false;
 
     }
 
@@ -134,7 +142,7 @@ public class PlayerAttack : MonoBehaviour
 
     private void Attackp()
     {
-        float upwardAttackKey = Input.GetAxisRaw("Vertical");
+        upwardAttackKey = Input.GetAxisRaw("Vertical");
         horizontalInput = Input.GetAxisRaw("Horizontal");
         int direction = spriteRenderer.flipX ? -1 : 1;
         detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset; 
@@ -144,19 +152,19 @@ public class PlayerAttack : MonoBehaviour
         rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
         
 
-        if (Input.GetButtonDown("Fire1") && upwardAttackKey == 1 && attackTimeCounterUpward <= 0f)
+        if (Input.GetButtonDown("Fire1") && upwardAttackKey == 1 && attackTimeCounterUpward <= 0f && !isHoldingSelect)
         {
             // Obtenir la direction actuelle du sprite du joueur
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterUpward = timeBtwAttacksUpward;
             attack1 = true;
             
-        } else if (Input.GetButtonDown("Fire1")  && upwardAttackKey == 0 && attackTimeCounter <= 0f)
+        } else if (Input.GetButtonDown("Fire1")  && upwardAttackKey == 0 && attackTimeCounter <= 0f && !isHoldingSelect)
         {
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounter = timeBtwAttacks;
             attack2 = true;
-        } else if (Input.GetButtonDown("Fire1") && upwardAttackKey == -1 && attackTimeCounterDownward <= 0f)
+        } else if (Input.GetButtonDown("Fire1") && upwardAttackKey == -1 && attackTimeCounterDownward <= 0f && !isHoldingSelect)
         {
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterDownward = timeBtwAttacksDownward;
@@ -170,13 +178,16 @@ public class PlayerAttack : MonoBehaviour
         {
             attackTimeCounterAttract = timeBtwAttacksAttract;
             attack5 = true;
-        }
-
-        else if(holdingTime >= requiredHoldingTime && Input.GetButtonDown("Boomerang") && attackTimeCounterPique <= 0f)
+        } else if(holdingTime >= requiredHoldingTime && Input.GetButtonDown("Boomerang") && attackTimeCounterPique <= 0f)
         {
             attackTimeCounterPique = timeBtwAttacksPique;
             attack6 = true;
-        } 
+        } else if(holdingTime>= requiredHoldingTime && Input.GetButtonDown("Fire1") && attackTimeCounterIcePic <= 0f)
+        {
+            attackTimeCounterIcePic = timeBtwAttacksIcePic;
+            attack7 = true;
+        }
+
 
         attackTimeCounter = TimerDecrement(attackTimeCounter);
         attackTimeCounterSlam = TimerDecrement(attackTimeCounterSlam);
@@ -184,6 +195,7 @@ public class PlayerAttack : MonoBehaviour
         attackTimeCounterUpward = TimerDecrement(attackTimeCounterUpward);
         attackTimeCounterAttract = TimerDecrement(attackTimeCounterAttract);
         attackTimeCounterPique = TimerDecrement(attackTimeCounterPique);
+        attackTimeCounterIcePic = TimerDecrement(attackTimeCounterIcePic);
     }
         
 
@@ -253,6 +265,10 @@ public class PlayerAttack : MonoBehaviour
         {
             StartCoroutine(WaitForLanding());
             attack6 = false;
+        } else if (attack7 == true)
+        {
+            StartCoroutine(SamouraiCo());
+            attack7 = false;
         }
     }
 
@@ -421,12 +437,57 @@ public class PlayerAttack : MonoBehaviour
             attack5 = false;
             yield return null;
     }
+    private IEnumerator SamouraiCo()
+    {
+        Time.timeScale = 0.5f;
+        Physics2D.IgnoreLayerCollision(9,11,true);
+        //Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionAttract, detectionRadiusAttract, enemyLayerMask);
+        int direction = spriteRenderer.flipX ? -1 : 1;
+        playerRb.velocity = Vector2.zero;
+        positionTemp = playerRb.transform.position; 
+        playerRb.transform.position = new Vector3(playerRb.transform.position.x + detectionRadiusAttract*5 * direction, playerRb.transform.position.y + detectionRadiusAttract*5 * upwardAttackKey, playerRb.transform.position.z);
+        sizeAttack = playerRb.transform.position + positionTemp;
+        playerRb.velocity = Vector2.zero;
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, new Vector2(MathF.Abs(sizeAttack.x)/2,MathF.Abs(sizeAttack.y)/2), 0, enemyLayerMask);
+        yield return new WaitForSeconds(1);
+        
+        playerRb.velocity = Vector2.zero;
+        if (colliders.Length >= 1)
+            {
+                Instantiate(hitEffect, detectionPosition, Quaternion.identity);
+                //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
+                float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+                audioSource.pitch = newPitch;
+                audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
+                
+                CameraShakeManager.instance.CameraShake(impulseSource);
+            }
+            foreach (Collider2D collider in colliders)
+            {
+                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+                if (enemyRb != null)
+                {
+                    //Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                    //enemyRb.AddForce(directionVector * -forceMagnitudeForward , ForceMode2D.Impulse);
+
+                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+
+                    monsterHealth.TakeDamage(damage * samouraiRatio);
+                    //monsterHealth.ContactDamage();
+                }
+
+            }
+            Time.timeScale = 1;
+            Physics2D.IgnoreLayerCollision(9,11,false);
+            attack7 = false;
+            yield return null;
+    }
 
     // Afficher le rayon de détection dans l'éditeur Unity
     private void OnDrawGizmosSelected()
     {
         // Dessiner le rayon de détection dans l'éditeur
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(detectionPosition, detectionRadius);
+        Gizmos.DrawWireCube(transform.position, new Vector2(MathF.Abs(sizeAttack.x)/2,MathF.Abs(sizeAttack.y)/2));
     }
 }
