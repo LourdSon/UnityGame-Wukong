@@ -12,6 +12,7 @@ TagManager:
   - Ground
   - EnergyBall2
   - Boss
+  - BossParent
   layers:
   - Default
   - TransparentFX

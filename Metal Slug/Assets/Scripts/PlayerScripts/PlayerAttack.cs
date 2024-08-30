@@ -87,6 +87,7 @@ public class PlayerAttack : MonoBehaviour
 
     [Header("HoldingSelect")]
     public bool isHoldingSelect = false;
+    public bool isHoldingSelect2 = false;
     public float holdingTime = 0f;
     public float requiredHoldingTime = 0.5f;
     public bool attack6 = false;
@@ -95,12 +96,16 @@ public class PlayerAttack : MonoBehaviour
     public float timeBtwAttacksPique = 0.5f;
     public float detectionRadiusPique = 10f;
     public float piqueRatio = 1.35f;
-    public float attackTimeCounterIcePic = 0f;
-    public float timeBtwAttacksIcePic = 0.5f;
+    public float attackTimeCounterSamourai = 0f;
+    public float timeBtwAttacksSamourai = 0.5f;
     public bool attack7;
     public float samouraiRatio = 1.5f;
     public Vector3 positionTemp;
     public Vector2 sizeAttack;
+    public Vector2 attackCenter;
+    private PlayerMovement playerKi;
+    public float piqueCost = 15f;
+    public float samouraiCost = 15f;
 
     void Start()
     {
@@ -112,12 +117,13 @@ public class PlayerAttack : MonoBehaviour
         attackTimeCounterSlam = 0f;
         attackTimeCounterAttract = 0f;
         attackTimeCounterPique = 0f;
-        attackTimeCounterIcePic = 0f;
+        attackTimeCounterSamourai = 0f;
 
         playerRb = GetComponent<Rigidbody2D>();
         tileDestroyer = GetComponentInChildren<TileDestroyer>();
         impulseSource = GetComponent<CinemachineImpulseSource>();
         audioSource = GetComponent<AudioSource>();
+        playerKi = GetComponent<PlayerMovement>();
 
         attack1 = false;
         attack2 = false;
@@ -178,14 +184,19 @@ public class PlayerAttack : MonoBehaviour
         {
             attackTimeCounterAttract = timeBtwAttacksAttract;
             attack5 = true;
-        } else if(holdingTime >= requiredHoldingTime && Input.GetButtonDown("Boomerang") && attackTimeCounterPique <= 0f)
+        } else if(holdingTime >= requiredHoldingTime && Input.GetButtonDown("Fire2") && attackTimeCounterPique <= 0f && playerKi.currentKi >= piqueCost)
         {
+            playerKi.currentKi -= piqueCost;
+            playerKi.UpdateKiBar();
             attackTimeCounterPique = timeBtwAttacksPique;
             attack6 = true;
-        } else if(holdingTime>= requiredHoldingTime && Input.GetButtonDown("Fire1") && attackTimeCounterIcePic <= 0f)
+        } else if(holdingTime>= requiredHoldingTime && Input.GetButtonDown("Fire1") && attackTimeCounterSamourai <= 0f && playerKi.currentKi >= samouraiCost)
         {
-            attackTimeCounterIcePic = timeBtwAttacksIcePic;
+            playerKi.currentKi -= samouraiCost;
+            playerKi.UpdateKiBar();
+            attackTimeCounterSamourai = timeBtwAttacksSamourai;
             attack7 = true;
+            
         }
 
 
@@ -195,17 +206,17 @@ public class PlayerAttack : MonoBehaviour
         attackTimeCounterUpward = TimerDecrement(attackTimeCounterUpward);
         attackTimeCounterAttract = TimerDecrement(attackTimeCounterAttract);
         attackTimeCounterPique = TimerDecrement(attackTimeCounterPique);
-        attackTimeCounterIcePic = TimerDecrement(attackTimeCounterIcePic);
+        attackTimeCounterSamourai = TimerDecrement(attackTimeCounterSamourai);
     }
         
 
     private void HoldingSelectF()
     {
-        if(Input.GetButtonDown("Select"))
+        if(Input.GetButtonDown("Return Boomerang"))
         {   
             isHoldingSelect = true;
         }
-        if(Input.GetButtonUp("Select"))
+        if(Input.GetButtonUp("Return Boomerang"))
         {
             isHoldingSelect = false;
             holdingTime = 0f;
@@ -213,6 +224,7 @@ public class PlayerAttack : MonoBehaviour
         if(isHoldingSelect)
         {
             holdingTime += Time.deltaTime;
+            
         }
     }
 
@@ -317,10 +329,19 @@ public class PlayerAttack : MonoBehaviour
             foreach (Collider2D collider in colliders)
             {
                 Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
-                if (enemyRb != null)
+                Rigidbody2D bossRb = collider.GetComponent<Rigidbody2D>();
+                if (enemyRb != null && enemyRb.tag == "Enemy")
                 {
                     Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
                     enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
+                    //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
+
+                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+                    monsterHealth.TakeDamage(damage);
+                } else if (bossRb != null && bossRb.tag == "Boss")
+                {
+                    Vector2 directionVector = ((Vector2)bossRb.transform.position - (Vector2)transform.position).normalized;
+                    bossRb.AddForce(directionVector * forceMagnitudeForward*5, ForceMode2D.Impulse);
                     //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
 
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
@@ -346,11 +367,13 @@ public class PlayerAttack : MonoBehaviour
             foreach (Collider2D collider in collidersDown)
             {
                 Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+                //Rigidbody2D bossRb = collider.GetComponentInChildren<Rigidbody2D>();
                 if (enemyRb != null)
                 {
                     enemyRb.AddForce(Vector2.down * forceMagnitudeDownward, ForceMode2D.Impulse);
+                    //bossRb.AddForce(Vector2.down * forceMagnitudeDownward, ForceMode2D.Impulse);
 
-                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+                    MonsterHealth monsterHealth = enemyRb.GetComponent<MonsterHealth>();
 
                     monsterHealth.TakeDamage(damage);
                     //monsterHealth.ContactDamage();
@@ -439,17 +462,18 @@ public class PlayerAttack : MonoBehaviour
     }
     private IEnumerator SamouraiCo()
     {
-        Time.timeScale = 0.5f;
+        Time.timeScale = 0.66f;
         Physics2D.IgnoreLayerCollision(9,11,true);
         //Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionAttract, detectionRadiusAttract, enemyLayerMask);
         int direction = spriteRenderer.flipX ? -1 : 1;
         playerRb.velocity = Vector2.zero;
         positionTemp = playerRb.transform.position; 
         playerRb.transform.position = new Vector3(playerRb.transform.position.x + detectionRadiusAttract*5 * direction, playerRb.transform.position.y + detectionRadiusAttract*5 * upwardAttackKey, playerRb.transform.position.z);
+        attackCenter = new Vector2(playerRb.transform.position.x + detectionRadiusAttract*2.5f * -direction, playerRb.transform.position.y + detectionRadiusAttract*2.5f * -upwardAttackKey);
         sizeAttack = playerRb.transform.position + positionTemp;
         playerRb.velocity = Vector2.zero;
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, new Vector2(MathF.Abs(sizeAttack.x)/2,MathF.Abs(sizeAttack.y)/2), 0, enemyLayerMask);
-        yield return new WaitForSeconds(1);
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(attackCenter, new Vector2(detectionRadiusAttract*5f,detectionRadiusAttract), 0, enemyLayerMask);
+        yield return new WaitForSeconds(0.5f);
         
         playerRb.velocity = Vector2.zero;
         if (colliders.Length >= 1)
@@ -488,6 +512,6 @@ public class PlayerAttack : MonoBehaviour
     {
         // Dessiner le rayon de détection dans l'éditeur
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(transform.position, new Vector2(MathF.Abs(sizeAttack.x)/2,MathF.Abs(sizeAttack.y)/2));
+        Gizmos.DrawCube(new Vector3(attackCenter.x,attackCenter.y,0), new Vector2(detectionRadiusAttract*5f,detectionRadiusAttract));
     }
 }

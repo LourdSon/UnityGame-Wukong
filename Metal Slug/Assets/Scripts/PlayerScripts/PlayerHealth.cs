@@ -24,6 +24,7 @@ public class PlayerHealth : MonoBehaviour
 
     public float healCost = 25f;
     private PlayerMovement playerKi;
+    private PlayerAttack playerAttack;
     
     
     // Start is called before the first frame update
@@ -37,6 +38,7 @@ public class PlayerHealth : MonoBehaviour
         material = GetComponent<SpriteRenderer>().material;
 
         playerKi = GetComponent<PlayerMovement>();
+        playerAttack = GetComponent<PlayerAttack>();
         
     }
 
@@ -110,7 +112,7 @@ public class PlayerHealth : MonoBehaviour
     }
     public void GetMyHealthBack()
     {
-        if (Input.GetButtonDown("Return Boomerang") && playerKi.currentKi >= healCost && health != maxHealth)
+        if (Input.GetButtonUp("Return Boomerang") && playerKi.currentKi >= healCost && health != maxHealth /*&& !playerAttack.isHoldingSelect*/ && playerAttack.holdingTime < playerAttack.requiredHoldingTime)
         {
             health += 10;
             UpdateHealthBar();

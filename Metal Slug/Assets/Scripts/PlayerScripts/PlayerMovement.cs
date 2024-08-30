@@ -103,6 +103,8 @@ public class PlayerMovement : MonoBehaviour
 
     public Quaternion rotation;
     public ParticleSystem slamParticles;
+
+    private PlayerAttack playerAttack;
     
 
     
@@ -124,6 +126,7 @@ public class PlayerMovement : MonoBehaviour
         UpdateKiBar();
 
         impulseSource = GetComponent<CinemachineImpulseSource>();
+        playerAttack = GetComponent<PlayerAttack>();
 
         //tileDestroyer = GetComponentInChildren<TileDestroyer>();
         
@@ -324,7 +327,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void ReadChargeKi()
     {
-        if(Input.GetAxisRaw("Charging") == 1  && Time.time > nextChargeTime && isGrounded)
+        if(Input.GetAxisRaw("Charging") == 1  && Time.time > nextChargeTime)
         {
             animator.SetBool("IsCharging", true);
             animator.SetTrigger("ChargingTrigger");

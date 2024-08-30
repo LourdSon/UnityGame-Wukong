@@ -86,7 +86,8 @@ public class EndMission : MonoBehaviour
         
         if(!playedOnce && count == 0 && GetComponent<WaveManager>().currentWaveIndex == GetComponent<WaveManager>().waves.Count)
         {
-            boss.SetActive(true);
+            YouWinScreen();
+            /*boss.SetActive(true);
             
             if(countB == 1)
             {
@@ -95,6 +96,7 @@ public class EndMission : MonoBehaviour
                 Invoke(nameof(StopCutscene), 7.30f);
                 playedOnce = true;
             } 
+            */
         }else if (countB == 0 && playedOnce)
         {
             YouWinScreen();

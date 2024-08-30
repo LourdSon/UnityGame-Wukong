@@ -3,7 +3,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class BossPositionStart : MonoBehaviour
+public class GiantPositionStart : MonoBehaviour
 {
     public Transform playerTr;
     public Transform bossTr;
@@ -13,6 +13,8 @@ public class BossPositionStart : MonoBehaviour
     public float speed = 20f;
     public SpriteRenderer spriteRenderer;
     private MonsterHealth monsterHealth;
+    public float detectionRange = 500f;
+    public EndMission endMission;
     
 
     // Start is called before the first frame update
@@ -20,26 +22,32 @@ public class BossPositionStart : MonoBehaviour
     {
         spriteRenderer = spriteRenderer.GetComponent<SpriteRenderer>();
         monsterHealth = animator.GetComponent<MonsterHealth>();
+        endMission = GetComponent<EndMission>();
     }
 
     // Update is called once per frame
     void Update()
     {
         bosses = GameObject.FindGameObjectsWithTag("Boss");
+        endMission = GetComponent<EndMission>();
+        
         int countB = bosses.Length; 
         if (countB == 1)
         {
-            if (animator.GetCurrentAnimatorStateInfo(0).IsName("introBoss") && animator != null)
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("IntroBoss") && animator != null)
             {
                 StartCoroutine(Intro());
             }else if(animator.GetCurrentAnimatorStateInfo(0).IsName("BossOnGround"))
             {
                 
-            }else if(animator.GetCurrentAnimatorStateInfo(0).IsName("Walking"))
+            }else if(animator.GetCurrentAnimatorStateInfo(0).IsName("BossWalking"))
             {
+                //GetComponent<FlyingMonsterMovement>().enabled = true;
+                //GetComponent<GiantPositionStart>().enabled = false;
                 
                 //StartCoroutine(Walking());
-                Walking();
+                //Walking();
+                DetectPlayer();
                 
             }
         } else if(countB == 0)
@@ -56,7 +64,7 @@ public class BossPositionStart : MonoBehaviour
         bossTr.position = bossPosition;
         yield return null;
     }
-    public void Walking()
+    /*public void Walking()
     {
         int direction;
         if (playerTr.position.x - bossTr.position.x < 0)
@@ -79,5 +87,40 @@ public class BossPositionStart : MonoBehaviour
                 spriteRenderer.flipX = false;
             }
         }
+    }*/
+    public void DetectPlayer()
+    {
+        MonsterHealth monsterHealth = GetComponentInChildren<MonsterHealth>();
+        AttackHitBoxSide attackHitBoxSide = GetComponentInChildren<AttackHitBoxSide>();
+        if (playerTr == null)
+        {
+            return;
+        }
+        if(!monsterHealth.isTakingDamage  && attackHitBoxSide.isAttacking == false)
+        {
+            
+            // Vérifie la distance entre l'ennemi et le joueur
+            float distanceToPlayer = Vector2.Distance(transform.position, playerTr.position);        
+            if (distanceToPlayer <= detectionRange)
+            {
+                // Déplace l'ennemi vers le joueur uniquement sur l'axe X
+                transform.position = Vector2.MoveTowards(transform.position, playerTr.position, speed * Time.deltaTime);
+                animator.SetFloat("Speed",Mathf.Abs(speed * Time.deltaTime));
+                animator.SetBool("IsWalking", true);
+                if(playerTr.position.x > transform.position.x)
+                {
+                    spriteRenderer.flipX = false;
+                } else 
+                {
+                    spriteRenderer.flipX = true;
+                }
+                
+            } else
+            {
+                animator.SetBool("IsWalking", false);
+            }
+            
+        }
+        
     }
 }

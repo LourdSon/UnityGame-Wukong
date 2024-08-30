@@ -5,7 +5,7 @@ using Cinemachine;
 
 using UnityEngine;
 
-public class MonsterHealth : MonoBehaviour
+public class BossHealth : MonoBehaviour
 {
 
     public float maxHealth = 50;
@@ -21,7 +21,7 @@ public class MonsterHealth : MonoBehaviour
     public float knockBackCounter;
     public float knockBackDuration;
 
-    private Rigidbody2D enemyRb;
+    public Rigidbody2D enemyRb;
     public float additionalDamageMultiplier = 0.1f;
     public float normalDamage = 10f;
 
@@ -44,7 +44,7 @@ public class MonsterHealth : MonoBehaviour
         isTakingDamage = false;
         
         knockBackCounter = 0;
-        enemyRb = GetComponent<Rigidbody2D>();
+        enemyRb = GetComponentInParent<Rigidbody2D>();
         
     }
 
@@ -160,3 +160,4 @@ public class MonsterHealth : MonoBehaviour
         return hit.collider != null;
     }
 }
+

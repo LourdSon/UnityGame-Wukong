@@ -46,7 +46,7 @@ public class FlyingMonsterMovement : MonoBehaviour
         
     }
 
-    private void DetectPlayer()
+    public void DetectPlayer()
     {
         MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
         AttackHitBoxSide attackHitBoxSide = GetComponentInChildren<AttackHitBoxSide>();
