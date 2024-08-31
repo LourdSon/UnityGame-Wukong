@@ -20,12 +20,12 @@ public class MonsterInstantiate : MonoBehaviour
     void Update()
     {
         // Vérifie si la touche "J" est enfoncée
-        if (Input.GetKeyDown(KeyCode.J))
+        /*if (Input.GetKeyDown(KeyCode.J))
         {
             
             // Instancie un ennemi à la position actuelle du GameObject EnnemySpawner
             Instantiate(ennemyPrefab, transform.position + enemyPosition, Quaternion.identity);
-        }
+        }*/
     }
 }
 

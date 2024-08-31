@@ -51,11 +51,17 @@ public class AttackHitBoxSide : MonoBehaviour
     private IEnumerator AttackSpe()
     {
         isAttacking = true;
+        Color tempColor = GetComponentInParent<SpriteRenderer>().color;
+        Color.RGBToHSV(tempColor, out float h, out float s, out float v);
+        s *= 0.25f;
+        Color newColor = Color.HSVToRGB(h, s, v);
+        GetComponentInParent<SpriteRenderer>().color = newColor;
         anim.SetTrigger("SimpleAttackTrigger");
         yield return new WaitForSeconds(waitingForAttack);
         monsterAttack2.Attack();
         yield return null;
         isAttacking = false;
+        GetComponentInParent<SpriteRenderer>().color = tempColor;
     }
 }
 
