@@ -46,6 +46,15 @@ public class PlayerShooting : MonoBehaviour
     public float costEnergy = 5f;
     public float attackTimeCounter2;
     public float timeBtwAttacks2 = 10f;
+    private PlayerAttack playerAttack;
+    public float costExplosion = 20f;
+    public float attackTimeCounter3;
+    public float timeBtwAttacks3 = 10f;
+    public bool isShooting4;
+    public float radius;
+    public Rigidbody2D[] energyballrb3;
+    private ObjectPool objectPool;
+    public float delay = 0.25f;
 
 
     void Start()
@@ -54,12 +63,15 @@ public class PlayerShooting : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         attackTimeCounter = 0f;
         attackTimeCounter2 = 0f;
+        attackTimeCounter3 = 0f;
         animator = GetComponent<Animator>();
         playerKi = GetComponent<PlayerMovement>();
         audioSource = GetComponent<AudioSource>();
         impulseSource = GetComponent<CinemachineImpulseSource>();
         energyBall2 = GameObject.FindWithTag("EnergyBall2");
         energyBall2.SetActive(false);
+        playerAttack = GetComponent<PlayerAttack>();
+        objectPool = GetComponent<ObjectPool>();
 
         // Obtenir la direction actuelle du sprite du joueur
     }
@@ -92,7 +104,7 @@ public class PlayerShooting : MonoBehaviour
 
 
         // Vérifie si l'entrée n'est pas nulle (si le joueur appuie sur les touches de direction)
-        if (horizontalInput != 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy || verticalInput != 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy)
+        if (horizontalInput != 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy && !playerAttack.isHoldingSelect|| verticalInput != 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy && !playerAttack.isHoldingSelect)
         {
             energyBall = Instantiate(energyBallPrefab, transform.position, Quaternion.identity);
             energyrb = energyBall.GetComponent<Rigidbody2D>();
@@ -103,7 +115,7 @@ public class PlayerShooting : MonoBehaviour
             isShooting = true;
             attackTimeCounter = timeBtwAttacks;
 
-        } else if(horizontalInput == 0 && verticalInput == 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy)
+        } else if(horizontalInput == 0 && verticalInput == 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy && !playerAttack.isHoldingSelect)
         {
             energyBall = Instantiate(energyBallPrefab, new Vector2(transform.position.x + (offset.x*direction), transform.position.y + offset.y), Quaternion.identity);
             energyrb = energyBall.GetComponent<Rigidbody2D>();
@@ -128,6 +140,19 @@ public class PlayerShooting : MonoBehaviour
             playerKi.currentKi -= costUltimate;
             playerKi.UpdateKiBar();
 
+        } else if(playerAttack.holdingTime >= playerAttack.requiredHoldingTime && mouseRight && attackTimeCounter3 <= 0f && cKi >= costExplosion)
+        {
+            int numberOfBalls = 10; // Nombre de EnergyBalls à instancier
+            int setsOfBalls = 5;
+            
+            
+            StartCoroutine(SpawnAndShootEnergyBalls(numberOfBalls,setsOfBalls,delay));
+            
+            animator.SetTrigger("SimpleShootingTrigger");
+            playerKi.currentKi -= costExplosion;
+            playerKi.UpdateKiBar();
+            attackTimeCounter3 = timeBtwAttacks3;
+            isShooting4 = true;
         }
 
         if (attackTimeCounter >= 0f)
@@ -138,7 +163,14 @@ public class PlayerShooting : MonoBehaviour
         {
             attackTimeCounter2 -= Time.deltaTime;
         }
+        if (attackTimeCounter3 >= 0f)
+        {
+            attackTimeCounter3 -= Time.deltaTime;
+        }
     }
+    
+
+
     private void Shooting()
     {     
         if (isShooting)
@@ -157,6 +189,7 @@ public class PlayerShooting : MonoBehaviour
 
     private IEnumerator Shooting1()
     {
+        CameraShakeManager.instance.CameraShake(impulseSource);
         audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
         energyrb.velocity = shootDirection * energyBallSpeed;
         isShooting = false;
@@ -166,6 +199,7 @@ public class PlayerShooting : MonoBehaviour
     }
     private IEnumerator Shooting2()
     {
+        CameraShakeManager.instance.CameraShake(impulseSource);
         audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
         energyrb.velocity = direction * Vector2.right * energyBallSpeed;
         isShooting2 = false;
@@ -203,6 +237,60 @@ public class PlayerShooting : MonoBehaviour
 
         }
         yield return null;
+    }
+
+    
+    private IEnumerator SpawnAndShootEnergyBalls(int numberOfBalls, int setsOfBalls, float delay)
+    {
+        float angleStep = 360f / numberOfBalls; // L'angle entre chaque EnergyBall
+        int totalBalls = numberOfBalls * setsOfBalls;
+        energyballrb3 = new Rigidbody2D[totalBalls]; // Initialiser le tableau avec la bonne taille
+        int index = 0;
+        Rigidbody2D playerRb = GetComponent<Rigidbody2D>();
+        
+        for (int j = 0; j < setsOfBalls; j++)
+        {
+            CameraShakeManager.instance.CameraShake(impulseSource);
+            playerKi.EnemiesStepBackCharging();
+            playerRb.velocity = Vector2.zero;
+            // Générer un ensemble de boules d'énergie
+            for (int i = 0; i < numberOfBalls; i++)
+            {
+                float angle = i * angleStep;
+                Vector3 position = GetPositionAroundHero(angle);
+                GameObject pooledEnergyBall = objectPool.GetPooledObject(); // Obtenir un objet du pool
+                pooledEnergyBall.transform.position = position;
+                pooledEnergyBall.transform.rotation = Quaternion.identity;
+                pooledEnergyBall.transform.localScale = Vector3.one * scaleMultiplier;
+                pooledEnergyBall.SetActive(true); // Activer l'objet
+                energyballrb3[index] = pooledEnergyBall.GetComponent<Rigidbody2D>(); // Stocker chaque Rigidbody2D dans le tableau
+                index++;
+            }
+
+            // Projeter l'ensemble de boules d'énergie
+            for (int i = j * numberOfBalls; i < (j + 1) * numberOfBalls; i++)
+            {
+                Vector2 directionVector = ((Vector2)energyballrb3[i].transform.position - (Vector2)transform.position).normalized;
+                energyballrb3[i].velocity = directionVector * energyBallSpeed;
+            }
+
+            // Attendre avant de passer à l'ensemble suivant
+            yield return new WaitForSeconds(delay);
+        }
+
+        isShooting4 = false; // Réinitialiser l'état de tir
+    }
+    public Vector3 GetPositionAroundHero(float angle)
+    {
+        // Convertir l'angle en radians
+        float angleRad = angle * Mathf.Deg2Rad;
+
+        // Calculer la position autour du héros
+        float x = transform.position.x + Mathf.Cos(angleRad) * radius;
+        float y = transform.position.y + Mathf.Sin(angleRad) * radius;
+
+        // Retourner la nouvelle position avec la même hauteur que le héros
+        return new Vector3(x, y, transform.position.z);
     }
     
 }

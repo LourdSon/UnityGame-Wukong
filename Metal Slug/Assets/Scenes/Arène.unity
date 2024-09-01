@@ -15778,7 +15778,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: e49a9a974b812c84eb109258c40b0d2c, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.15
+  m_Volume: 0.05
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -16326,6 +16326,7 @@ GameObject:
   - component: {fileID: 8467768669592782888}
   - component: {fileID: 8467768669592782890}
   - component: {fileID: 8467768669592782889}
+  - component: {fileID: 8467768669592782891}
   m_Layer: 9
   m_Name: Player
   m_TagString: Player
@@ -21561,7 +21562,7 @@ MonoBehaviour:
   attackTimeCounterSamourai: 0
   timeBtwAttacksSamourai: 0.5
   attack7: 0
-  samouraiRatio: 4
+  samouraiRatio: 3
   positionTemp: {x: 0, y: 0, z: 0}
   sizeAttack: {x: 0, y: 0}
   attackCenter: {x: 0, y: 0}
@@ -21668,6 +21669,13 @@ MonoBehaviour:
   costEnergy: 1
   attackTimeCounter2: 0
   timeBtwAttacks2: 5
+  costExplosion: 20
+  attackTimeCounter3: 0
+  timeBtwAttacks3: 5
+  isShooting4: 0
+  radius: 10
+  energyballrb3: []
+  delay: 0.25
 --- !u!114 &6673407387677361854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22222,6 +22230,20 @@ DistanceJoint2D:
   m_AutoConfigureDistance: 1
   m_Distance: 79.25061
   m_MaxDistanceOnly: 0
+--- !u!114 &8467768669592782891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783027960897221129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f28343f2fe00f674c9c1cea77fad3b58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  energyBallPrefab: {fileID: 8430373969313254213, guid: 10ae7674b407eb5489896ac8053934d6, type: 3}
+  poolSize: 50
 --- !u!95 &8757822347824970020
 Animator:
   serializedVersion: 5

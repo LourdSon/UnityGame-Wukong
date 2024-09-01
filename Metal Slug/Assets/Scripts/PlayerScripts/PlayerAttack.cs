@@ -468,11 +468,11 @@ public class PlayerAttack : MonoBehaviour
         int direction = spriteRenderer.flipX ? -1 : 1;
         playerRb.velocity = Vector2.zero;
         positionTemp = playerRb.transform.position; 
-        playerRb.transform.position = new Vector3(playerRb.transform.position.x + detectionRadiusAttract*5 * direction, playerRb.transform.position.y + detectionRadiusAttract*5 * upwardAttackKey, playerRb.transform.position.z);
-        attackCenter = new Vector2(playerRb.transform.position.x + detectionRadiusAttract*2.5f * -direction, playerRb.transform.position.y + detectionRadiusAttract*2.5f * -upwardAttackKey);
+        playerRb.transform.position = new Vector3(playerRb.transform.position.x + detectionRadiusAttract*3 * direction, playerRb.transform.position.y, playerRb.transform.position.z);
+        attackCenter = new Vector2(playerRb.transform.position.x + detectionRadiusAttract*1.5f * -direction, playerRb.transform.position.y );
         sizeAttack = playerRb.transform.position + positionTemp;
         playerRb.velocity = Vector2.zero;
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(attackCenter, new Vector2(detectionRadiusAttract*5f,detectionRadiusAttract), 0, enemyLayerMask);
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(attackCenter, new Vector2(detectionRadiusAttract*3f,detectionRadiusAttract), 0, enemyLayerMask);
         yield return new WaitForSeconds(0.5f);
         
         playerRb.velocity = Vector2.zero;
@@ -512,6 +512,6 @@ public class PlayerAttack : MonoBehaviour
     {
         // Dessiner le rayon de détection dans l'éditeur
         Gizmos.color = Color.green;
-        Gizmos.DrawCube(new Vector3(attackCenter.x,attackCenter.y,0), new Vector2(detectionRadiusAttract*5f,detectionRadiusAttract));
+        Gizmos.DrawCube(attackCenter, new Vector2(detectionRadiusAttract*3f,detectionRadiusAttract));
     }
 }

@@ -122,7 +122,7 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
 
-        currentKi = 0f;
+        currentKi = maxKi;
         UpdateKiBar();
 
         impulseSource = GetComponent<CinemachineImpulseSource>();
@@ -378,8 +378,9 @@ public class PlayerMovement : MonoBehaviour
         KiBarFill.fillAmount = targetKiFillAmount;
     }
 
-    private void EnemiesStepBackCharging()
+    public void EnemiesStepBackCharging()
     {
+        
          // Détecter les ennemis dans la zone d'attaque
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, detectionBoxKi, enemyLayerMask);
         foreach (Collider2D collider in colliders)
@@ -388,7 +389,7 @@ public class PlayerMovement : MonoBehaviour
             if (enemyRb != null)
             {
                 Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
-                enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
+                enemyRb.AddForce(directionVector * forceMagnitudeForward/0.75f, ForceMode2D.Impulse);
                 // Infliger des dégâts aux ennemis
                 MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                 if (monsterHealth != null)

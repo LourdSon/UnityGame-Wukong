@@ -22,9 +22,14 @@ public class DieCollider : MonoBehaviour
         {
             RespawnPlayer(collision.gameObject);
         }*/
-        /*else*/ if (collision.CompareTag("Enemy") || collision.CompareTag("EnergyBall"))
+        /*else*/ 
+        if (collision.CompareTag("Enemy") || collision.CompareTag("EnergyBall"))
         {
             Destroy(collision.gameObject);
+        } 
+        if(collision.CompareTag("EnergyBall3"))
+        {
+            collision.gameObject.SetActive(false);
         }
     }
 
