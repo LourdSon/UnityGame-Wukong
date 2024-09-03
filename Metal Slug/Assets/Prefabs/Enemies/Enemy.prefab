@@ -950,7 +950,7 @@ MonoBehaviour:
   isTakingDamage: 0
   knockBackCounter: 0
   knockBackDuration: 1
-  additionalDamageMultiplier: 0.1
+  additionalDamageMultiplier: 1.5
   normalDamage: 10
   rayDistance: 2
   groundLayerMask:
@@ -1003,6 +1003,7 @@ MonoBehaviour:
   multipUltim: 3
   impactParticles: {fileID: 1132110526623212655, guid: 7476291775d6d264f8ad52f6dff1edb5, type: 3}
   forceMagnitudeUpward: 30
+  multipBeerus: 3
 --- !u!114 &7389688462781611766
 MonoBehaviour:
   m_ObjectHideFlags: 0

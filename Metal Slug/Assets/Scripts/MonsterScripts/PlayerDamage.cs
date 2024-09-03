@@ -10,6 +10,7 @@ public class PlayerDamage : MonoBehaviour
     public int multipUltim = 3;
     public ParticleSystem impactParticles;
     public float forceMagnitudeUpward;
+    public int multipBeerus = 3;
     
     // Start is called before the first frame update
     void Start()
@@ -57,7 +58,7 @@ public class PlayerDamage : MonoBehaviour
         {
             SpriteRenderer enemySr = GetComponentInChildren<SpriteRenderer>();
             MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
-            monsterHealth.TakeDamage(damage);
+            monsterHealth.TakeDamage(damage*multipBeerus);
             int direction = enemySr.flipX ? 1 : -1;
             Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
             Instantiate(impactParticles, other.transform.position, rotation);

@@ -267,6 +267,8 @@ public class PlayerMovement : MonoBehaviour
         // Si le joueur appuie sur le bouton de dash et le dash est prêt
         if (Input.GetAxis("Dash") == 1  && Time.time > nextDashTime)
         {
+            isGrounded=true;
+            jumpCounter = 1;
             isDashing = true;
             animator.SetBool("IsDashing", true);
             nextDashTime = Time.time + dashCooldown; // Mettre à jour le temps de recharge du dash
@@ -276,7 +278,7 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator Dash()
     {
         
-        CameraShakeManager.instance.CameraShake(impulseSource);
+        
         SpawnDashParticles();
         // Déterminer la direction du dash en fonction des entrées du joueur
         Vector2 dashMovement = new Vector2(horizontalInput, verticalInput);
@@ -296,7 +298,7 @@ public class PlayerMovement : MonoBehaviour
         //playerRb.velocity = Vector2.zero;
         animator.SetBool("IsDashing", false);       
         isDashing = false;
-        jumpCounter = 1;
+        //jumpCounter = 1;
         //moveSpeed -= dashForce;
         StartCoroutine(ReduceSpeedGradually(defaultSpeed, speedReductionDuration));
         
@@ -347,6 +349,8 @@ public class PlayerMovement : MonoBehaviour
         //tileDestroyer.DestructionMouse();
         if (KiCharging.gameObject.activeSelf)
         {
+            float newPitch = UnityEngine.Random.Range(0.9f,1.1f);
+            audioSource.pitch = newPitch;
             audioSource.PlayOneShot(soundEffect, 0.25f);
             Instantiate(slamParticles,transform.position,Quaternion.identity);
         }
@@ -359,9 +363,11 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("IsCharging", false);
         if(currentKi >= maxKi)
         {
+            float newPitch = UnityEngine.Random.Range(0.9f,1.1f);
+            audioSource.pitch = newPitch;
             audioSource.loop = true;
             audioSource.clip = KiAura;
-            audioSource.volume = 0.10f;
+            //audioSource.volume = 0.10f;
             audioSource.Play();
             KiCharging.gameObject.SetActive(true);
             yield return new WaitForSeconds(100f);

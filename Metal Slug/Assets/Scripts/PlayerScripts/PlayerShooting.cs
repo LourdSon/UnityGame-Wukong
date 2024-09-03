@@ -189,7 +189,8 @@ public class PlayerShooting : MonoBehaviour
 
     private IEnumerator Shooting1()
     {
-        CameraShakeManager.instance.CameraShake(impulseSource);
+        float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+        audioSource.pitch = newPitch;
         audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
         energyrb.velocity = shootDirection * energyBallSpeed;
         isShooting = false;
@@ -199,7 +200,8 @@ public class PlayerShooting : MonoBehaviour
     }
     private IEnumerator Shooting2()
     {
-        CameraShakeManager.instance.CameraShake(impulseSource);
+        float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+        audioSource.pitch = newPitch;
         audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
         energyrb.velocity = direction * Vector2.right * energyBallSpeed;
         isShooting2 = false;
@@ -215,6 +217,8 @@ public class PlayerShooting : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         if(shootDirection!= null)
         {
+            float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            audioSource.pitch = newPitch;
             playerRb.AddForce(Vector2.right * selfForceMagnitudeForward/5 * -direction, ForceMode2D.Impulse);
             audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
             energyrb2.AddForce(shootDirection * energyBallSpeed2, ForceMode2D.Impulse);
@@ -226,6 +230,8 @@ public class PlayerShooting : MonoBehaviour
 
         }else if(shootDirection == null)
         {
+            float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            audioSource.pitch = newPitch;
             playerRb.AddForce(Vector2.right * selfForceMagnitudeForward/5 * -direction, ForceMode2D.Impulse);
             energyrb2.AddForce(direction * Vector2.right * energyBallSpeed2, ForceMode2D.Impulse);
             audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
@@ -247,9 +253,9 @@ public class PlayerShooting : MonoBehaviour
         energyballrb3 = new Rigidbody2D[totalBalls]; // Initialiser le tableau avec la bonne taille
         int index = 0;
         Rigidbody2D playerRb = GetComponent<Rigidbody2D>();
-        
         for (int j = 0; j < setsOfBalls; j++)
         {
+            
             CameraShakeManager.instance.CameraShake(impulseSource);
             playerKi.EnemiesStepBackCharging();
             playerRb.velocity = Vector2.zero;

@@ -30,19 +30,20 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 0f;
         playerHealth = FindObjectOfType<PlayerHealth>();
         playerHealth.OnDeath += HandleGameOver;
         gameOverScreen.SetActive(false);
-        pauseScreen.SetActive(false);
+        pauseScreen.SetActive(true);
         // Sauvegarder la gravité par défaut
         defaultGravityR = Physics2D.gravity;
         // Ajoute un écouteur d'événements de clic sur le bouton de redémarrage
         restartButton.onClick.AddListener(RestartGame);
         gameOverEventSystem.SetActive(false);
-        pauseEventSystem.SetActive(false);
-        EventSystem.SetActive(true);
+        EventSystem.SetActive(false);
+        pauseEventSystem.SetActive(true);
         pauseButton.onClick.AddListener(DepauseGame);
-        onPause = false;
+        onPause = true;
         
 
     }
@@ -80,13 +81,16 @@ public class GameManager : MonoBehaviour
 
     void PauseGame()
     {
-        if(Input.GetButtonDown("Start"))
+        if(Input.GetButtonDown("Start") && onPause == false)
         {
             Time.timeScale = 0f;
             onPause = true;
             pauseScreen.SetActive(true);
             EventSystem.SetActive(false);
             pauseEventSystem.SetActive(true);
+        } else if (Input.GetButtonDown("Start") && onPause == true)
+        {
+            DepauseGame();
         }
     }
     

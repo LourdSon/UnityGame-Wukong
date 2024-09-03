@@ -64,7 +64,7 @@ public class MonsterHealth : MonoBehaviour
 
         SpawnDamageParticles();
 
-        ContactDamage();
+        //ContactDamage();
         //StartCoroutine(FlashCoroutine());
 
         health -= damage;

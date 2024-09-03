@@ -289,7 +289,7 @@ public class PlayerAttack : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
         if (colliders.Length >= 1)
         {
-            float newPitch = UnityEngine.Random.Range(0.6f,1f);
+            float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
             audioSource.pitch = newPitch;
             Instantiate(hitEffect, detectionPosition, Quaternion.identity);
             playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
@@ -313,9 +313,10 @@ public class PlayerAttack : MonoBehaviour
 
     private IEnumerator Attack2Co()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(detectionPosition, new Vector2(detectionRadius+5,detectionRadius+4), 0,enemyLayerMask);
         if (colliders.Length >= 1)
             {
+                Debug.Log(colliders[0]);
                 float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
                 audioSource.pitch = newPitch;
                 Instantiate(hitEffect, detectionPosition, Quaternion.identity);
@@ -329,21 +330,12 @@ public class PlayerAttack : MonoBehaviour
             foreach (Collider2D collider in colliders)
             {
                 Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
-                Rigidbody2D bossRb = collider.GetComponent<Rigidbody2D>();
+                
                 if (enemyRb != null && enemyRb.tag == "Enemy")
                 {
                     Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
                     enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
                     //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
-
-                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
-                    monsterHealth.TakeDamage(damage);
-                } else if (bossRb != null && bossRb.tag == "Boss")
-                {
-                    Vector2 directionVector = ((Vector2)bossRb.transform.position - (Vector2)transform.position).normalized;
-                    bossRb.AddForce(directionVector * forceMagnitudeForward*5, ForceMode2D.Impulse);
-                    //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
-
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                     monsterHealth.TakeDamage(damage);
                 }
@@ -385,10 +377,10 @@ public class PlayerAttack : MonoBehaviour
     }
     private IEnumerator WaitForLanding()
     {
-        BoxCollider2D playerBox = GetComponent<BoxCollider2D>();
+        
         int direction = spriteRenderer.flipX ? -1 : 1;
         // Appliquer une force descendante aux ennemis
-        playerRb.AddForce((Vector2.right * direction * slamForce + Vector2.down * slamForce), ForceMode2D.Impulse);
+        playerRb.AddForce(Vector2.right * direction * slamForce + Vector2.down * slamForce, ForceMode2D.Impulse);
         CameraShakeManager.instance.CameraShake(impulseSource);
         Physics2D.IgnoreLayerCollision(9,11,true);
         yield return new WaitForSeconds(distancePique);
@@ -403,6 +395,8 @@ public class PlayerAttack : MonoBehaviour
         {
             //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
             Instantiate(hitEffect, detectionPosition, Quaternion.identity);
+            float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            audioSource.pitch = newPitch;
             audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
             CameraShakeManager.instance.CameraShake(impulseSource);
         }
@@ -462,7 +456,7 @@ public class PlayerAttack : MonoBehaviour
     }
     private IEnumerator SamouraiCo()
     {
-        Time.timeScale = 0.66f;
+        Time.timeScale = 0.77f;
         Physics2D.IgnoreLayerCollision(9,11,true);
         //Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionAttract, detectionRadiusAttract, enemyLayerMask);
         int direction = spriteRenderer.flipX ? -1 : 1;
@@ -512,6 +506,6 @@ public class PlayerAttack : MonoBehaviour
     {
         // Dessiner le rayon de détection dans l'éditeur
         Gizmos.color = Color.green;
-        Gizmos.DrawCube(attackCenter, new Vector2(detectionRadiusAttract*3f,detectionRadiusAttract));
+        Gizmos.DrawWireCube(detectionPosition, new Vector2(detectionRadius+5,detectionRadius+4));
     }
 }
