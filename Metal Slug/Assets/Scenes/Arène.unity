@@ -3875,7 +3875,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Take Five !
+  m_Text: 
 --- !u!222 &1032930727
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9143,7 +9143,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5a86ee2481462d54aac7e89135ec27a0, type: 3}
+  m_Sprite: {fileID: 21300000, guid: acb1d37e33f7ce54e808088b4bcdf925, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -15180,7 +15180,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fcb830acf8fd36246909878b37cd4370, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0621556c4740d9c4bb4b06c0ed062eab, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
