@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 1989305649797434625}
   - component: {fileID: 652174744038127845}
   - component: {fileID: 8593012306154484162}
+  - component: {fileID: -2992674545453540616}
   m_Layer: 12
   m_Name: EnergyBall 3
   m_TagString: EnergyBall3
@@ -5100,3 +5101,35 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &-2992674545453540616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8430373969313254213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShadowGroup: 0
+  m_ComponentVersion: 1
+  m_HasRenderer: 1
+  m_UseRendererSilhouette: 1
+  m_CastsShadows: 1
+  m_SelfShadows: 0
+  m_ApplyToSortingLayers: 51d5088f00000000c5246bac83f440a38d690773138b13ce
+  m_ShapePath:
+  - {x: -0.9524821, y: -1.042977, z: 0}
+  - {x: -1.3970723, y: 0.022510951, z: 0}
+  - {x: 0.0041931444, y: -0.35324985, z: 0}
+  - {x: 1.3273947, y: -0.08176102, z: 0}
+  - {x: 1.0559001, y: -1.0559049, z: 0}
+  - {x: 0.14137983, y: -1.3607874, z: 0}
+  m_ShapePathHash: 134706494
+  m_Mesh: {fileID: 0}
+  m_InstanceId: -263794
+  m_LocalBounds:
+    m_Center: {x: -0.034838796, y: -0.6691382, z: 0}
+    m_Extent: {x: 1.3622335, y: 0.6916492, z: 0}

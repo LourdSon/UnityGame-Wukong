@@ -14,6 +14,8 @@ TagManager:
   - Boss
   - BossParent
   - EnergyBall3
+  - EnemyDash
+  - Roofs
   layers:
   - Default
   - TransparentFX
@@ -29,7 +31,7 @@ TagManager:
   - Enemy
   - EnergyBall
   - Boss
-  - 
+  - Roofs
   - 
   - 
   - 

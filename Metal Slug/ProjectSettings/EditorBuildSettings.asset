@@ -12,6 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Test B&W.unity
     guid: 12f8c0e53b8c26a429099515fa13fa91
   - enabled: 1
-    path: "Assets/Scenes/Ar\xE8ne.unity"
+    path: "Assets/Scenes/Ar\xE8ne Night.unity"
     guid: 9dd765bd14b235e48a58718b80276839
   m_configObjects: {}

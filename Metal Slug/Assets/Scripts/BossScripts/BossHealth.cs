@@ -115,7 +115,7 @@ public class BossHealth : MonoBehaviour
                 float additionalDamage = impactForce * additionalDamageMultiplier;
                 otherEnemy.TakeDamage(normalDamage + additionalDamage);                               
             }
-        } else if(collision.gameObject.CompareTag("Ground"))
+        } else if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
         {
             if(enemyRb.velocity.magnitude > 15f)
             {

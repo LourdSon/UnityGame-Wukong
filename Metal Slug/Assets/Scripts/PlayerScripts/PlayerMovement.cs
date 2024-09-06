@@ -102,6 +102,7 @@ public class PlayerMovement : MonoBehaviour
     Material material;
 
     public Quaternion rotation;
+    public Quaternion trueRotation;
     public ParticleSystem slamParticles;
 
     private PlayerAttack playerAttack;
@@ -244,7 +245,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.CompareTag("Ground"))
+        if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
         {
             isGrounded = true;
             jumpCounter = 2;
@@ -267,6 +268,7 @@ public class PlayerMovement : MonoBehaviour
         // Si le joueur appuie sur le bouton de dash et le dash est prêt
         if (Input.GetAxis("Dash") == 1  && Time.time > nextDashTime)
         {
+            SpawnDashParticles();
             isGrounded=true;
             jumpCounter = 1;
             isDashing = true;
@@ -279,21 +281,23 @@ public class PlayerMovement : MonoBehaviour
     {
         
         
-        SpawnDashParticles();
+        
         // Déterminer la direction du dash en fonction des entrées du joueur
-        Vector2 dashMovement = new Vector2(horizontalInput, verticalInput);
+        Vector2 dashMovement = new Vector2(horizontalInput, verticalInput).normalized;
         float defaultSpeed = moveSpeed;
         moveSpeed += dashForce;
         
         //playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce);
         playerRb.AddForce(dashMovement * dashForce,ForceMode2D.Impulse);       
-        Physics2D.IgnoreLayerCollision(9,11,true);      
+        Physics2D.IgnoreLayerCollision(9,11,true);
+        Physics2D.IgnoreLayerCollision(9,14,true);      
         //playerRb.gravityScale = 0;
         yield return new WaitForSeconds(dashDuration);
         //boxCollider.enabled = true,
         //playerRb.gravityScale = 1;
 
         Physics2D.IgnoreLayerCollision(9,11,false);
+        Physics2D.IgnoreLayerCollision(9,14,false);
         // Arrêter le dash en réinitialisant la vélocité du joueur
         //playerRb.velocity = Vector2.zero;
         animator.SetBool("IsDashing", false);       
@@ -415,8 +419,15 @@ public class PlayerMovement : MonoBehaviour
         GameObject player = GameObject.FindWithTag("Player");
         SpriteRenderer playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         int direction = playerSpriteRenderer.flipX ? 1 : -1;
-        Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);  
-        dashParticlesInstance = Instantiate(dashParticles,transform.position, rotation);
+        Vector2 inputPlayer = new Vector2(horizontalInput, verticalInput).normalized;
+        
+        // 2. Calcul de l'angle en fonction du vecteur de mouvement
+        
+        float angleInRadians = Mathf.Atan2(inputPlayer.y, inputPlayer.x);
+        float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+        rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f + angleInDegrees + 180 : 180f + angleInDegrees);
+        //trueRotation = Quaternion.Euler() 
+        dashParticlesInstance = Instantiate(dashParticles,new Vector2(transform.position.x, transform.position.y -2), rotation);
     }
 
 

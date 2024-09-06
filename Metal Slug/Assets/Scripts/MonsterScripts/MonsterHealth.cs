@@ -31,7 +31,10 @@ public class MonsterHealth : MonoBehaviour
 
     public Light impactLight;
     public float flashDuration = 0.1f;
-    
+    private GameObject player;
+    private Rigidbody2D playerRb;
+    private SpriteRenderer playerSpriteRenderer;
+    public float dashDistance = 50f;
 
     // Start is called before the first frame update
     void Start()
@@ -45,12 +48,17 @@ public class MonsterHealth : MonoBehaviour
         
         knockBackCounter = 0;
         enemyRb = GetComponent<Rigidbody2D>();
+        player = GameObject.FindWithTag("Player");
+        playerRb = player.GetComponent<Rigidbody2D>();
+        playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
+
         
     }
 
     // Update is called once per frame
     void Update()
     {
+        Physics2D.IgnoreLayerCollision(11,14,true);
         knockBackTest();
         
     }
@@ -59,6 +67,7 @@ public class MonsterHealth : MonoBehaviour
     {
         knockBackCounter = 0;
         isTakingDamage = true;
+         
         knockBackTest();
         //CameraShakeManager.instance.CameraShake(impulseSource);
 
@@ -74,8 +83,17 @@ public class MonsterHealth : MonoBehaviour
         if (health <= 0)
         {
             Destroy(gameObject);
+            //StartCoroutine(DyingEnemies());
         }
         
+    }
+    private IEnumerator DyingEnemies()
+    {
+        
+        gameObject.SetActive(false);
+        yield return new WaitForSeconds(0.5f);
+        Destroy(gameObject);
+        yield return null;
     }
 
 
@@ -85,18 +103,24 @@ public class MonsterHealth : MonoBehaviour
         if (isTakingDamage)
         {
             knockBackCounter += Time.deltaTime;
+            if(knockBackCounter < knockBackDuration)
+            {
+                Physics2D.IgnoreLayerCollision(11,14,false);
+            }
             if(knockBackCounter >= knockBackDuration)
             {
+                enemyRb.velocity = Vector3.zero;
                 isTakingDamage = false;
                 knockBackCounter = 0;
+                Vector2 dashDirection = (playerRb.transform.position - transform.position).normalized;
+                enemyRb.AddForce(dashDirection * dashDistance, ForceMode2D.Impulse);
+                
             }
         }
     }
 
     private void SpawnDamageParticles()
     {
-        GameObject player = GameObject.FindWithTag("Player");
-        SpriteRenderer playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         int direction = playerSpriteRenderer.flipX ? 1 : -1;
         Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 180f : 0f);  
         damageParticlesInstance = Instantiate(damageParticles,transform.position, rotation);
@@ -115,7 +139,7 @@ public class MonsterHealth : MonoBehaviour
                 float additionalDamage = impactForce * additionalDamageMultiplier;
                 otherEnemy.TakeDamage(normalDamage + additionalDamage);                               
             }
-        } else if(collision.gameObject.CompareTag("Ground"))
+        } else if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
         {
             if(enemyRb.velocity.magnitude > 15f)
             {

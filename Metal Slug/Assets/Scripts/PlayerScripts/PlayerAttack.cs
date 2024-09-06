@@ -316,7 +316,7 @@ public class PlayerAttack : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapBoxAll(detectionPosition, new Vector2(detectionRadius+5,detectionRadius+4), 0,enemyLayerMask);
         if (colliders.Length >= 1)
             {
-                Debug.Log(colliders[0]);
+                
                 float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
                 audioSource.pitch = newPitch;
                 Instantiate(hitEffect, detectionPosition, Quaternion.identity);
@@ -331,7 +331,7 @@ public class PlayerAttack : MonoBehaviour
             {
                 Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
                 
-                if (enemyRb != null && enemyRb.tag == "Enemy")
+                if (enemyRb != null)
                 {
                     Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
                     enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
@@ -428,7 +428,7 @@ public class PlayerAttack : MonoBehaviour
         int direction = spriteRenderer.flipX ? -1 : 1;
         if (colliders.Length >= 1)
             {
-                Instantiate(hitEffect, detectionPosition, Quaternion.identity);
+                /* Instantiate(hitEffect, detectionPosition, Quaternion.identity); */
                 //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
                 float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
                 audioSource.pitch = newPitch;
@@ -445,7 +445,7 @@ public class PlayerAttack : MonoBehaviour
                     enemyRb.AddForce(directionVector * -forceMagnitudeForward , ForceMode2D.Impulse);
 
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
-
+                    Instantiate(hitEffect, enemyRb.transform.position, Quaternion.identity);
                     monsterHealth.TakeDamage(damage * piqueRatio);
                     //monsterHealth.ContactDamage();
                 }
@@ -466,39 +466,42 @@ public class PlayerAttack : MonoBehaviour
         attackCenter = new Vector2(playerRb.transform.position.x + detectionRadiusAttract*1.5f * -direction, playerRb.transform.position.y );
         sizeAttack = playerRb.transform.position + positionTemp;
         playerRb.velocity = Vector2.zero;
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(attackCenter, new Vector2(detectionRadiusAttract*3f,detectionRadiusAttract), 0, enemyLayerMask);
         yield return new WaitForSeconds(0.5f);
         
         playerRb.velocity = Vector2.zero;
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(attackCenter, new Vector2(detectionRadiusAttract*3f,detectionRadiusAttract), 0, enemyLayerMask);
         if (colliders.Length >= 1)
+        {
+            Instantiate(hitEffect, detectionPosition, Quaternion.identity);
+            //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
+            float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            audioSource.pitch = newPitch;
+            audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
+            
+            CameraShakeManager.instance.CameraShake(impulseSource);
+        }
+
+        foreach (Collider2D collider in colliders)
+        {
+            if (collider == null || collider.gameObject == null || collider.GetComponent<MonsterHealth>() == null)
             {
-                Instantiate(hitEffect, detectionPosition, Quaternion.identity);
-                //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
-                float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
-                audioSource.pitch = newPitch;
-                audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
-                
-                CameraShakeManager.instance.CameraShake(impulseSource);
+                continue;
             }
-            foreach (Collider2D collider in colliders)
+            else
             {
-                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
-                if (enemyRb != null)
-                {
-                    //Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
-                    //enemyRb.AddForce(directionVector * -forceMagnitudeForward , ForceMode2D.Impulse);
+                //Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                //enemyRb.AddForce(directionVector * -forceMagnitudeForward , ForceMode2D.Impulse);
 
-                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
-
-                    monsterHealth.TakeDamage(damage * samouraiRatio);
-                    //monsterHealth.ContactDamage();
-                }
-
+                MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+                Instantiate(hitEffect, collider.GetComponent<Rigidbody2D>().transform.position, Quaternion.identity);
+                monsterHealth.TakeDamage(damage * samouraiRatio);
+                //monsterHealth.ContactDamage();
             }
-            Time.timeScale = 1;
-            Physics2D.IgnoreLayerCollision(9,11,false);
-            attack7 = false;
-            yield return null;
+        }
+        Time.timeScale = 1;
+        Physics2D.IgnoreLayerCollision(9,11,false);
+        attack7 = false;
+        yield return null;
     }
 
     // Afficher le rayon de détection dans l'éditeur Unity

@@ -29,10 +29,11 @@ public class ObjectPool : MonoBehaviour
         }
 
         // Si tous les objets sont utilisés, vous pouvez choisir de créer un nouvel objet
-        GameObject newObj = Instantiate(energyBallPrefab);
+        /* GameObject newObj = Instantiate(energyBallPrefab);
         newObj.SetActive(false);
         pool.Add(newObj);
-        return newObj;
+        return newObj; */
+        return null;
     }
 }
 
