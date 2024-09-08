@@ -961,6 +961,9 @@ MonoBehaviour:
   impactLight: {fileID: 0}
   flashDuration: 2.08
   dashDistance: 0
+  dashExplosionParticles: {fileID: 9110157677477234812, guid: 38ebfe1bdc34cde4db02fc211afc2914, type: 3}
+  rotation: {x: 0, y: 0, z: 0, w: 0}
+  direction: 0
 --- !u!114 &2014544144765135667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1138,7 +1141,7 @@ MonoBehaviour:
   - {x: -0.43300948, y: -1.5400442, z: 0}
   m_ShapePathHash: 879690107
   m_Mesh: {fileID: 0}
-  m_InstanceId: -101344
+  m_InstanceId: -1324
   m_LocalBounds:
     m_Center: {x: -0.09113884, y: -0.5349324, z: 0}
     m_Extent: {x: 0.53444165, y: 1.0051118, z: 0}

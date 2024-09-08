@@ -83,7 +83,7 @@ public class PlayerMovement : MonoBehaviour
 
     private CinemachineImpulseSource impulseSource;
     public ParticleSystem dashParticles;
-    private ParticleSystem dashParticlesInstance;
+    public ParticleSystem dashExplosionParticles;
 
     public float detectionBoxKi =15f;
     public LayerMask enemyLayerMask;
@@ -151,7 +151,8 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         if(!EndMission.isCutsceneon)  
-        {     
+        {  
+               
             MovePlayer();
             Jump();
             ResetPosition(); // P
@@ -165,7 +166,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void ReadInputMove()
     {
-
+        if(isDashing == false)
+        {
             //Get Axis from Unity
             horizontalInput = Input.GetAxisRaw("Horizontal");
             verticalInput = Input.GetAxisRaw("Vertical");
@@ -189,16 +191,18 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("IsWalking", false);
                 animator.SetBool("IsIdling", true);
             }
+        }
     }
 
     private void MovePlayer()
     {
-
-        //Move the character
-        transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
-        //playerRb.AddForce(Vector2.right * movement.x);
-        //playerRb.velocity = new Vector2(movement.x, playerRb.velocity.y);       
-        //playerRb.MovePosition((Vector2) transform.position + movement * Time.deltaTime);
+        
+            //Move the character
+            transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
+            //playerRb.AddForce(Vector2.right * movement.x);
+            //playerRb.velocity = new Vector2(movement.x, playerRb.velocity.y);       
+            //playerRb.MovePosition((Vector2) transform.position + movement * Time.deltaTime);
+        
     
     }
 
@@ -207,9 +211,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (jumpBool)
         {
+            Physics2D.IgnoreLayerCollision(9,14,true);
             playerRb.velocity = Vector2.Lerp(playerRb.velocity, jumpVelocity, jumpCurve.Evaluate(jumpTime));
             jumpBool = false;
+            
         }
+        
     }
     private void ReadInputJump()
     {
@@ -284,17 +291,32 @@ public class PlayerMovement : MonoBehaviour
         
         // Déterminer la direction du dash en fonction des entrées du joueur
         Vector2 dashMovement = new Vector2(horizontalInput, verticalInput).normalized;
+        SpriteRenderer playerSpriteRenderer = GetComponent<SpriteRenderer>();
+        //GameObject playerGameObject = GetComponent<GameObject>();
         float defaultSpeed = moveSpeed;
         moveSpeed += dashForce;
+        int direction = playerSpriteRenderer.flipX ? 1 : -1;
+        float angleInRadians = Mathf.Atan2(dashMovement.y, dashMovement.x);
+        float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
         
-        //playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce);
+        // 2. Calcul de l'angle en fonction du vecteur de mouvement
+        if(angleInDegrees > 45 && angleInDegrees < 115)
+        {
+            
+            
+            //playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce);
+            rotation = Quaternion.Euler(0f, 0f, angleInDegrees -90);
+            playerRb.transform.rotation = rotation;
+        }
         playerRb.AddForce(dashMovement * dashForce,ForceMode2D.Impulse);       
         Physics2D.IgnoreLayerCollision(9,11,true);
         Physics2D.IgnoreLayerCollision(9,14,true);      
         //playerRb.gravityScale = 0;
+        
         yield return new WaitForSeconds(dashDuration);
         //boxCollider.enabled = true,
         //playerRb.gravityScale = 1;
+        
 
         Physics2D.IgnoreLayerCollision(9,11,false);
         Physics2D.IgnoreLayerCollision(9,14,false);
@@ -302,6 +324,8 @@ public class PlayerMovement : MonoBehaviour
         //playerRb.velocity = Vector2.zero;
         animator.SetBool("IsDashing", false);       
         isDashing = false;
+        rotation = Quaternion.Euler(0f, 0f, 0f);
+        playerRb.transform.rotation = rotation;
         //jumpCounter = 1;
         //moveSpeed -= dashForce;
         StartCoroutine(ReduceSpeedGradually(defaultSpeed, speedReductionDuration));
@@ -355,7 +379,7 @@ public class PlayerMovement : MonoBehaviour
         {
             float newPitch = UnityEngine.Random.Range(0.9f,1.1f);
             audioSource.pitch = newPitch;
-            audioSource.PlayOneShot(soundEffect, 0.25f);
+            audioSource.PlayOneShot(soundEffect, 0.1f);
             Instantiate(slamParticles,transform.position,Quaternion.identity);
         }
         playerRb.velocity = new Vector2(0f,0f);
@@ -371,10 +395,10 @@ public class PlayerMovement : MonoBehaviour
             audioSource.pitch = newPitch;
             audioSource.loop = true;
             audioSource.clip = KiAura;
-            //audioSource.volume = 0.10f;
+            audioSource.volume = 0.05f;
             audioSource.Play();
             KiCharging.gameObject.SetActive(true);
-            yield return new WaitForSeconds(100f);
+            yield return new WaitForSeconds(5f);
             KiCharging.gameObject.SetActive(false);
             audioSource.Stop();
             audioSource.loop = false;
@@ -427,7 +451,9 @@ public class PlayerMovement : MonoBehaviour
         float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
         rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f + angleInDegrees + 180 : 180f + angleInDegrees);
         //trueRotation = Quaternion.Euler() 
-        dashParticlesInstance = Instantiate(dashParticles,new Vector2(transform.position.x, transform.position.y -2), rotation);
+        //Instantiate(dashParticles,new Vector2(transform.position.x, transform.position.y -2), rotation);
+        Instantiate(dashExplosionParticles,transform.position, rotation);
+
     }
 
 

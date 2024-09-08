@@ -71,7 +71,6 @@ public class GameManager : MonoBehaviour
     }
 
 
-    //Lors du reset, chose à ignorer
     void ResetPlayer(Vector2 defaultGravity)
     {
         // Réinitialiser la gravité du joueur à sa valeur initiale

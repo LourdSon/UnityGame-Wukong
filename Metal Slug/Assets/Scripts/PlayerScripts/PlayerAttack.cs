@@ -80,7 +80,7 @@ public class PlayerAttack : MonoBehaviour
 
     private AudioSource audioSource;
     public AudioClip punchSoundEffect;
-    public float volumeSoundEffect = 0.25f;
+    public float volumeSoundEffect = 0.55f;
     public ParticleSystem hitEffect;
     public float horizontalInput;
     public float upwardAttackKey;
@@ -330,6 +330,26 @@ public class PlayerAttack : MonoBehaviour
             foreach (Collider2D collider in colliders)
             {
                 Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+                ParticleSystem particleSystem = collider.GetComponent<ParticleSystem>();
+                if (particleSystem != null)
+                {
+                    // Récupérer les particules actives du système
+                    ParticleSystem.Particle[] particles = new ParticleSystem.Particle[particleSystem.main.maxParticles];
+                    int particleCount = particleSystem.GetParticles(particles);
+
+                    // Modifier la vélocité de chaque particule dans le système
+                    for (int i = 0; i < particleCount; i++)
+                    {
+                        Vector2 newdirection = (new Vector2(particles[i].position.x- detectionPosition.x, particles[i].position.y- detectionPosition.y) ).normalized;
+                         // Appliquer la force en augmentant la vélocité actuelle
+                        Vector3 addedForce = newdirection * forceMagnitudeForward;
+                        particles[i].velocity += addedForce * Time.deltaTime;
+
+                    }
+
+                    // Appliquer les changements de particules au système
+                    particleSystem.SetParticles(particles, particleCount);
+                }
                 
                 if (enemyRb != null)
                 {

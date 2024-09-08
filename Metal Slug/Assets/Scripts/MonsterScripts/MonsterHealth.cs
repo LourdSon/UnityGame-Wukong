@@ -35,6 +35,10 @@ public class MonsterHealth : MonoBehaviour
     private Rigidbody2D playerRb;
     private SpriteRenderer playerSpriteRenderer;
     public float dashDistance = 50f;
+    public ParticleSystem dashExplosionParticles;
+    public Quaternion rotation;
+    public int direction;
+    private SpriteRenderer spriteRenderer;
 
     // Start is called before the first frame update
     void Start()
@@ -51,6 +55,7 @@ public class MonsterHealth : MonoBehaviour
         player = GameObject.FindWithTag("Player");
         playerRb = player.GetComponent<Rigidbody2D>();
         playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
 
         
     }
@@ -60,6 +65,7 @@ public class MonsterHealth : MonoBehaviour
     {
         Physics2D.IgnoreLayerCollision(11,14,true);
         knockBackTest();
+        direction = spriteRenderer.flipX ? -1 : 1;
         
     }
 
@@ -83,19 +89,10 @@ public class MonsterHealth : MonoBehaviour
         if (health <= 0)
         {
             Destroy(gameObject);
-            //StartCoroutine(DyingEnemies());
         }
         
     }
-    private IEnumerator DyingEnemies()
-    {
-        
-        gameObject.SetActive(false);
-        yield return new WaitForSeconds(0.5f);
-        Destroy(gameObject);
-        yield return null;
-    }
-
+   
 
 
     public void knockBackTest()
@@ -112,7 +109,14 @@ public class MonsterHealth : MonoBehaviour
                 enemyRb.velocity = Vector3.zero;
                 isTakingDamage = false;
                 knockBackCounter = 0;
+                
+
+
                 Vector2 dashDirection = (playerRb.transform.position - transform.position).normalized;
+                float angleInRadians = Mathf.Atan2(dashDirection.y, dashDirection.x);
+                float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+                rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f + angleInDegrees + 180 : 180f + angleInDegrees);
+                Instantiate(dashExplosionParticles,transform.position, rotation);
                 enemyRb.AddForce(dashDirection * dashDistance, ForceMode2D.Impulse);
                 
             }

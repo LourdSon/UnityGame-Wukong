@@ -14,7 +14,7 @@ public class DashingMonster : MonoBehaviour
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private Vector2 trajectoirePlayer;
-    public float dashDistance = 15f;
+    
 
     public float dashTimeCounter = 0;
     public float timeBtwDash = 1f;
@@ -93,9 +93,7 @@ public class DashingMonster : MonoBehaviour
                 } else 
                 {
                     spriteRenderer.flipX = true;
-                }
-                
-                
+                } 
             } else
             {
                 animator.SetBool("IsWalking", false);
