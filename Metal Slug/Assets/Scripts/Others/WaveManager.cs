@@ -14,6 +14,16 @@ public class WaveManager : MonoBehaviour
         public float spawnRate;
     }
 
+    [System.Serializable]
+    public class RandomEvent
+    {
+        public string eventName;
+        public GameObject eventPrefab; // Le prefab de l'événement (par exemple un PNJ ou un objet)
+        public float chanceToOccur; // Probabilité que l'événement se produise
+    }
+
+    public List<RandomEvent> randomEvents;
+    public Transform[] eventSpawnPoints; // Points de spawn pour les événements aléatoires
     public List<Wave> waves;
     public Transform[] spawnPoints;
 
@@ -45,6 +55,8 @@ public class WaveManager : MonoBehaviour
         for (int i = 0; i < enemiesRemainingToSpawn; i++)
         {
             SpawnEnemy(wave.enemyPrefab[Random.Range(0, wave.enemyPrefab.Length)]);
+            // Tenter de déclencher un événement aléatoire
+            
             yield return new WaitForSeconds(1f / wave.spawnRate);
         }
 
@@ -53,6 +65,7 @@ public class WaveManager : MonoBehaviour
         if (currentWaveIndex < waves.Count)
         {
             currentWaveIndex++;
+            TryTriggerRandomEvent();
         }
         else
         {
@@ -71,6 +84,20 @@ public class WaveManager : MonoBehaviour
 
         
     }
-
+    void TryTriggerRandomEvent()
+    {
+        foreach (RandomEvent randomEvent in randomEvents)
+        {
+            float randomValue = Random.Range(0f, 1f);
+            if (randomValue <= randomEvent.chanceToOccur)
+            {
+                // Si l'événement est déclenché, on le spawn à un point aléatoire
+                Transform spawnPoint = eventSpawnPoints[Random.Range(0, eventSpawnPoints.Length)];
+                Instantiate(randomEvent.eventPrefab, spawnPoint.position, spawnPoint.rotation);
+                Debug.Log("Event triggered: " + randomEvent.eventName);
+            }
+        }
+    }
+    
     
 }

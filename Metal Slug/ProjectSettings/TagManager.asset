@@ -16,6 +16,7 @@ TagManager:
   - EnergyBall3
   - EnemyDash
   - Roofs
+  - NPCs
   layers:
   - Default
   - TransparentFX

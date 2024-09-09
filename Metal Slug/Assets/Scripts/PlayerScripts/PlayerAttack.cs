@@ -336,7 +336,7 @@ public class PlayerAttack : MonoBehaviour
                     // Récupérer les particules actives du système
                     ParticleSystem.Particle[] particles = new ParticleSystem.Particle[particleSystem.main.maxParticles];
                     int particleCount = particleSystem.GetParticles(particles);
-
+                    Debug.Log(particles);
                     // Modifier la vélocité de chaque particule dans le système
                     for (int i = 0; i < particleCount; i++)
                     {
@@ -344,7 +344,7 @@ public class PlayerAttack : MonoBehaviour
                          // Appliquer la force en augmentant la vélocité actuelle
                         Vector3 addedForce = newdirection * forceMagnitudeForward;
                         particles[i].velocity += addedForce * Time.deltaTime;
-
+                        Debug.Log(particles[i]);
                     }
 
                     // Appliquer les changements de particules au système

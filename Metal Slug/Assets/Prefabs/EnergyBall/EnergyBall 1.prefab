@@ -260,7 +260,7 @@ ParticleSystem:
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 1
   looping: 1
-  prewarm: 0
+  prewarm: 1
   playOnAwake: 1
   useUnscaledTime: 0
   autoRandomSeed: 1
@@ -5128,7 +5128,7 @@ MonoBehaviour:
   - {x: 0.14137983, y: -1.3607874, z: 0}
   m_ShapePathHash: 134706494
   m_Mesh: {fileID: 0}
-  m_InstanceId: -2030
+  m_InstanceId: -1742
   m_LocalBounds:
     m_Center: {x: -0.034838796, y: -0.6691382, z: 0}
     m_Extent: {x: 1.3622335, y: 0.6916492, z: 0}
