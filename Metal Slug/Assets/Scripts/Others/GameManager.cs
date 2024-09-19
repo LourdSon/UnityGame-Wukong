@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void ResetPlayer(Vector2 defaultGravity)
+    public void ResetPlayer(Vector2 defaultGravity)
     {
         // Réinitialiser la gravité du joueur à sa valeur initiale
         Physics2D.gravity = defaultGravity;
@@ -80,14 +80,14 @@ public class GameManager : MonoBehaviour
 
     void PauseGame()
     {
-        if(Input.GetButtonDown("Start") && onPause == false)
+        if(PlayerController.instance.playerInputActions.Player.PauseMenu.triggered && onPause == false)
         {
             Time.timeScale = 0f;
             onPause = true;
             pauseScreen.SetActive(true);
             EventSystem.SetActive(false);
             pauseEventSystem.SetActive(true);
-        } else if (Input.GetButtonDown("Start") && onPause == true)
+        } else if (PlayerController.instance.playerInputActions.Player.PauseMenu.triggered && onPause == true)
         {
             DepauseGame();
         }

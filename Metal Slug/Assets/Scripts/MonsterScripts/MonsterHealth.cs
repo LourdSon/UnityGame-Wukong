@@ -65,7 +65,7 @@ public class MonsterHealth : MonoBehaviour
     {
         Physics2D.IgnoreLayerCollision(11,14,true);
         knockBackTest();
-        direction = spriteRenderer.flipX ? -1 : 1;
+        direction = enemyRb.transform.rotation.y == 0 ? 1 : -1;
         
     }
 
@@ -125,7 +125,7 @@ public class MonsterHealth : MonoBehaviour
 
     private void SpawnDamageParticles()
     {
-        int direction = playerSpriteRenderer.flipX ? 1 : -1;
+        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
         Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 180f : 0f);  
         damageParticlesInstance = Instantiate(damageParticles,transform.position, rotation);
         Instantiate(impactParticles,transform.position, rotation);

@@ -112,7 +112,7 @@ public class PlayerHealth : MonoBehaviour
     }
     public void GetMyHealthBack()
     {
-        if (Input.GetButtonUp("Return Boomerang") && playerKi.currentKi >= healCost && health != maxHealth /*&& !playerAttack.isHoldingSelect*/ && playerAttack.holdingTime < playerAttack.requiredHoldingTime)
+        if (playerAttack.holdingTime < playerAttack.requiredHoldingTime && PlayerController.instance.playerInputActions.Player.Heal.triggered && playerKi.currentKi >= healCost && health != maxHealth)
         {
             health += 10;
             UpdateHealthBar();

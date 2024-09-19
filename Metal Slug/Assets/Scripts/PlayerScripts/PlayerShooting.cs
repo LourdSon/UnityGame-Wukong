@@ -11,7 +11,7 @@ public class PlayerShooting : MonoBehaviour
     public GameObject energyBallPrefab;
     // Vitesse de la boule d'énergie
     public float energyBallSpeed = 5f;
-    private Rigidbody2D rb;
+    private Rigidbody2D playerRb;
     private Rigidbody2D energyrb;
     private Rigidbody2D energyrb2;
     private SpriteRenderer spriteRenderer;
@@ -59,7 +59,7 @@ public class PlayerShooting : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        playerRb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         attackTimeCounter = 0f;
         attackTimeCounter2 = 0f;
@@ -90,10 +90,11 @@ public class PlayerShooting : MonoBehaviour
     public void ReadInputShooting()
     {
         // Obtient les valeurs des entrées horizontales et verticales
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        float verticalInput = Input.GetAxisRaw("Vertical");
-        bool mouseRight = Input.GetButtonDown("Shooting");
-        direction = spriteRenderer.flipX ? -1 : 1;
+        Vector2 moveInput = PlayerController.instance.playerInputActions.Player.Move.ReadValue<Vector2>();
+        float horizontalInput = moveInput.x;
+        float verticalInput = moveInput.y;
+        bool mouseRight = PlayerController.instance.playerInputActions.Player.Shoot.triggered;
+        direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
 
         
         float cKi = playerKi.currentKi;
@@ -126,7 +127,7 @@ public class PlayerShooting : MonoBehaviour
             attackTimeCounter = timeBtwAttacks;
             isShooting2 = true;
 
-        } else if(horizontalInput != 0 && Input.GetButtonDown("Fire2") && attackTimeCounter2 <= 0f  && cKi >= costUltimate || verticalInput != 0 && Input.GetButtonDown("Fire2") && attackTimeCounter2 <= 0f && cKi >= costUltimate)
+        } else if(horizontalInput != 0 && PlayerController.instance.playerInputActions.Player.SuperShot.triggered && attackTimeCounter2 <= 0f  && cKi >= costUltimate || verticalInput != 0 && PlayerController.instance.playerInputActions.Player.SuperShot.triggered && attackTimeCounter2 <= 0f && cKi >= costUltimate)
         {
             //energyBall2 = Instantiate(energyBallPrefab2, transform.position + offsetGenki, Quaternion.identity);
             energyBall2.transform.position = new Vector3(transform.position.x + offsetGenki.x * horizontalInput, transform.position.y + offsetGenki.y * verticalInput, transform.position.z);

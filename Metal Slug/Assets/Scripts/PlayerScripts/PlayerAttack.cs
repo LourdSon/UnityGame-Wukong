@@ -106,6 +106,7 @@ public class PlayerAttack : MonoBehaviour
     private PlayerMovement playerKi;
     public float piqueCost = 15f;
     public float samouraiCost = 15f;
+    public ParticleSystem BoomComics;
 
     void Start()
     {
@@ -148,9 +149,10 @@ public class PlayerAttack : MonoBehaviour
 
     private void Attackp()
     {
-        upwardAttackKey = Input.GetAxisRaw("Vertical");
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        int direction = spriteRenderer.flipX ? -1 : 1;
+        Vector2 moveInput = PlayerController.instance.playerInputActions.Player.Move.ReadValue<Vector2>();
+        upwardAttackKey = moveInput.y;
+        horizontalInput = moveInput.x;
+        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
         detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset; 
         detectionPositionDown = (Vector2)transform.position + Vector2.down * detectionOffsetAir.y + Vector2.right * direction * detectionOffsetAir.x;
         detectionPositionAttract = (Vector2)transform.position + Vector2.right * direction * detectionOffsetAttract; 
@@ -158,19 +160,19 @@ public class PlayerAttack : MonoBehaviour
         rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
         
 
-        if (Input.GetButtonDown("Fire1") && upwardAttackKey == 1 && attackTimeCounterUpward <= 0f && !isHoldingSelect)
+        if (PlayerController.instance.playerInputActions.Player.Attack.triggered && upwardAttackKey == 1 && attackTimeCounterUpward <= 0f && !isHoldingSelect)
         {
             // Obtenir la direction actuelle du sprite du joueur
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterUpward = timeBtwAttacksUpward;
             attack1 = true;
             
-        } else if (Input.GetButtonDown("Fire1")  && upwardAttackKey == 0 && attackTimeCounter <= 0f && !isHoldingSelect)
+        } else if (PlayerController.instance.playerInputActions.Player.Attack.triggered  && upwardAttackKey == 0 && attackTimeCounter <= 0f && !isHoldingSelect)
         {
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounter = timeBtwAttacks;
             attack2 = true;
-        } else if (Input.GetButtonDown("Fire1") && upwardAttackKey == -1 && attackTimeCounterDownward <= 0f && !isHoldingSelect)
+        } else if (PlayerController.instance.playerInputActions.Player.Attack.triggered && upwardAttackKey == -1 && attackTimeCounterDownward <= 0f && !isHoldingSelect)
         {
             animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterDownward = timeBtwAttacksDownward;
@@ -180,17 +182,17 @@ public class PlayerAttack : MonoBehaviour
             //animator.SetTrigger("SimpleAttackTrigger");
             attackTimeCounterSlam = timeBtwAttacksSlam;
             attack4 = true;  
-        }*/ else if(Input.GetButtonDown("Boomerang") && attackTimeCounterAttract <= 0f && !isHoldingSelect)
+        }*/ else if(PlayerController.instance.playerInputActions.Player.Attraction.triggered && attackTimeCounterAttract <= 0f && !isHoldingSelect)
         {
             attackTimeCounterAttract = timeBtwAttacksAttract;
             attack5 = true;
-        } else if(holdingTime >= requiredHoldingTime && Input.GetButtonDown("Fire2") && attackTimeCounterPique <= 0f && playerKi.currentKi >= piqueCost)
+        } else if(holdingTime >= requiredHoldingTime && PlayerController.instance.playerInputActions.Player.SuperShot.triggered && attackTimeCounterPique <= 0f && playerKi.currentKi >= piqueCost)
         {
             playerKi.currentKi -= piqueCost;
             playerKi.UpdateKiBar();
             attackTimeCounterPique = timeBtwAttacksPique;
             attack6 = true;
-        } else if(holdingTime>= requiredHoldingTime && Input.GetButtonDown("Fire1") && attackTimeCounterSamourai <= 0f && playerKi.currentKi >= samouraiCost)
+        } else if(holdingTime>= requiredHoldingTime && PlayerController.instance.playerInputActions.Player.Attack.triggered && attackTimeCounterSamourai <= 0f && playerKi.currentKi >= samouraiCost)
         {
             playerKi.currentKi -= samouraiCost;
             playerKi.UpdateKiBar();
@@ -210,13 +212,13 @@ public class PlayerAttack : MonoBehaviour
     }
         
 
-    private void HoldingSelectF()
+     private void HoldingSelectF()
     {
-        if(Input.GetButtonDown("Return Boomerang"))
+        if(PlayerController.instance.playerInputActions.Player.Heal.triggered)
         {   
             isHoldingSelect = true;
         }
-        if(Input.GetButtonUp("Return Boomerang"))
+        if(PlayerController.instance.playerInputActions.Player.Heal.ReadValue<float>() == 0f)
         {
             isHoldingSelect = false;
             holdingTime = 0f;
@@ -227,6 +229,33 @@ public class PlayerAttack : MonoBehaviour
             
         }
     }
+
+    /* private void HoldingSelectF()
+    {
+        // Vérifie si la touche de soin a été activée (première activation)
+        if (PlayerController.instance.playerInputActions.Player.Heal.ReadValue<float>() > 0f)
+        {
+            isHoldingSelect = true;
+            holdingTime = 0f; // Réinitialiser le temps de maintien lorsqu'on commence à maintenir
+        }
+
+        // Vérifie si la touche est toujours maintenue
+        if (PlayerController.instance.playerInputActions.Player.Heal.ReadValue<float>() > 0f)
+        {
+            if (isHoldingSelect)
+            {
+                holdingTime += Time.deltaTime; // Mise à jour du temps de maintien
+            }
+        }
+        else
+        {
+            // La touche n'est plus maintenue
+            if (isHoldingSelect)
+            {
+                isHoldingSelect = false;
+            }
+        }
+    } */
 
     private float TimerDecrement(float timeCounter)
     {
@@ -320,7 +349,7 @@ public class PlayerAttack : MonoBehaviour
                 float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
                 audioSource.pitch = newPitch;
                 Instantiate(hitEffect, detectionPosition, Quaternion.identity);
-                int direction = spriteRenderer.flipX ? -1 : 1;
+                int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
                 //playerRb.velocity = new Vector2(diagonal.x * selfForceMagnitudeForward,playerRb.velocity.y);
                 playerRb.AddForce(Vector2.right * selfForceMagnitudeForward * -direction, ForceMode2D.Impulse);
                 audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
@@ -398,7 +427,7 @@ public class PlayerAttack : MonoBehaviour
     private IEnumerator WaitForLanding()
     {
         
-        int direction = spriteRenderer.flipX ? -1 : 1;
+        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
         // Appliquer une force descendante aux ennemis
         playerRb.AddForce(Vector2.right * direction * slamForce + Vector2.down * slamForce, ForceMode2D.Impulse);
         CameraShakeManager.instance.CameraShake(impulseSource);
@@ -445,7 +474,7 @@ public class PlayerAttack : MonoBehaviour
     private IEnumerator Attack5Co()
     {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionAttract, detectionRadiusAttract, enemyLayerMask);
-        int direction = spriteRenderer.flipX ? -1 : 1;
+        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
         if (colliders.Length >= 1)
             {
                 /* Instantiate(hitEffect, detectionPosition, Quaternion.identity); */
@@ -479,7 +508,7 @@ public class PlayerAttack : MonoBehaviour
         Time.timeScale = 0.77f;
         Physics2D.IgnoreLayerCollision(9,11,true);
         //Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionAttract, detectionRadiusAttract, enemyLayerMask);
-        int direction = spriteRenderer.flipX ? -1 : 1;
+        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
         playerRb.velocity = Vector2.zero;
         positionTemp = playerRb.transform.position; 
         playerRb.transform.position = new Vector3(playerRb.transform.position.x + detectionRadiusAttract*3 * direction, playerRb.transform.position.y, playerRb.transform.position.z);

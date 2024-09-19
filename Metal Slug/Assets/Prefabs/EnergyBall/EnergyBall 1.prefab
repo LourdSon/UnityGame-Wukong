@@ -1577,7 +1577,7 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 1, g: 0.8291087, b: 0, a: 1}
+        key0: {r: 0, g: 0.9419036, b: 1, a: 1}
         key1: {r: 1, g: 1, b: 1, a: 1}
         key2: {r: 0, g: 0, b: 0, a: 1}
         key3: {r: 0, g: 0, b: 0, a: 1}
@@ -5128,7 +5128,7 @@ MonoBehaviour:
   - {x: 0.14137983, y: -1.3607874, z: 0}
   m_ShapePathHash: 134706494
   m_Mesh: {fileID: 0}
-  m_InstanceId: -1742
+  m_InstanceId: 144336
   m_LocalBounds:
     m_Center: {x: -0.034838796, y: -0.6691382, z: 0}
     m_Extent: {x: 1.3622335, y: 0.6916492, z: 0}

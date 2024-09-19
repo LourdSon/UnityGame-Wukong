@@ -9,7 +9,7 @@ public class AttackHitBoxKamikaze : MonoBehaviour
     public KamikazeAttack kamikazeAttack;
     public float waitingForAttack = 3f;
     
-    public SpriteRenderer spriteRenderer;
+    public Rigidbody2D enemyRb;
     public GameObject meleeHitbox;
     public float xGauche = 0f;
     public float xDroite = 1f;
@@ -18,7 +18,7 @@ public class AttackHitBoxKamikaze : MonoBehaviour
 
     void Start()
     {
-        spriteRenderer = GetComponentInParent<SpriteRenderer>();
+        enemyRb = GetComponentInParent<Rigidbody2D>();
         anim = GetComponentInParent<Animator>();
         isAttacking = false;
           
@@ -28,7 +28,7 @@ public class AttackHitBoxKamikaze : MonoBehaviour
     void Update()
     {
         kamikazeAttack = GetComponentInParent<KamikazeAttack>(); 
-        if (spriteRenderer.flipX)
+        if (enemyRb.transform.rotation.y == 180)
         {
             // Si le joueur est retourné, positionne la hitbox de mêlée à gauche du joueur
             meleeHitbox.transform.localPosition = new Vector3(xGauche, 0f, 0f);

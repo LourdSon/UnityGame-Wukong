@@ -5,18 +5,20 @@ using System.Collections;
 using UnityEngine;
 
 using Cinemachine;
+using Unity.VisualScripting;
 
 
 
 public class PlayerMovement : MonoBehaviour
 {
 
+    
     [Header("Horizontal movement")]
     //Move Variables
     public float moveSpeed = 10.0f;
     private float horizontalInput;
     private float verticalInput;
-
+    public int direction;
     
 
 
@@ -106,10 +108,16 @@ public class PlayerMovement : MonoBehaviour
     public ParticleSystem slamParticles;
 
     private PlayerAttack playerAttack;
+
+    public float rayDistance;
+    public LayerMask groundLayerMask;
     
 
     
+
     
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -128,6 +136,7 @@ public class PlayerMovement : MonoBehaviour
 
         impulseSource = GetComponent<CinemachineImpulseSource>();
         playerAttack = GetComponent<PlayerAttack>();
+        
 
         //tileDestroyer = GetComponentInChildren<TileDestroyer>();
         
@@ -144,7 +153,9 @@ public class PlayerMovement : MonoBehaviour
             ReadInputJump();
             ReadDashPress();
             ReadChargeKi();
+            IsGrounded();
         }
+        
     }
 
     // Update is called once per frame
@@ -169,8 +180,9 @@ public class PlayerMovement : MonoBehaviour
         if(isDashing == false)
         {
             //Get Axis from Unity
-            horizontalInput = Input.GetAxisRaw("Horizontal");
-            verticalInput = Input.GetAxisRaw("Vertical");
+            Vector2 moveInput = PlayerController.instance.playerInputActions.Player.Move.ReadValue<Vector2>();
+            horizontalInput = moveInput.x;
+            verticalInput = moveInput.y;
             float horizontalMove = horizontalInput * moveSpeed;
             movement = new Vector2(horizontalMove, verticalInput);
             animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
@@ -181,10 +193,12 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("IsIdling", false);
                 if (horizontalInput < 0)
                 {
-                    spriteRenderer.flipX = true;
+                    playerRb.transform.rotation = Quaternion.Euler(playerRb.transform.rotation.x, 180f, playerRb.transform.rotation.z);
+                    direction = -1;
                 } else if (horizontalInput > 0)
                 {
-                    spriteRenderer.flipX = false;
+                    playerRb.transform.rotation = Quaternion.Euler(playerRb.transform.rotation.x, 0f,playerRb.transform.rotation.z);
+                    direction = 1;
                 }
             } else
             {
@@ -198,7 +212,7 @@ public class PlayerMovement : MonoBehaviour
     {
         
             //Move the character
-            transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * horizontalInput);
+            transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * direction * horizontalInput);
             //playerRb.AddForce(Vector2.right * movement.x);
             //playerRb.velocity = new Vector2(movement.x, playerRb.velocity.y);       
             //playerRb.MovePosition((Vector2) transform.position + movement * Time.deltaTime);
@@ -211,6 +225,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (jumpBool)
         {
+            SpawnDashParticles();
             Physics2D.IgnoreLayerCollision(9,14,true);
             playerRb.velocity = Vector2.Lerp(playerRb.velocity, jumpVelocity, jumpCurve.Evaluate(jumpTime));
             jumpBool = false;
@@ -221,7 +236,7 @@ public class PlayerMovement : MonoBehaviour
     private void ReadInputJump()
     {
         //Jump
-        if(Input.GetButtonDown("Jump") && isGrounded)
+        if(PlayerController.instance.playerInputActions.Player.Jump.triggered && isGrounded)
         {
             jumpVelocity = new Vector2(playerRb.velocity.x, jumpForce);
             animator.SetBool("IsJumping", true);
@@ -261,6 +276,21 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
+    private void ReadDashPress()
+    {
+        // Si le joueur appuie sur le bouton de dash et le dash est prêt
+        if (PlayerController.instance.playerInputActions.Player.Dash.ReadValue<float>() == 1  && Time.time > nextDashTime)
+        {
+            SpawnDashParticles();
+            
+            isGrounded=true;
+            jumpCounter = 1;
+            isDashing = true;
+            animator.SetBool("IsDashing", true);
+            animator.SetBool("IsIdling", false);
+            nextDashTime = Time.time + dashCooldown; // Mettre à jour le temps de recharge du dash
+        }
+    }
     private void DashPress()
     {
         if(isDashing)
@@ -268,19 +298,6 @@ public class PlayerMovement : MonoBehaviour
             
             StartCoroutine(Dash());
             isDashing = false;
-        }
-    }
-    private void ReadDashPress()
-    {
-        // Si le joueur appuie sur le bouton de dash et le dash est prêt
-        if (Input.GetAxis("Dash") == 1  && Time.time > nextDashTime)
-        {
-            SpawnDashParticles();
-            isGrounded=true;
-            jumpCounter = 1;
-            isDashing = true;
-            animator.SetBool("IsDashing", true);
-            nextDashTime = Time.time + dashCooldown; // Mettre à jour le temps de recharge du dash
         }
     }
 
@@ -295,18 +312,43 @@ public class PlayerMovement : MonoBehaviour
         //GameObject playerGameObject = GetComponent<GameObject>();
         float defaultSpeed = moveSpeed;
         moveSpeed += dashForce;
-        int direction = playerSpriteRenderer.flipX ? 1 : -1;
+        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
         float angleInRadians = Mathf.Atan2(dashMovement.y, dashMovement.x);
         float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
-        
         // 2. Calcul de l'angle en fonction du vecteur de mouvement
         if(angleInDegrees > 45 && angleInDegrees < 115)
         {
-            
-            
-            //playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce);
-            rotation = Quaternion.Euler(0f, 0f, angleInDegrees -90);
-            playerRb.transform.rotation = rotation;
+            if(angleInDegrees == 90)
+            {
+                if(direction == 1)
+                {
+                    rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees);
+                }
+                if(direction == -1)
+                {
+                    rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, angleInDegrees);
+                }
+                playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
+            } else
+            {
+                //playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce);
+                rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees -90);
+                playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
+            }
+            /* rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees -90);
+            playerRb.transform.rotation = rotation; */
+        } 
+        if(angleInDegrees == -90)
+        {
+            if(direction == 1)
+            {
+                rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees);
+            }
+            if(direction == -1)
+            {
+                rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, angleInDegrees);
+            }
+            playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
         }
         playerRb.AddForce(dashMovement * dashForce,ForceMode2D.Impulse);       
         Physics2D.IgnoreLayerCollision(9,11,true);
@@ -319,32 +361,36 @@ public class PlayerMovement : MonoBehaviour
         
 
         Physics2D.IgnoreLayerCollision(9,11,false);
-        Physics2D.IgnoreLayerCollision(9,14,false);
         // Arrêter le dash en réinitialisant la vélocité du joueur
         //playerRb.velocity = Vector2.zero;
         animator.SetBool("IsDashing", false);       
         isDashing = false;
-        rotation = Quaternion.Euler(0f, 0f, 0f);
-        playerRb.transform.rotation = rotation;
+        
+
+        if(direction == 1)
+        {
+            rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, 0f);
+        }
+        if(direction == -1)
+        {
+            rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, 0f);
+        }
+        playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
         //jumpCounter = 1;
         //moveSpeed -= dashForce;
         StartCoroutine(ReduceSpeedGradually(defaultSpeed, speedReductionDuration));
+        Physics2D.IgnoreLayerCollision(9,14,false);
         
     }
 
     private IEnumerator ReduceSpeedGradually(float targetSpeed, float duration)
     {
-        float startSpeed = moveSpeed;
-        //float time = 1;
-
-        if (/*time < duration &&*/ moveSpeed > targetSpeed)
+        if ( moveSpeed > targetSpeed)
         {
-            moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, /*time /*/ duration);
-            //time += Time.deltaTime;
+            moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed,duration);
             yield return null;
         }
 
-        //moveSpeed = targetSpeed;
     }
 
     private void ChargeKi()
@@ -357,7 +403,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void ReadChargeKi()
     {
-        if(Input.GetAxisRaw("Charging") == 1  && Time.time > nextChargeTime)
+        if(PlayerController.instance.playerInputActions.Player.KiExplosion.triggered  && Time.time > nextChargeTime)
         {
             animator.SetBool("IsCharging", true);
             animator.SetTrigger("ChargingTrigger");
@@ -442,14 +488,14 @@ public class PlayerMovement : MonoBehaviour
     {
         GameObject player = GameObject.FindWithTag("Player");
         SpriteRenderer playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
-        int direction = playerSpriteRenderer.flipX ? 1 : -1;
+        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
         Vector2 inputPlayer = new Vector2(horizontalInput, verticalInput).normalized;
         
         // 2. Calcul de l'angle en fonction du vecteur de mouvement
         
         float angleInRadians = Mathf.Atan2(inputPlayer.y, inputPlayer.x);
         float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
-        rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f + angleInDegrees + 180 : 180f + angleInDegrees);
+        rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f + angleInDegrees + 180 : -180f + angleInDegrees);
         //trueRotation = Quaternion.Euler() 
         //Instantiate(dashParticles,new Vector2(transform.position.x, transform.position.y -2), rotation);
         Instantiate(dashExplosionParticles,transform.position, rotation);
@@ -506,4 +552,24 @@ public class PlayerMovement : MonoBehaviour
                 }
     }
 
+
+    public bool IsGrounded()
+    {
+        
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayDistance, groundLayerMask);
+         // Dessiner le raycast dans la vue de scène pour le débogage
+        Debug.DrawRay(transform.position, Vector2.down * rayDistance, Color.red);
+        if(hit.collider == null)
+        {
+            animator.SetBool("IsGrounded()", false);
+            return hit.collider == null;
+        }
+        if (hit.collider != null)
+        {
+            animator.SetBool("IsGrounded()", true);
+            return hit.collider != null;
+            
+        }
+        return hit.collider != null;
+    }
 }

@@ -13,7 +13,7 @@ public class MeleeHitBoxSide : MonoBehaviour
     // Update est appelée une fois par frame
     void Update()
     {
-        if (playerSpriteRenderer.flipX)
+        if (transform.rotation.y == 0f)
         {
             // Si le joueur est retourné, positionne la hitbox de mêlée à gauche du joueur
             meleeHitbox.transform.localPosition = new Vector3(-offsetX, 0f, 0f);

@@ -13,7 +13,7 @@ public class NPCDirectionIndicator : MonoBehaviour
     void Update()
     {
         npcfirst = GameObject.FindGameObjectWithTag("NPCs");
-        if(npcfirst != null)
+        if(npcfirst != null && player != null)
         {
             npc = npcfirst.GetComponent<Transform>();
             distanceToNPC = Vector2.Distance(player.position, npc.position);
@@ -22,7 +22,7 @@ public class NPCDirectionIndicator : MonoBehaviour
         
 
         // Si le PNJ est hors du rayon de détection, affiche la flèche
-        if (distanceToNPC > detectionRadius)
+        if (distanceToNPC > detectionRadius && npcfirst != null)
         {
             arrowUI.enabled = true;  // Affiche la flèche
 

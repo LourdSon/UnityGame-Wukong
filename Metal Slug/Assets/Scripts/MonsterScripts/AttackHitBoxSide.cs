@@ -9,16 +9,17 @@ public class AttackHitBoxSide : MonoBehaviour
     public MonsterAttack2 monsterAttack2;
     public float waitingForAttack = 3f;
     
-    public SpriteRenderer spriteRenderer;
+    public Rigidbody2D enemyRb;
     public GameObject meleeHitbox;
     public float xGauche = 0f;
     public float xDroite = 1f;
     private Animator anim;
     public bool isAttacking;
+    public int direction;
 
     void Start()
     {
-        spriteRenderer = GetComponentInParent<SpriteRenderer>();
+        enemyRb = GetComponentInParent<Rigidbody2D>();
         anim = GetComponentInParent<Animator>();
         isAttacking = false;
     }
@@ -26,8 +27,11 @@ public class AttackHitBoxSide : MonoBehaviour
     // Update est appelée une fois par frame
     void Update()
     {
+        
+        /* direction = enemyRb.transform.rotation.y == 0 ? 1 : -1;
+        
         monsterAttack2 = GetComponentInParent<MonsterAttack2>(); 
-        if (spriteRenderer.flipX)
+        if (direction == -1)
         {
             // Si le joueur est retourné, positionne la hitbox de mêlée à gauche du joueur
             meleeHitbox.transform.localPosition = new Vector3(xGauche, 0f, 0f);
@@ -36,7 +40,7 @@ public class AttackHitBoxSide : MonoBehaviour
         {
             // Si le joueur n'est pas retourné, positionne la hitbox de mêlée à droite du joueur
             meleeHitbox.transform.localPosition = new Vector3(xDroite, 0f, 0f);
-        }
+        } */
         
     }
 

@@ -69,10 +69,10 @@ public class MonsterMovement : MonoBehaviour
                 animator.SetBool("IsWalking", true);
                 if(playerTransform.position.x > transform.position.x)
                 {
-                    spriteRenderer.flipX = false;
+                    transform.rotation = Quaternion.Euler(transform.rotation.x, 0f, transform.rotation.z);
                 } else 
                 {
-                    spriteRenderer.flipX = true;
+                    transform.rotation = Quaternion.Euler(transform.rotation.x, 180f, transform.rotation.z);
                 }
                 
             } else

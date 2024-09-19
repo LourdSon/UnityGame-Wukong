@@ -31,7 +31,7 @@ public class PlayerDamage : MonoBehaviour
             SpriteRenderer enemySr = GetComponentInChildren<SpriteRenderer>();
             MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
             monsterHealth.TakeDamage(damage);
-            int direction = enemySr.flipX ? 1 : -1;
+            int direction = transform.rotation.y == 0f ? 1 : -1;
             Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
             Instantiate(impactParticles, other.transform.position, rotation);
             Destroy(other.gameObject);
@@ -43,7 +43,7 @@ public class PlayerDamage : MonoBehaviour
             Rigidbody2D enemyRb = GetComponentInChildren<Rigidbody2D>();
             MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
             monsterHealth.TakeDamage(damage*multipUltim);
-            int direction = enemySr.flipX ? 1 : -1;
+            int direction = transform.rotation.y == 0f ? 1 : -1;
             Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
             int upOrDown = Random.Range(-1,1);
             if (upOrDown == 0)
@@ -59,7 +59,7 @@ public class PlayerDamage : MonoBehaviour
             SpriteRenderer enemySr = GetComponentInChildren<SpriteRenderer>();
             MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
             monsterHealth.TakeDamage(damage*multipBeerus);
-            int direction = enemySr.flipX ? 1 : -1;
+            int direction = transform.rotation.y == 0f ? 1 : -1;
             Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
             Instantiate(impactParticles, other.transform.position, rotation);
             other.gameObject.SetActive(false);

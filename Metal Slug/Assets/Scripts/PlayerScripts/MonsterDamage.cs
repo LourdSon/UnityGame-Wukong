@@ -35,7 +35,7 @@ public class MonsterDamage : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
 
-        int direction = spriteRenderer.flipX ? -1 : 1;
+        int direction = transform.rotation.y == 0f ? 1 : -1;
         
 
         if(collision.gameObject.tag == "Enemy" || collision.gameObject.tag == "Boss")

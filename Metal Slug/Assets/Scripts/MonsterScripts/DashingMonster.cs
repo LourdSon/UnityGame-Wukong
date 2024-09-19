@@ -64,35 +64,19 @@ public class DashingMonster : MonoBehaviour
         }
         if(!monsterHealth.isTakingDamage  && attackHitBoxSide.isAttacking == false)
         {
-            
             // Vérifie la distance entre l'ennemi et le joueur
             float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
-               
-            if (distanceToPlayer <= detectionRange /* && dashTimeCounter <= 0 */)
+            if (distanceToPlayer <= detectionRange)
             {
-                 
                 transform.position = Vector2.MoveTowards(transform.position, playerTransform.position, speed * Time.deltaTime);
-                
-
-                
-                /* transform.position = new Vector2(
-                    transform.position.x + dashDirection.x * dashDistance,
-                    transform.position.y + dashDirection.y * dashDistance
-                ); 
-                Vector2 dashDirection = (playerTransform.position - transform.position).normalized;
-                enemyRb.AddForce(dashDirection * dashDistance, ForceMode2D.Impulse); */
-                
-                /* dashTimeCounter = timeBtwDash; */
-                
-
                 animator.SetFloat("Speed",Mathf.Abs(speed * Time.deltaTime));
                 animator.SetBool("IsWalking", true);
                 if(playerTransform.position.x > transform.position.x)
                 {
-                    spriteRenderer.flipX = false;
+                    transform.rotation = Quaternion.Euler(transform.rotation.x, 0f, transform.rotation.z);
                 } else 
                 {
-                    spriteRenderer.flipX = true;
+                    transform.rotation = Quaternion.Euler(transform.rotation.x, 180f, transform.rotation.z);
                 } 
             } else
             {

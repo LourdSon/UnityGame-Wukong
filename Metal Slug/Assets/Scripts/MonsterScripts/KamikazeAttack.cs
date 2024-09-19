@@ -45,13 +45,13 @@ public class KamikazeAttack : MonoBehaviour
     public void Attack()
     {
         anim.SetTrigger("SimpleAttackTriggerFollow");
-        direction = enemySpriteRenderer.flipX ? -1 : 1;
+        direction = transform.rotation.y == 0f ? 1 : -1;
         detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
         Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, playerLayerMask);
         Instantiate(explosionParticles,transform.position, rotation);
         if (colliders.Length >= 1)
         {
-            direction = enemySpriteRenderer.flipX ? -1 : 1;
+            direction = transform.rotation.y == 0f ? 1 : -1;
             //playerRb.velocity = new Vector2(diagonal.x * selfForceMagnitudeForward,playerRb.velocity.y);
             //enemyRb.AddForce(Vector2.right * selfForceMagnitudeForward2 * -direction, ForceMode2D.Impulse);
         }
