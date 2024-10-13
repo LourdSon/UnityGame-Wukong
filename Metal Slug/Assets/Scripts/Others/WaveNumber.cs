@@ -22,7 +22,7 @@ public class WaveNumber : MonoBehaviour
         //waveManager = GetComponent<WaveManager>();
         if(waveManager != null)
         {
-            int waveManagerNumber = waveManager.currentWaveIndex;
+            int waveManagerNumber = waveManager.numerOfWaveDone;
             //int waveNumber = waveManager.currentWaveIndex;
             string v = "Wave number : " + waveManagerNumber;
             waveText.text = v;

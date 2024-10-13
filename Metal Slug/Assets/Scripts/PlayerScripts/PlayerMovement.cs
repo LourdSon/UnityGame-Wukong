@@ -6,6 +6,7 @@ using UnityEngine;
 
 using Cinemachine;
 using Unity.VisualScripting;
+using UnityEngine.Rendering.Universal;
 
 
 
@@ -72,8 +73,10 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Audio Source")]
     private AudioSource audioSource;
+    public AudioSource audioSource2;
     public AudioClip soundEffect;
     public AudioClip KiAura;
+    public AudioClip walkSound;
 
 
 
@@ -111,14 +114,20 @@ public class PlayerMovement : MonoBehaviour
 
     public float rayDistance;
     public LayerMask groundLayerMask;
+    public bool wantToFight;
+    public bool isJumping = false;
+    public GameObject dashEffect;
+    public GameObject DestructionGroundEffect;
+    public Light2D auraLight;
+    public float footstepTimer = 0f;
+    public float footstepDelay = 0.5f;
+    public bool isGrounder;
+    public PlayerLevel playerLevel;
+    private bool forceIncreased;
+    public GameObject ForceFieldParticles;
+    private PlayerHealth playerHealth;
     
-
     
-
-    
-
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -137,9 +146,13 @@ public class PlayerMovement : MonoBehaviour
         impulseSource = GetComponent<CinemachineImpulseSource>();
         playerAttack = GetComponent<PlayerAttack>();
         
-
+        wantToFight = false;
         //tileDestroyer = GetComponentInChildren<TileDestroyer>();
-        
+        Physics2D.IgnoreLayerCollision(9,16,true);
+
+        playerLevel = GetComponent<PlayerLevel>();
+        ForceFieldParticles.SetActive(false);
+        playerHealth = GetComponent<PlayerHealth>();
         
         
     }
@@ -147,13 +160,15 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if(!EndMission.isCutsceneon)  
+        if(/* !EndMission.isCutsceneon || */ !playerHealth.isHealing)  
         {  
             ReadInputMove();
             ReadInputJump();
             ReadDashPress();
             ReadChargeKi();
             IsGrounded();
+            moreLevelMoreForce();
+            RoofJump();
         }
         
     }
@@ -161,7 +176,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(!EndMission.isCutsceneon)  
+        if(/* !EndMission.isCutsceneon || */ !playerHealth.isHealing)  
         {  
                
             MovePlayer();
@@ -172,6 +187,19 @@ public class PlayerMovement : MonoBehaviour
             InstantDash(); // V
             ThorTest();
             //PunchAttack();
+        }
+    }
+
+    public void moreLevelMoreForce()
+    {
+        if(playerLevel.isLevelingUp && !forceIncreased)
+        {
+            dashForce += dashForce/100;
+            jumpForce += jumpForce/100;
+            forceIncreased = true;
+        }else if (!playerLevel.isLevelingUp)
+        {
+            forceIncreased = false;
         }
     }
 
@@ -186,9 +214,12 @@ public class PlayerMovement : MonoBehaviour
             float horizontalMove = horizontalInput * moveSpeed;
             movement = new Vector2(horizontalMove, verticalInput);
             animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
+            playerRb.transform.position = new Vector3(playerRb.transform.position.x,playerRb.transform.position.y,0f);
+
             //Flip sprite
             if (horizontalInput != 0)
             {
+                PlayFootsteps();
                 animator.SetBool("IsWalking", true);
                 animator.SetBool("IsIdling", false);
                 if (horizontalInput < 0)
@@ -202,9 +233,22 @@ public class PlayerMovement : MonoBehaviour
                 }
             } else
             {
+                audioSource2.Stop();
                 animator.SetBool("IsWalking", false);
                 animator.SetBool("IsIdling", true);
             }
+        }
+    }
+    void PlayFootsteps()
+    {
+        // Gère le timer pour jouer les pas à intervalles réguliers
+        footstepTimer += Time.deltaTime;
+        if (footstepTimer >= footstepDelay && isGrounded)
+        {
+            float newPitch = UnityEngine.Random.Range(0.9f,1.1f);
+            audioSource2.pitch = newPitch;
+            audioSource2.PlayOneShot(walkSound); 
+            footstepTimer = 0f;                      
         }
     }
 
@@ -216,38 +260,59 @@ public class PlayerMovement : MonoBehaviour
             //playerRb.AddForce(Vector2.right * movement.x);
             //playerRb.velocity = new Vector2(movement.x, playerRb.velocity.y);       
             //playerRb.MovePosition((Vector2) transform.position + movement * Time.deltaTime);
-        
-    
     }
-
-
     private void Jump()
     {
         if (jumpBool)
         {
-            SpawnDashParticles();
-            Physics2D.IgnoreLayerCollision(9,14,true);
+            isJumping = true;
+            SpawnJumpParticles();
             playerRb.velocity = Vector2.Lerp(playerRb.velocity, jumpVelocity, jumpCurve.Evaluate(jumpTime));
             jumpBool = false;
-            
         }
-        
     }
+
+    public void RoofJump()
+    {
+        if (isJumping)
+        {
+            // Si le joueur monte (vitesse verticale positive)
+            if (playerRb.velocity.y >= 0)
+            {
+                // Ignore les collisions entre le joueur et la couche de plateforme pendant la montée
+                Physics2D.IgnoreLayerCollision(9, 14, true);
+            }
+            // Si le joueur descend (vitesse verticale négative)
+            else if (playerRb.velocity.y < 0)
+            {
+                // Réactive les collisions entre le joueur et la couche de plateforme pendant la descente
+                Physics2D.IgnoreLayerCollision(9, 14, false);
+            }
+            if (playerRb.velocity.y == 0)
+            {
+                isJumping = false; // Le saut est terminé
+                Physics2D.IgnoreLayerCollision(9, 14, false); // Réactivation des collisions
+            }
+        }
+    }
+
     private void ReadInputJump()
     {
         //Jump
-        if(PlayerController.instance.playerInputActions.Player.Jump.triggered && isGrounded)
+        if(PlayerController.instance.playerInputActions.Player.Jump.triggered && isGrounder)
         {
             jumpVelocity = new Vector2(playerRb.velocity.x, jumpForce);
             animator.SetBool("IsJumping", true);
             animator.SetTrigger("JumpingTrigger");     
             jumpBool = true;                    
-            jumpCounter -=1;                    
+            jumpCounter -=1;
+                               
             if (jumpCounter == 0)
             {   
-                isGrounded = false;
+                isGrounder = false;
                 jumpCounter = 2;
             }
+            
         }
     }
 
@@ -257,9 +322,9 @@ public class PlayerMovement : MonoBehaviour
     private void ResetPosition()
     {
         //Reset Player position
-        if(Input.GetKeyDown(KeyCode.P))
+        if(PlayerController.instance.playerInputActions.Player.ResetPosition.triggered)
         {
-            transform.position = new Vector2(20,2);
+            transform.position = new Vector2(70,2);
         }
     }
 
@@ -269,7 +334,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
         {
-            isGrounded = true;
+            isGrounder = true;
             jumpCounter = 2;
             animator.SetBool("IsJumping", false);
         }
@@ -283,7 +348,7 @@ public class PlayerMovement : MonoBehaviour
         {
             SpawnDashParticles();
             
-            isGrounded=true;
+            isGrounder=true;
             jumpCounter = 1;
             isDashing = true;
             animator.SetBool("IsDashing", true);
@@ -304,8 +369,6 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator Dash()
     {
         
-        
-        
         // Déterminer la direction du dash en fonction des entrées du joueur
         Vector2 dashMovement = new Vector2(horizontalInput, verticalInput).normalized;
         SpriteRenderer playerSpriteRenderer = GetComponent<SpriteRenderer>();
@@ -322,39 +385,39 @@ public class PlayerMovement : MonoBehaviour
             {
                 if(direction == 1)
                 {
-                    rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees);
+                    rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees-90);
                 }
                 if(direction == -1)
                 {
-                    rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, angleInDegrees);
+                    rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, angleInDegrees-90);
                 }
-                playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
+                // playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
+                playerRb.transform.rotation = rotation;
             } else
             {
                 //playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce);
-                rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees -90);
+                rotation = Quaternion.Euler(0f, 0f, angleInDegrees -90);
                 playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
             }
-            /* rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees -90);
-            playerRb.transform.rotation = rotation; */
         } 
         if(angleInDegrees == -90)
         {
             if(direction == 1)
             {
-                rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees);
+                rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees+90);
             }
             if(direction == -1)
             {
-                rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, angleInDegrees);
+                rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, angleInDegrees+90);
             }
-            playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
+            // playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
+            playerRb.transform.rotation = rotation;
+
         }
         playerRb.AddForce(dashMovement * dashForce,ForceMode2D.Impulse);       
         Physics2D.IgnoreLayerCollision(9,11,true);
         Physics2D.IgnoreLayerCollision(9,14,true);      
         //playerRb.gravityScale = 0;
-        
         yield return new WaitForSeconds(dashDuration);
         //boxCollider.enabled = true,
         //playerRb.gravityScale = 1;
@@ -375,12 +438,11 @@ public class PlayerMovement : MonoBehaviour
         {
             rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, 0f);
         }
-        playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
+        // playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
         //jumpCounter = 1;
         //moveSpeed -= dashForce;
         StartCoroutine(ReduceSpeedGradually(defaultSpeed, speedReductionDuration));
         Physics2D.IgnoreLayerCollision(9,14,false);
-        
     }
 
     private IEnumerator ReduceSpeedGradually(float targetSpeed, float duration)
@@ -393,10 +455,18 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    private IEnumerator particlesForceField()
+    {
+        ForceFieldParticles.SetActive(true);
+        yield return new WaitForSeconds(0.15f);
+        ForceFieldParticles.SetActive(false);
+    }
+    
     private void ChargeKi()
     {
         if(isCharging)
         {
+            StartCoroutine(particlesForceField());
             StartCoroutine(KiChargingCo());
             isCharging = false;
         }
@@ -405,16 +475,19 @@ public class PlayerMovement : MonoBehaviour
     {
         if(PlayerController.instance.playerInputActions.Player.KiExplosion.triggered  && Time.time > nextChargeTime)
         {
+            
             animator.SetBool("IsCharging", true);
             animator.SetTrigger("ChargingTrigger");
             isCharging = true;
             nextChargeTime = Time.time + chargeCooldown;
+            StartCoroutine(DestroyDestructionGroundEffect());
             
         }
     }
 
     private IEnumerator KiChargingCo()
     {
+
         CameraShakeManager.instance.CameraShake(impulseSource);
         currentKi += 20;
         currentKi = Mathf.Clamp(currentKi, 0, maxKi);
@@ -431,6 +504,7 @@ public class PlayerMovement : MonoBehaviour
         playerRb.velocity = new Vector2(0f,0f);
         EnemiesStepBackCharging();
         yield return new WaitForSeconds(chargeDuration);
+        
         KiCharging.gameObject.SetActive(false);
         audioSource.Stop();
         
@@ -486,8 +560,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void SpawnDashParticles()
     {
-        GameObject player = GameObject.FindWithTag("Player");
-        SpriteRenderer playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
         Vector2 inputPlayer = new Vector2(horizontalInput, verticalInput).normalized;
         
@@ -496,6 +568,16 @@ public class PlayerMovement : MonoBehaviour
         float angleInRadians = Mathf.Atan2(inputPlayer.y, inputPlayer.x);
         float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
         rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f + angleInDegrees + 180 : -180f + angleInDegrees);
+        //trueRotation = Quaternion.Euler() 
+        //Instantiate(dashParticles,new Vector2(transform.position.x, transform.position.y -2), rotation);
+        Instantiate(dashExplosionParticles,transform.position, rotation);
+
+    }
+    
+
+    private void SpawnJumpParticles()
+    {
+        rotation = Quaternion.Euler(0f, 0f, 90f);
         //trueRotation = Quaternion.Euler() 
         //Instantiate(dashParticles,new Vector2(transform.position.x, transform.position.y -2), rotation);
         Instantiate(dashExplosionParticles,transform.position, rotation);
@@ -562,14 +644,32 @@ public class PlayerMovement : MonoBehaviour
         if(hit.collider == null)
         {
             animator.SetBool("IsGrounded()", false);
-            return hit.collider == null;
-        }
-        if (hit.collider != null)
+            isGrounded = false;
+            return hit.collider == null; 
+        } else 
         {
             animator.SetBool("IsGrounded()", true);
-            return hit.collider != null;
             
+            if(direction == 1)
+            {
+                rotation = Quaternion.Euler(0f, 0f, 0f);
+            }
+            if(direction == -1)
+            {
+                rotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+            isGrounded = true;
+            return hit.collider != null;   
         }
-        return hit.collider != null;
+        
+    }
+    public IEnumerator DestroyDestructionGroundEffect()
+    {
+        
+        UnityEngine.Object destructionGroundObject = Instantiate(DestructionGroundEffect,new Vector2(transform.position.x,transform.position.y), Quaternion.Euler(0f,0f,0f));
+        yield return new WaitForSeconds(1f);
+        Destroy(destructionGroundObject);
+        
+        yield return null;
     }
 }

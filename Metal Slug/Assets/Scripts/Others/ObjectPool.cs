@@ -12,7 +12,7 @@ public class ObjectPool : MonoBehaviour
         pool = new List<GameObject>();
         for (int i = 0; i < poolSize; i++)
         {
-            GameObject obj = Instantiate(energyBallPrefab);
+            GameObject obj = Instantiate(energyBallPrefab,new Vector3(-500f, -500f, 0f), Quaternion.identity);
             obj.SetActive(false);
             pool.Add(obj);
         }
@@ -24,6 +24,7 @@ public class ObjectPool : MonoBehaviour
         {
             if (!obj.activeInHierarchy)
             {
+                // obj.SetActive(true);
                 return obj;
             }
         }

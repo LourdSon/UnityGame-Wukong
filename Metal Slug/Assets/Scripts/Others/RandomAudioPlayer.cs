@@ -4,6 +4,7 @@ public class RandomAudioPlayer : MonoBehaviour
 {
     public AudioClip[] audioClips; // Liste des clips audio
     private AudioSource audioSource; // Composant AudioSource
+    public PlayerMovement playerMovement;
 
     void Start()
     {
@@ -11,18 +12,23 @@ public class RandomAudioPlayer : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
 
         // Vérifiez si des clips audio ont été assignés
-        if (audioClips.Length > 0)
+        if (audioClips.Length > 0 && playerMovement.wantToFight)
         {
             PlayRandomClip();
         }
+        
     }
 
     void Update()
     {
         // Vérifiez si la lecture est terminée et lancez un nouveau clip
-        if (!audioSource.isPlaying)
+        if (!audioSource.isPlaying && playerMovement.wantToFight)
         {
             PlayRandomClip();
+        }
+        if(audioSource.isPlaying && !playerMovement.wantToFight)
+        {
+            audioSource.Stop();
         }
     }
     

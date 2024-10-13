@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &9071370250499542813
 Transform:
   m_ObjectHideFlags: 0
@@ -47,10 +47,10 @@ MonoBehaviour:
   m_ComponentVersion: 1
   m_LightType: 1
   m_BlendStyleIndex: 0
-  m_FalloffIntensity: 1
-  m_Color: {r: 0.5849056, g: 0.41778937, b: 0.20140618, a: 1}
-  m_Intensity: 1
-  m_LightVolumeIntensity: 1
+  m_FalloffIntensity: 0.519
+  m_Color: {r: 0.37781265, g: 0.38679248, b: 0.20616768, a: 0.59607846}
+  m_Intensity: 1.5
+  m_LightVolumeIntensity: 0
   m_LightVolumeIntensityEnabled: 0
   m_ApplyToSortingLayers: c5246bac8d690773
   m_LightCookieSprite: {fileID: 0}
@@ -62,12 +62,12 @@ MonoBehaviour:
   m_NormalMapQuality: 2
   m_UseNormalMap: 0
   m_ShadowIntensityEnabled: 1
-  m_ShadowIntensity: 1
-  m_ShadowVolumeIntensityEnabled: 0
-  m_ShadowVolumeIntensity: 0.75
+  m_ShadowIntensity: 0.6
+  m_ShadowVolumeIntensityEnabled: 1
+  m_ShadowVolumeIntensity: 1
   m_LocalBounds:
-    m_Center: {x: -0.14590001, y: -4.2926497, z: 0}
-    m_Extent: {x: 3.2824, y: 5.37435, z: 0}
+    m_Center: {x: 0.20414996, y: -7.58185, z: 0}
+    m_Extent: {x: 5.73285, y: 9.50275, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
@@ -75,13 +75,13 @@ MonoBehaviour:
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
   m_ShapeLightParametricRadius: 1
-  m_ShapeLightFalloffSize: 0.66
+  m_ShapeLightFalloffSize: 1.5
   m_ShapeLightFalloffOffset: {x: 0, y: 0}
   m_ShapePath:
   - {x: -0.17888191, y: 0.33222952, z: -0.00000000840096}
-  - {x: -2.7696595, y: -8.545241, z: -0.00000000840096}
-  - {x: -0.27380407, y: -9.007967, z: -0.00000000840096}
-  - {x: 2.4795923, y: -8.671037, z: -0.00000000840096}
+  - {x: -4.029185, y: -15.122761, z: -0.000000009934108}
+  - {x: 0.0060891756, y: -15.585488, z: -0.000000009934108}
+  - {x: 4.438853, y: -14.268926, z: -0.000000009934108}
   - {x: 0.1634592, y: 0.42165047, z: -0.00000000840096}
 --- !u!1 &7271294025234803235
 GameObject:
@@ -154,9 +154,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1402264379
-  m_SortingLayer: 1
-  m_SortingOrder: -8
+  m_SortingLayerID: 1929865613
+  m_SortingLayer: 3
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 2fa732754c362384faec8e794a9e5e72, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

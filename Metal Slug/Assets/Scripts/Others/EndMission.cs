@@ -86,7 +86,10 @@ public class EndMission : MonoBehaviour
         
         if(!playedOnce && count == 0 && GetComponent<WaveManager>().currentWaveIndex == GetComponent<WaveManager>().waves.Count)
         {
-            YouWinScreen();
+            // YouWinScreen();
+            ReturningToWave0();
+            return;
+            
             /*boss.SetActive(true);
             
             if(countB == 1)
@@ -99,7 +102,9 @@ public class EndMission : MonoBehaviour
             */
         }else if (countB == 0 && playedOnce)
         {
-            YouWinScreen();
+            // YouWinScreen();
+            ReturningToWave0();
+            return;
         }
     }
     public void StopCutscene()
@@ -116,6 +121,11 @@ public class EndMission : MonoBehaviour
         EventSystem.SetActive(false);
         winningEventSystem.SetActive(true);
         
+    }
+    public void ReturningToWave0()
+    {
+        GetComponent<WaveManager>().currentWaveIndex = 0;
+        return;
     }
 
 }

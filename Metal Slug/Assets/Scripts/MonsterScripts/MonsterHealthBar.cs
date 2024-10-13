@@ -8,7 +8,7 @@ public class MonsterHealthBar : MonoBehaviour
 {
 
     public Slider slider;
-    public new Camera camera;
+    // public Camera camera;
     public Transform target;
     public Vector3 offset;
 

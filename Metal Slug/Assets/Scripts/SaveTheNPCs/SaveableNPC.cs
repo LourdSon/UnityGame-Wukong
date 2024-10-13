@@ -5,7 +5,7 @@ using System.Collections;
 public class SaveableNPC : MonoBehaviour
 {
     public float saveTimeRequired = 5f;  // Temps que le joueur doit passer dans la zone
-    private bool playerInZone = false;
+    public bool playerInZone = false;
     public float currentSaveTime = 0f;
     
     public Slider saveIndicator; // Pour indiquer visuellement le processus de sauvegarde
@@ -13,6 +13,7 @@ public class SaveableNPC : MonoBehaviour
 
     public float currentLimitTime = 0f;
     public float timeRequired = 50f;
+    public GameObject XpForPlayer;
     public Text text;
 
     void Start()
@@ -76,7 +77,10 @@ public class SaveableNPC : MonoBehaviour
 
     void SaveNPC()
     {
-        
+        Instantiate(XpForPlayer, transform.position, Quaternion.identity);
+        Instantiate(XpForPlayer, transform.position, Quaternion.identity);
+        Instantiate(XpForPlayer, transform.position, Quaternion.identity);
+        Instantiate(XpForPlayer, transform.position, Quaternion.identity);
         Destroy(gameObject); 
     }
 

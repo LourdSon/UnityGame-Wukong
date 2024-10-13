@@ -34,8 +34,6 @@ public class PlayerShooting : MonoBehaviour
     public Vector3 offsetGenki;
 
 
-    //public int damage = 10;
-    //public MonsterHealth monsterHealth;
     public Vector3 offset = new Vector3(2.5f, 0f, 0f);
 
     private AudioSource audioSource;
@@ -55,6 +53,10 @@ public class PlayerShooting : MonoBehaviour
     public Rigidbody2D[] energyballrb3;
     private ObjectPool objectPool;
     public float delay = 0.25f;
+    public GameObject shootingEffect;
+    private float horizontalInput;
+    private float verticalInput;
+    private PlayerHealth playerHealth;
 
 
     void Start()
@@ -72,6 +74,7 @@ public class PlayerShooting : MonoBehaviour
         energyBall2.SetActive(false);
         playerAttack = GetComponent<PlayerAttack>();
         objectPool = GetComponent<ObjectPool>();
+        playerHealth = GetComponent<PlayerHealth>();
 
         // Obtenir la direction actuelle du sprite du joueur
     }
@@ -79,20 +82,26 @@ public class PlayerShooting : MonoBehaviour
     // Update est appelée une fois par frame
     void Update()
     {
-        ReadInputShooting();
+        if(!playerHealth.isHealing)
+        {
+            ReadInputShooting();
+        }
 
     }
     void FixedUpdate()
     {
-        Shooting();
+        if(!playerHealth.isHealing)
+        {
+            Shooting();
+        }
     }
 
     public void ReadInputShooting()
     {
         // Obtient les valeurs des entrées horizontales et verticales
         Vector2 moveInput = PlayerController.instance.playerInputActions.Player.Move.ReadValue<Vector2>();
-        float horizontalInput = moveInput.x;
-        float verticalInput = moveInput.y;
+        horizontalInput = moveInput.x;
+        verticalInput = moveInput.y;
         bool mouseRight = PlayerController.instance.playerInputActions.Player.Shoot.triggered;
         direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
 
@@ -107,6 +116,7 @@ public class PlayerShooting : MonoBehaviour
         // Vérifie si l'entrée n'est pas nulle (si le joueur appuie sur les touches de direction)
         if (horizontalInput != 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy && !playerAttack.isHoldingSelect|| verticalInput != 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy && !playerAttack.isHoldingSelect)
         {
+            SpawnShootingParticles();
             energyBall = Instantiate(energyBallPrefab, transform.position, Quaternion.identity);
             energyrb = energyBall.GetComponent<Rigidbody2D>();
             energyBall.transform.localScale *= scaleMultiplier;
@@ -118,6 +128,7 @@ public class PlayerShooting : MonoBehaviour
 
         } else if(horizontalInput == 0 && verticalInput == 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy && !playerAttack.isHoldingSelect)
         {
+            SpawnShootingParticles();
             energyBall = Instantiate(energyBallPrefab, new Vector2(transform.position.x + (offset.x*direction), transform.position.y + offset.y), Quaternion.identity);
             energyrb = energyBall.GetComponent<Rigidbody2D>();
             energyBall.transform.localScale *= scaleMultiplier;
@@ -129,11 +140,12 @@ public class PlayerShooting : MonoBehaviour
 
         } else if(horizontalInput != 0 && PlayerController.instance.playerInputActions.Player.SuperShot.triggered && attackTimeCounter2 <= 0f  && cKi >= costUltimate || verticalInput != 0 && PlayerController.instance.playerInputActions.Player.SuperShot.triggered && attackTimeCounter2 <= 0f && cKi >= costUltimate)
         {
+            SpawnShootingParticles();
             //energyBall2 = Instantiate(energyBallPrefab2, transform.position + offsetGenki, Quaternion.identity);
             energyBall2.transform.position = new Vector3(transform.position.x + offsetGenki.x * horizontalInput, transform.position.y + offsetGenki.y * verticalInput, transform.position.z);
             energyBall2.SetActive(true);
             energyrb2 = energyBall2.GetComponent<Rigidbody2D>();
-            energyBall2.transform.localScale = new Vector3(3f,3f,3f);
+            energyBall2.transform.localScale = new Vector3(10f,10f,10f);
             energyBall2.transform.localScale *= scaleMultiplier;
             animator.SetTrigger("SimpleShootingTrigger");
             isShooting3 = true;
@@ -145,10 +157,7 @@ public class PlayerShooting : MonoBehaviour
         {
             int numberOfBalls = 10; // Nombre de EnergyBalls à instancier
             int setsOfBalls = 5;
-            
-            
             StartCoroutine(SpawnAndShootEnergyBalls(numberOfBalls,setsOfBalls,delay));
-            
             animator.SetTrigger("SimpleShootingTrigger");
             playerKi.currentKi -= costExplosion;
             playerKi.UpdateKiBar();
@@ -298,6 +307,20 @@ public class PlayerShooting : MonoBehaviour
 
         // Retourner la nouvelle position avec la même hauteur que le héros
         return new Vector3(x, y, transform.position.z);
+    }
+
+    private void SpawnShootingParticles()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        SpriteRenderer playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
+        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
+        Vector2 inputPlayer = new Vector2(horizontalInput, verticalInput).normalized;
+        float angleInRadians = Mathf.Atan2(inputPlayer.y, inputPlayer.x);
+        float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+        if(inputPlayer != new Vector2(0,0))
+            shootingEffect.transform.rotation = Quaternion.Euler(0f, 0f, angleInDegrees - 45f); 
+        shootingEffect.SetActive(true);
+
     }
     
 }

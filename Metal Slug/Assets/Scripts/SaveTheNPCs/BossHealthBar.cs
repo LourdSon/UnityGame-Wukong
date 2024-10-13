@@ -8,7 +8,7 @@ public class NPCHealthBar : MonoBehaviour
 {
 
     public Slider slider;
-    public new Camera camera;
+    // public new Camera camera;
     public Vector3 position;
     public Transform npcposition;
 

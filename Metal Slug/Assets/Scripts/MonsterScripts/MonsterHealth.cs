@@ -39,6 +39,13 @@ public class MonsterHealth : MonoBehaviour
     public Quaternion rotation;
     public int direction;
     private SpriteRenderer spriteRenderer;
+    public GameObject ComicBoomEffect;
+    public GameObject XpForPlayer;
+    public PlayerLevel playerLevel;
+    private bool damageIncreased;
+    public float percentage = 20;
+    public GameObject enemyPrefab;
+    public GameObject attackHitBox;
 
     // Start is called before the first frame update
     void Start()
@@ -56,7 +63,7 @@ public class MonsterHealth : MonoBehaviour
         playerRb = player.GetComponent<Rigidbody2D>();
         playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-
+        playerLevel = player.GetComponent<PlayerLevel>();
         
     }
 
@@ -66,7 +73,22 @@ public class MonsterHealth : MonoBehaviour
         Physics2D.IgnoreLayerCollision(11,14,true);
         knockBackTest();
         direction = enemyRb.transform.rotation.y == 0 ? 1 : -1;
+        moreLevelMoreHealth();
         
+    }
+
+    public void moreLevelMoreHealth()
+    {
+        if(playerLevel.isLevelingUp && !damageIncreased)
+        {
+            maxHealth += maxHealth/percentage;
+            healthBar.UpdateHealthBar(health,maxHealth);
+            // health = Mathf.Clamp(health, 0, maxHealth); 
+            damageIncreased = true;
+        }else if (!playerLevel.isLevelingUp)
+        {
+            damageIncreased = false;
+        }
     }
 
     public void TakeDamage(float damage)
@@ -88,7 +110,49 @@ public class MonsterHealth : MonoBehaviour
 
         if (health <= 0)
         {
-            Destroy(gameObject);
+            Instantiate(XpForPlayer, transform.position, Quaternion.identity);
+            // Destroy(gameObject);
+            // envoyer l'ennemi au pool une fois vaincu
+            // EnemyPoolManager.Instance.ReturnEnemyToPool(gameObject, enemyPrefab);
+            // gameObject.SetActive(false);
+            EnemyPoolManager.Instance.ReturnEnemyToPool(gameObject);
+            AttackHitBoxSide attackHitBoxSide = attackHitBox.GetComponent<AttackHitBoxSide>();
+            AttackHitBoxKamikaze attackHitBoxKamikaze = attackHitBox.GetComponent<AttackHitBoxKamikaze>();
+            if (attackHitBoxSide != null)
+            {
+                attackHitBoxSide.isAttacking = false;
+            }
+            if (attackHitBoxKamikaze != null)
+            {
+                attackHitBoxKamikaze.isAttacking = false;
+            }
+        }
+        
+    }
+
+    public void TakeDamage2(float damage)
+    {
+        knockBackCounter = 0;
+        // isTakingDamage = true;
+         
+        // knockBackTest();
+        //CameraShakeManager.instance.CameraShake(impulseSource);
+
+        SpawnDamageParticles();
+
+        //ContactDamage();
+        //StartCoroutine(FlashCoroutine());
+
+        health -= damage;
+        healthBar.UpdateHealthBar(health,maxHealth);
+        health = Mathf.Clamp(health, 0, maxHealth);
+
+        if (health <= 0)
+        {
+            Instantiate(XpForPlayer, transform.position, Quaternion.identity);
+            // Destroy(gameObject);
+            // gameObject.SetActive(false);
+            EnemyPoolManager.Instance.ReturnEnemyToPool(gameObject);
         }
         
     }
@@ -137,7 +201,7 @@ public class MonsterHealth : MonoBehaviour
         {
             // Vérifie si la collision est suffisamment forte pour causer des dégâts supplémentaires
             MonsterHealth otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
-            if (enemyRb != null && enemyRb.velocity.magnitude > 15f && otherEnemy != null)
+            if (enemyRb != null && enemyRb.velocity.magnitude > 30f && otherEnemy != null)
             {               
                 float impactForce = collision.relativeVelocity.magnitude;
                 float additionalDamage = impactForce * additionalDamageMultiplier;
@@ -145,11 +209,13 @@ public class MonsterHealth : MonoBehaviour
             }
         } else if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
         {
-            if(enemyRb.velocity.magnitude > 15f)
+            if(enemyRb.velocity.magnitude > 30f)
             {
                 float impactForce = collision.relativeVelocity.magnitude;
                 float additionalDamage = impactForce * additionalDamageMultiplier;
                 TakeDamage(normalDamage + additionalDamage);
+                
+
             }
         }
     }
@@ -157,7 +223,7 @@ public class MonsterHealth : MonoBehaviour
     public void ContactDamage()
     {
 
-        if(enemyRb.velocity.magnitude > 15f && !IsGrounded())
+        if(enemyRb.velocity.magnitude > 30f && !IsGrounded())
         {
             StartCoroutine(DamageGrounded());
         }
@@ -187,4 +253,5 @@ public class MonsterHealth : MonoBehaviour
         Debug.DrawRay(transform.position, Vector2.down * rayDistance, Color.red);
         return hit.collider != null;
     }
+
 }

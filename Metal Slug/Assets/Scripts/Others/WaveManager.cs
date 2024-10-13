@@ -31,16 +31,30 @@ public class WaveManager : MonoBehaviour
     private int enemiesRemainingToSpawn;
     private GameObject[] enemiesRemainingAlive;
     private bool spawningEnemies = false;
+    public PlayerMovement playerMovement;
+    public int numerOfWaveDone;
+    public Transform playerTransform;
 
     void Update()
     {
-        enemiesRemainingAlive = GameObject.FindGameObjectsWithTag("Enemy");
-        if (!spawningEnemies && enemiesRemainingAlive.Length == 0 && currentWaveIndex < waves.Count)
+        if(playerMovement.wantToFight)
         {
-            StartCoroutine(SpawnWave());
-        } else if (!spawningEnemies && enemiesRemainingAlive.Length == 0 && currentWaveIndex == waves.Count )
+            enemiesRemainingAlive = GameObject.FindGameObjectsWithTag("Enemy");
+            if (!spawningEnemies && enemiesRemainingAlive.Length == 0 && currentWaveIndex < waves.Count)
+            {
+                StartCoroutine(SpawnWave());
+            } else if (!spawningEnemies && enemiesRemainingAlive.Length == 0 && currentWaveIndex == waves.Count )
+            {
+                GetComponent<EndMission>().EnemyNumber();
+            }
+        } if(!playerMovement.wantToFight)
         {
-            GetComponent<EndMission>().EnemyNumber();
+            enemiesRemainingAlive = GameObject.FindGameObjectsWithTag("Enemy");
+            if(!spawningEnemies && enemiesRemainingAlive.Length != 0)
+            {
+                for(int i = 0; i < enemiesRemainingAlive.Length; i++)
+                    EnemyPoolManager.Instance.ReturnEnemyToPool(enemiesRemainingAlive[i]);
+            }
         }
     }
 
@@ -65,6 +79,7 @@ public class WaveManager : MonoBehaviour
         if (currentWaveIndex < waves.Count)
         {
             currentWaveIndex++;
+            numerOfWaveDone++;
             TryTriggerRandomEvent();
         }
         else
@@ -80,7 +95,14 @@ public class WaveManager : MonoBehaviour
     void SpawnEnemy(GameObject enemyPrefab)
     {
         Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-        GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
+        // GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
+        GameObject enemy = EnemyPoolManager.Instance.GetEnemy(enemyPrefab);
+        if (enemy != null)
+        {
+            enemy.transform.position = spawnPoint.position;
+            MonsterHealth monsterHealth = enemy.GetComponent<MonsterHealth>();
+            monsterHealth.health = monsterHealth.maxHealth;
+        }
 
         
     }
@@ -91,10 +113,19 @@ public class WaveManager : MonoBehaviour
             float randomValue = Random.Range(0f, 1f);
             if (randomValue <= randomEvent.chanceToOccur)
             {
-                // Si l'événement est déclenché, on le spawn à un point aléatoire
-                Transform spawnPoint = eventSpawnPoints[Random.Range(0, eventSpawnPoints.Length)];
-                Instantiate(randomEvent.eventPrefab, spawnPoint.position, spawnPoint.rotation);
-                Debug.Log("Event triggered: " + randomEvent.eventName);
+                if (randomEvent.eventName == "CircleOfEnemies" || randomEvent.eventName == "CircleOfEnemies2")
+                {
+                    // Déclencher l'événement "Cercle d'ennemis autour du joueur"
+                    EnemyCircleSpawner spawner = randomEvent.eventPrefab.GetComponent<EnemyCircleSpawner>();
+                    spawner.SpawnEnemiesAroundPlayer(playerTransform);
+                }
+                else
+                {
+                    // Si l'événement est déclenché, on le spawn à un point aléatoire
+                    Transform spawnPoint = eventSpawnPoints[Random.Range(0, eventSpawnPoints.Length)];
+                    Instantiate(randomEvent.eventPrefab, spawnPoint.position, spawnPoint.rotation);
+                    Debug.Log("Event triggered: " + randomEvent.eventName);
+                }
             }
         }
     }

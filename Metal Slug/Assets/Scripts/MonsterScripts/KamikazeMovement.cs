@@ -9,23 +9,19 @@ public class KamikazeMovement : MonoBehaviour
     public float detectionRange = 500f;
     public float speed = 20f; // Vitesse de déplacement de l'ennemi
 
-    private Transform playerTransform;
+    public Transform playerTransform;
         
     private Rigidbody2D enemyRb;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+    public GameObject player;
 
     
 
     void Start()
     {
         
-        // Trouve le joueur par son tag au démarrage
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
-        {
-            playerTransform = player.transform;
-        }
+        playerTransform = player.transform;
         
         enemyRb = GetComponentInChildren<Rigidbody2D>();
         animator = GetComponent<Animator>();
@@ -37,24 +33,27 @@ public class KamikazeMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        
+        if (playerTransform != null && player != null)
+        {
+            playerTransform = player.transform;
+        }if(playerTransform == null && player != null)
+        {
+            playerTransform = player.transform;
+        }
         DetectPlayer();
         
     }
-    void Update()
-    {
-        
-    }
+
 
     public void DetectPlayer()
     {
         MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
         AttackHitBoxKamikaze attackHitBoxKamikaze = GetComponentInChildren<AttackHitBoxKamikaze>();
-        if (playerTransform == null)
+        if (playerTransform == null && player != null)
         {
-            return;
+            playerTransform = player.transform;
         }
-        if(!monsterHealth.isTakingDamage  && attackHitBoxKamikaze.isAttacking == false)
+        if(!monsterHealth.isTakingDamage  && attackHitBoxKamikaze.isAttacking == false && playerTransform != null)
         {
             
             // Vérifie la distance entre l'ennemi et le joueur

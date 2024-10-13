@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MonsterAttack2 : MonoBehaviour
@@ -17,6 +18,12 @@ public class MonsterAttack2 : MonoBehaviour
     public Vector2 detectionOffset = new Vector2(10, 0);
     public int direction;
     public Animator anim;
+    public GameObject energyPrefab;
+    public float energyBallSpeed;
+    public bool isShooting;
+    public GameObject playerRb;
+    public float WaitBetweenShots;
+    public ObjectPool objectPool;
 
     // Start is called before the first frame update
     void Start()
@@ -59,6 +66,7 @@ public class MonsterAttack2 : MonoBehaviour
             }
         }
     }
+
 
 
     private void OnDrawGizmosSelected()

@@ -367,6 +367,9 @@ MonoBehaviour:
   impactParticles: {fileID: 1132110526623212655, guid: 7476291775d6d264f8ad52f6dff1edb5, type: 3}
   forceMagnitudeUpward: 30
   multipBeerus: 3
+  comicBoomEffect: {fileID: 6612662221487348332, guid: 469c1a809d4588c4892c424559a8748c, type: 3}
+  playerLevel: {fileID: 0}
+  damageIncreased: 0
 --- !u!114 &8778097764519723139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -434,7 +437,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionRange: 500
   speed: 30
+  target: {fileID: 0}
   player: {fileID: 0}
+  saveableNPC: {fileID: 0}
+  separationRadius: 3
+  separationForce: 15
 --- !u!114 &4875495184943951793
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -447,7 +454,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cadc6094fb400644b9fd5a0e915eaed6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 400
   health: 0
   healthBar: {fileID: 0}
   damageParticles: {fileID: 1132110526623212655, guid: 7476291775d6d264f8ad52f6dff1edb5, type: 3}
@@ -467,6 +474,12 @@ MonoBehaviour:
   dashExplosionParticles: {fileID: 9110157677477234812, guid: 38ebfe1bdc34cde4db02fc211afc2914, type: 3}
   rotation: {x: 0, y: 0, z: 0, w: 0}
   direction: 0
+  ComicBoomEffect: {fileID: 2440929272261559938, guid: c6d43981fdd47d946809f449b54bcfb7, type: 3}
+  XpForPlayer: {fileID: 4469632007056067750, guid: 26cf7772e11b17245bc6df2612d1e69d, type: 3}
+  playerLevel: {fileID: 0}
+  percentage: 20
+  enemyPrefab: {fileID: 178415945910635944}
+  attackHitBox: {fileID: 9169290811343539781}
 --- !u!114 &5928232531649868558
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,6 +505,12 @@ MonoBehaviour:
   detectionOffset: {x: 1.9, y: 0}
   direction: 0
   anim: {fileID: 0}
+  energyPrefab: {fileID: 0}
+  energyBallSpeed: 0
+  isShooting: 0
+  playerRb: {fileID: 0}
+  WaitBetweenShots: 0
+  objectPool: {fileID: 0}
 --- !u!114 &3955901659546125378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -532,7 +551,7 @@ MonoBehaviour:
   - {x: -0.43300948, y: -1.5400442, z: 0}
   m_ShapePathHash: 879690107
   m_Mesh: {fileID: 0}
-  m_InstanceId: 144710
+  m_InstanceId: 567846
   m_LocalBounds:
     m_Center: {x: -0.09113884, y: -0.5349324, z: 0}
     m_Extent: {x: 0.53444165, y: 1.0051118, z: 0}
@@ -982,7 +1001,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slider: {fileID: 5402825173928964503}
-  camera: {fileID: 0}
   target: {fileID: 7454788023328072181}
   offset: {x: 0, y: 3, z: 0}
 --- !u!1 &3899014341068111023
@@ -1661,7 +1679,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 186.00244, y: 0}
+  m_AnchoredPosition: {x: 68.28, y: 0.23}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &3022041624684194917

@@ -17,6 +17,10 @@ TagManager:
   - EnemyDash
   - Roofs
   - NPCs
+  - NormalNPCs
+  - Oiseaux
+  - Planes
+  - EnergyBallEnemy
   layers:
   - Default
   - TransparentFX
@@ -34,12 +38,12 @@ TagManager:
   - Boss
   - Roofs
   - Particles
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - NPCs
+  - Planes
+  - Cars
+  - HitBoxShoot
+  - EnergyBallEnemy
+  - XPZone
   - 
   - 
   - 

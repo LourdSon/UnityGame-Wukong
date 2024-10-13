@@ -25,7 +25,8 @@ public class KamikazeAttack : MonoBehaviour
     private float kamikazeDamageHimself;
     private Quaternion rotation;
     public ParticleSystem explosionParticles;
-    // Start is called before the first frame update
+    
+    
     void Start()
     {
         enemySpriteRenderer = GetComponent<SpriteRenderer>();

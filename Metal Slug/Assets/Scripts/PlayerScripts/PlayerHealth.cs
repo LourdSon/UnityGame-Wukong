@@ -1,9 +1,7 @@
-
-
 using UnityEngine;
-
 using UnityEngine.Events;
 using Cinemachine;
+using System.Collections;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -25,7 +23,8 @@ public class PlayerHealth : MonoBehaviour
     public float healCost = 25f;
     private PlayerMovement playerKi;
     private PlayerAttack playerAttack;
-    
+    public bool isHealing;
+    public float secondsBeforeHeal = 1;
     
     // Start is called before the first frame update
     void Start()
@@ -39,7 +38,7 @@ public class PlayerHealth : MonoBehaviour
 
         playerKi = GetComponent<PlayerMovement>();
         playerAttack = GetComponent<PlayerAttack>();
-        
+        isHealing = false;
     }
 
     // Update is called once per frame
@@ -112,16 +111,24 @@ public class PlayerHealth : MonoBehaviour
     }
     public void GetMyHealthBack()
     {
-        if (playerAttack.holdingTime < playerAttack.requiredHoldingTime && PlayerController.instance.playerInputActions.Player.Heal.triggered && playerKi.currentKi >= healCost && health != maxHealth)
+        if (PlayerController.instance.playerInputActions.Player.Heal.triggered && playerKi.currentKi >= healCost && health != maxHealth && !isHealing)
         {
-            health += 10;
-            UpdateHealthBar();
-            health = Mathf.Clamp(health, 0, maxHealth);
-            playerKi.currentKi -= healCost;
-            playerKi.UpdateKiBar();
+            StartCoroutine(WaitBeforeHeal(secondsBeforeHeal));
+            
         }
     }
-
+    public IEnumerator WaitBeforeHeal(float sec)
+    {
+        isHealing = true;
+        yield return new WaitForSeconds(sec);
+        health += 10;
+        UpdateHealthBar();
+        health = Mathf.Clamp(health, 0, maxHealth);
+        playerKi.currentKi -= healCost;
+        playerKi.UpdateKiBar();
+        isHealing = false;
+        
+    }
     
     
 }

@@ -116,6 +116,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Hold"",
+                    ""type"": ""Button"",
+                    ""id"": ""d8980117-7b8a-420a-901d-16f1596ba407"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ResetPosition"",
+                    ""type"": ""Button"",
+                    ""id"": ""ae1135eb-f7f3-4dbe-a44d-4cdbc86f4165"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -485,7 +503,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""8db157f6-3630-4f07-a41f-52f2f5d4eab4"",
-                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""path"": ""<Gamepad>/rightStickPress"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -534,6 +552,50 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
                     ""action"": ""Dash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""526fad28-fee5-49d6-a12f-3039b11ff77f"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Hold"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""df38bab5-4d81-407f-b3f4-3ed7f067a381"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Hold"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""85e7e941-51b8-4df1-9043-ff0bbf798466"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""ResetPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""476d985a-e1a7-4818-88f9-daa8d8fbfb97"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""ResetPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1093,6 +1155,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Attraction = m_Player.FindAction("Attraction", throwIfNotFound: true);
         m_Player_Heal = m_Player.FindAction("Heal", throwIfNotFound: true);
         m_Player_SuperShot = m_Player.FindAction("SuperShot", throwIfNotFound: true);
+        m_Player_Hold = m_Player.FindAction("Hold", throwIfNotFound: true);
+        m_Player_ResetPosition = m_Player.FindAction("ResetPosition", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1176,6 +1240,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Attraction;
     private readonly InputAction m_Player_Heal;
     private readonly InputAction m_Player_SuperShot;
+    private readonly InputAction m_Player_Hold;
+    private readonly InputAction m_Player_ResetPosition;
     public struct PlayerActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -1190,6 +1256,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @Attraction => m_Wrapper.m_Player_Attraction;
         public InputAction @Heal => m_Wrapper.m_Player_Heal;
         public InputAction @SuperShot => m_Wrapper.m_Player_SuperShot;
+        public InputAction @Hold => m_Wrapper.m_Player_Hold;
+        public InputAction @ResetPosition => m_Wrapper.m_Player_ResetPosition;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1229,6 +1297,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @SuperShot.started += instance.OnSuperShot;
             @SuperShot.performed += instance.OnSuperShot;
             @SuperShot.canceled += instance.OnSuperShot;
+            @Hold.started += instance.OnHold;
+            @Hold.performed += instance.OnHold;
+            @Hold.canceled += instance.OnHold;
+            @ResetPosition.started += instance.OnResetPosition;
+            @ResetPosition.performed += instance.OnResetPosition;
+            @ResetPosition.canceled += instance.OnResetPosition;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1263,6 +1337,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @SuperShot.started -= instance.OnSuperShot;
             @SuperShot.performed -= instance.OnSuperShot;
             @SuperShot.canceled -= instance.OnSuperShot;
+            @Hold.started -= instance.OnHold;
+            @Hold.performed -= instance.OnHold;
+            @Hold.canceled -= instance.OnHold;
+            @ResetPosition.started -= instance.OnResetPosition;
+            @ResetPosition.performed -= instance.OnResetPosition;
+            @ResetPosition.canceled -= instance.OnResetPosition;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1428,6 +1508,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnAttraction(InputAction.CallbackContext context);
         void OnHeal(InputAction.CallbackContext context);
         void OnSuperShot(InputAction.CallbackContext context);
+        void OnHold(InputAction.CallbackContext context);
+        void OnResetPosition(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

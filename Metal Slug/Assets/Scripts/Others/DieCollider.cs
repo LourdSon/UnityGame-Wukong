@@ -27,7 +27,7 @@ public class DieCollider : MonoBehaviour
         {
             Destroy(collision.gameObject);
         } 
-        if(collision.CompareTag("EnergyBall3"))
+        if(collision.CompareTag("EnergyBall3") || collision.CompareTag("EnergyBallEnemy"))
         {
             collision.gameObject.SetActive(false);
         }
