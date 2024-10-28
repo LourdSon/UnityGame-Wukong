@@ -3792,7 +3792,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     minKillSpeed: 0
-    maxKillSpeed: 100
+    maxKillSpeed: 25
     radiusScale: 1
     collidesWith:
       serializedVersion: 2

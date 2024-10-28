@@ -139,7 +139,7 @@ public class FlyingMonsterMovement : MonoBehaviour
         }
     }
 
-     void SeparateFromOtherEnemies()
+    void SeparateFromOtherEnemies()
     {
         // Récupère tous les ennemis dans un rayon autour de cet ennemi
         Collider2D[] enemiesNearby = Physics2D.OverlapCircleAll(transform.position, separationRadius);

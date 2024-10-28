@@ -82,6 +82,7 @@ public class MonsterHealth : MonoBehaviour
         if(playerLevel.isLevelingUp && !damageIncreased)
         {
             maxHealth += maxHealth/percentage;
+            // health = maxHealth;
             healthBar.UpdateHealthBar(health,maxHealth);
             // health = Mathf.Clamp(health, 0, maxHealth); 
             damageIncreased = true;
@@ -201,25 +202,36 @@ public class MonsterHealth : MonoBehaviour
         {
             // Vérifie si la collision est suffisamment forte pour causer des dégâts supplémentaires
             MonsterHealth otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
-            if (enemyRb != null && enemyRb.velocity.magnitude > 30f && otherEnemy != null)
+            if (enemyRb != null && enemyRb.velocity.magnitude > 20f && otherEnemy != null)
             {               
                 float impactForce = collision.relativeVelocity.magnitude;
                 float additionalDamage = impactForce * additionalDamageMultiplier;
-                otherEnemy.TakeDamage(normalDamage + additionalDamage);                               
+                otherEnemy.TakeDamage(normalDamage + additionalDamage);    
+                StartCoroutine(DestroyComicBoomEffect());                           
             }
         } else if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
         {
-            if(enemyRb.velocity.magnitude > 30f)
+            if(enemyRb.velocity.magnitude > 20f)
             {
                 float impactForce = collision.relativeVelocity.magnitude;
                 float additionalDamage = impactForce * additionalDamageMultiplier;
                 TakeDamage(normalDamage + additionalDamage);
-                
+                StartCoroutine(DestroyComicBoomEffect());
 
             }
         }
     }
 
+    public IEnumerator DestroyComicBoomEffect()
+    {
+        GameObject comicBoom = Instantiate(ComicBoomEffect,new Vector2(transform.position.x,transform.position.y + 2f), Quaternion.identity);
+        Light light = comicBoom.GetComponentInChildren<Light>();
+        yield return new WaitForSeconds(0.3f);
+        Destroy(comicBoom);
+        Destroy(light);
+        
+        yield return null;
+    }
     public void ContactDamage()
     {
 

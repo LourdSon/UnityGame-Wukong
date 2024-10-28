@@ -46,7 +46,7 @@ public class AttackHitBoxSide : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D coll)
     {                
-        if(coll.gameObject.CompareTag("Player"))
+        if(coll.gameObject.CompareTag("Player") && gameObject != null)
         {
             StartCoroutine(AttackSpe());         
         }

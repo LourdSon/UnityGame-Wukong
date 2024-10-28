@@ -126,6 +126,7 @@ public class PlayerMovement : MonoBehaviour
     private bool forceIncreased;
     public GameObject ForceFieldParticles;
     private PlayerHealth playerHealth;
+    public float volumeScaleFootstep;
     
     
     // Start is called before the first frame update
@@ -196,7 +197,9 @@ public class PlayerMovement : MonoBehaviour
         {
             dashForce += dashForce/100;
             jumpForce += jumpForce/100;
+            // playerHealth.health = playerHealth.maxHealth; 
             forceIncreased = true;
+
         }else if (!playerLevel.isLevelingUp)
         {
             forceIncreased = false;
@@ -247,7 +250,7 @@ public class PlayerMovement : MonoBehaviour
         {
             float newPitch = UnityEngine.Random.Range(0.9f,1.1f);
             audioSource2.pitch = newPitch;
-            audioSource2.PlayOneShot(walkSound); 
+            audioSource2.PlayOneShot(walkSound, volumeScaleFootstep); 
             footstepTimer = 0f;                      
         }
     }
@@ -480,7 +483,7 @@ public class PlayerMovement : MonoBehaviour
             animator.SetTrigger("ChargingTrigger");
             isCharging = true;
             nextChargeTime = Time.time + chargeCooldown;
-            StartCoroutine(DestroyDestructionGroundEffect());
+            // StartCoroutine(DestroyDestructionGroundEffect());
             
         }
     }

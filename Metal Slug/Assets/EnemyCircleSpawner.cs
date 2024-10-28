@@ -27,7 +27,7 @@ public class EnemyCircleSpawner : MonoBehaviour
             {
                 enemy.transform.position = spawnPosition;
             }
-            if(enemy.transform.position.y < -10 || enemy.transform.position.y > 230 || enemy.transform.position.x < 13 || enemy.transform.position.x > 555)
+            if(enemy.transform.position.y < -10 || enemy.transform.position.y > 230 || enemy.transform.position.x < 30 || enemy.transform.position.x > 555)
             {
                 EnemyPoolManager.Instance.ReturnEnemyToPool(enemy);
             }

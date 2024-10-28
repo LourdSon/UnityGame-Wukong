@@ -20,6 +20,9 @@ public class DashingMonster : MonoBehaviour
     public float timeBtwDash = 1f;
     private MonsterHealth monsterHealth;
 
+    public float separationRadius = 5f; // Rayon pour éviter la superposition
+    public float separationForce = 15f; // Force pour éviter la superposition
+
     
 
     
@@ -52,7 +55,7 @@ public class DashingMonster : MonoBehaviour
     void Update()
     {
         /* dashTimeCounter = TimerDecrement(dashTimeCounter); */
-        
+        SeparateFromOtherEnemies();
     }
 
     public void DetectPlayer()
@@ -94,6 +97,28 @@ public class DashingMonster : MonoBehaviour
             timeCounter -= Time.deltaTime;
 
         return timeCounter;
+    }
+
+    void SeparateFromOtherEnemies()
+    {
+        // Récupère tous les ennemis dans un rayon autour de cet ennemi
+        Collider2D[] enemiesNearby = Physics2D.OverlapCircleAll(transform.position, separationRadius);
+
+        foreach (Collider2D other in enemiesNearby)
+        {
+            if (other != null && other.gameObject != this.gameObject && other.CompareTag("Enemy"))
+            {
+                // Calcule une force de répulsion si trop proche
+                Vector3 repelDirection = transform.position - other.transform.position;
+                float distance = repelDirection.magnitude;
+
+                // Applique la force de répulsion
+                if (distance < separationRadius)
+                {
+                    transform.position += repelDirection.normalized * separationForce * Time.deltaTime;
+                }
+            }
+        }
     }
 
     

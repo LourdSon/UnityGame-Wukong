@@ -909,7 +909,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1402264379
   m_SortingLayer: 1
-  m_SortingOrder: 5
+  m_SortingOrder: 45
   m_Sprite: {fileID: -340183526, guid: 09eae6ebf35449b4fbaa073cf29b643d, type: 3}
   m_Color: {r: 0, g: 0.06159464, b: 0.20754719, a: 1}
   m_FlipX: 0
@@ -1148,6 +1148,8 @@ MonoBehaviour:
   target: {fileID: 0}
   player: {fileID: 0}
   saveableNPC: {fileID: 0}
+  separationRadius: 1
+  separationForce: 1
 --- !u!114 &3715493184510033907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1164,6 +1166,8 @@ MonoBehaviour:
   speed: 50
   dashTimeCounter: 0
   timeBtwDash: 1
+  separationRadius: 8
+  separationForce: 15
 --- !u!114 &5314030580234510785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1196,10 +1200,10 @@ MonoBehaviour:
   dashExplosionParticles: {fileID: 9110157677477234812, guid: 38ebfe1bdc34cde4db02fc211afc2914, type: 3}
   rotation: {x: 0, y: 0, z: 0, w: 0}
   direction: 0
-  ComicBoomEffect: {fileID: 2440929272261559938, guid: c6d43981fdd47d946809f449b54bcfb7, type: 3}
+  ComicBoomEffect: {fileID: 6612662221487348332, guid: 469c1a809d4588c4892c424559a8748c, type: 3}
   XpForPlayer: {fileID: 4469632007056067750, guid: 26cf7772e11b17245bc6df2612d1e69d, type: 3}
   playerLevel: {fileID: 0}
-  percentage: 2
+  percentage: 1.33
   enemyPrefab: {fileID: 5596427951718240916}
   attackHitBox: {fileID: 1608889877599191422}
 --- !u!114 &1174403918581132873
@@ -1279,7 +1283,7 @@ RectTransform:
   m_Father: {fileID: 4944958702687414378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

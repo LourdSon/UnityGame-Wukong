@@ -10,7 +10,7 @@ public class EnergyBallEnemyScript : MonoBehaviour
         direction = newDirection.normalized;  // Normalise la direction pour éviter des vitesses différentes
     }
 
-    void Update()
+    void FixedUpdate()
     {
         // Déplacer la boule d'énergie dans la direction définie
         transform.Translate(direction * speed * Time.deltaTime);

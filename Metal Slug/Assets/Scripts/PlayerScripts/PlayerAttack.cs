@@ -520,7 +520,7 @@ public class PlayerAttack : MonoBehaviour
                     MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                     Instantiate(hitEffect, enemyRb.transform.position, Quaternion.identity);
                     if (monsterHealth != null)
-                    monsterHealth.TakeDamage(damage * piqueRatio);
+                    monsterHealth.TakeDamage(damage/2 * piqueRatio);
                     //monsterHealth.ContactDamage();
                 }
 

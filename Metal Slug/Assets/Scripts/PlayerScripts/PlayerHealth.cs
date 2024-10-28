@@ -25,6 +25,7 @@ public class PlayerHealth : MonoBehaviour
     private PlayerAttack playerAttack;
     public bool isHealing;
     public float secondsBeforeHeal = 1;
+    public GameObject HealCharging;
     
     // Start is called before the first frame update
     void Start()
@@ -53,8 +54,6 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        
-
         if(!isTakingDamage)
         {
             knockBackF();
@@ -64,10 +63,8 @@ public class PlayerHealth : MonoBehaviour
             CameraShakeManager.instance.CameraShake(impulseSource);
         }
         if (health <= 0)
-        {
-            
-            Die();
-            
+        {       
+            Die();   
         }
     }
 
@@ -120,7 +117,9 @@ public class PlayerHealth : MonoBehaviour
     public IEnumerator WaitBeforeHeal(float sec)
     {
         isHealing = true;
+        HealCharging.gameObject.SetActive(true);
         yield return new WaitForSeconds(sec);
+        HealCharging.gameObject.SetActive(false);
         health += 10;
         UpdateHealthBar();
         health = Mathf.Clamp(health, 0, maxHealth);
@@ -131,4 +130,6 @@ public class PlayerHealth : MonoBehaviour
     }
     
     
+        //tileDestroyer.DestructionMouse();
+        
 }

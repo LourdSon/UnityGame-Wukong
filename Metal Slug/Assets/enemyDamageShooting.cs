@@ -8,6 +8,8 @@ public class EnemyDamageShooting : MonoBehaviour
 
     public int damage = 10;
     public ParticleSystem impactParticles;
+    public int force = 10;
+    
 
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -24,6 +26,9 @@ public class EnemyDamageShooting : MonoBehaviour
             Instantiate(impactParticles, other.transform.position, Quaternion.identity);
             // Destroy(other.gameObject);
             other.gameObject.SetActive(false);
+
+            Vector2 directionVector = other.gameObject.transform.position - transform.position;
+            gameObject.GetComponent<Rigidbody2D>().AddForce(directionVector * force, ForceMode2D.Impulse);
         } 
     }
 }

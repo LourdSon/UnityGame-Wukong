@@ -35,7 +35,7 @@ public class PlayerDamage : MonoBehaviour
         
         if(playerLevel.isLevelingUp && !damageIncreased)
         {
-            damage += damage/10;
+            damage += damage/5;
             damageIncreased = true;
         }else if (!playerLevel.isLevelingUp)
         {

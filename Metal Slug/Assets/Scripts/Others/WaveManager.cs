@@ -69,8 +69,6 @@ public class WaveManager : MonoBehaviour
         for (int i = 0; i < enemiesRemainingToSpawn; i++)
         {
             SpawnEnemy(wave.enemyPrefab[Random.Range(0, wave.enemyPrefab.Length)]);
-            // Tenter de déclencher un événement aléatoire
-            
             yield return new WaitForSeconds(1f / wave.spawnRate);
         }
 
@@ -80,9 +78,11 @@ public class WaveManager : MonoBehaviour
         {
             currentWaveIndex++;
             numerOfWaveDone++;
+
+        }if (currentWaveIndex < waves.Count && currentWaveIndex != 5 && currentWaveIndex != 11 && numerOfWaveDone >= 6)
+        {
             TryTriggerRandomEvent();
-        }
-        else
+        } else
         {
             Debug.Log("All waves completed!");
             //spawningEnemies = false;

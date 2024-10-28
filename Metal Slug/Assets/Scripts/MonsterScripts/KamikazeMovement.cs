@@ -16,7 +16,8 @@ public class KamikazeMovement : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     public GameObject player;
 
-    
+    public float separationRadius = 5f; // Rayon pour éviter la superposition
+    public float separationForce = 15f; // Force pour éviter la superposition
 
     void Start()
     {
@@ -41,6 +42,7 @@ public class KamikazeMovement : MonoBehaviour
             playerTransform = player.transform;
         }
         DetectPlayer();
+        SeparateFromOtherEnemies();
         
     }
 
@@ -79,5 +81,27 @@ public class KamikazeMovement : MonoBehaviour
             
         }
         
+    }
+
+    void SeparateFromOtherEnemies()
+    {
+        // Récupère tous les ennemis dans un rayon autour de cet ennemi
+        Collider2D[] enemiesNearby = Physics2D.OverlapCircleAll(transform.position, separationRadius);
+
+        foreach (Collider2D other in enemiesNearby)
+        {
+            if (other != null && other.gameObject != this.gameObject && other.CompareTag("Enemy"))
+            {
+                // Calcule une force de répulsion si trop proche
+                Vector3 repelDirection = transform.position - other.transform.position;
+                float distance = repelDirection.magnitude;
+
+                // Applique la force de répulsion
+                if (distance < separationRadius)
+                {
+                    transform.position += repelDirection.normalized * separationForce * Time.deltaTime;
+                }
+            }
+        }
     }
 }

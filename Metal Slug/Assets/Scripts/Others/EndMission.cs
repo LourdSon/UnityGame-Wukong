@@ -50,6 +50,7 @@ public class EndMission : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        
         EnemyNumber();
     }
 
@@ -80,7 +81,10 @@ public class EndMission : MonoBehaviour
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
         bosses = GameObject.FindGameObjectsWithTag("Boss");
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        playerTransform = player.GetComponent<Transform>();
+        if(player != null)
+        {
+            playerTransform = player.GetComponent<Transform>();
+        }
         int count = enemies.Length;
         int countB = bosses.Length;
         
