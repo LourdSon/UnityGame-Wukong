@@ -25,7 +25,17 @@ public class KamikazeAttack : MonoBehaviour
     private float kamikazeDamageHimself;
     private Quaternion rotation;
     public ParticleSystem explosionParticles;
+
+
+
+    private Collider2D[] colliders;
+    private Vector2 directionVector;
+    private Transform myTransform;
+    public GameObject ComicBoomEffect;
+    private GameObject comicBoom;
+    private Light lighter;
     
+
     
     void Start()
     {
@@ -35,24 +45,20 @@ public class KamikazeAttack : MonoBehaviour
         monsterHealth = GetComponent<MonsterHealth>();
         kamikazeDamageHimself = monsterHealth.maxHealth/2;
         rotation = Quaternion.Euler(0f, 0f, 0f);
+        myTransform = transform;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-    
-    }
 
     public void Attack()
     {
         anim.SetTrigger("SimpleAttackTriggerFollow");
-        direction = transform.rotation.y == 0f ? 1 : -1;
-        detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset;
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, playerLayerMask);
-        Instantiate(explosionParticles,transform.position, rotation);
+        direction = myTransform.rotation.y == 0f ? 1 : -1;
+        detectionPosition = (Vector2)myTransform.position + Vector2.right * direction * detectionOffset;
+        colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, playerLayerMask);
+        Instantiate(explosionParticles, myTransform.position, rotation);
         if (colliders.Length >= 1)
         {
-            direction = transform.rotation.y == 0f ? 1 : -1;
+            direction = myTransform.rotation.y == 0f ? 1 : -1;
             //playerRb.velocity = new Vector2(diagonal.x * selfForceMagnitudeForward,playerRb.velocity.y);
             //enemyRb.AddForce(Vector2.right * selfForceMagnitudeForward2 * -direction, ForceMode2D.Impulse);
         }
@@ -71,7 +77,7 @@ public class KamikazeAttack : MonoBehaviour
          
             if (playerRb != null)
             {
-                Vector2 directionVector = ((Vector2)playerRb.transform.position - (Vector2)transform.position).normalized;
+                directionVector = ((Vector2)playerRb.transform.position - (Vector2)myTransform.position).normalized;
                 playerRb.AddForce(directionVector * forceMagnitudeForward2, ForceMode2D.Impulse);
                 //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
                 
@@ -82,10 +88,11 @@ public class KamikazeAttack : MonoBehaviour
             }
             if (enemyRbOthers != null)
             {
-                Vector2 directionVector = ((Vector2)enemyRbOthers.transform.position - (Vector2)transform.position).normalized;
+                directionVector = ((Vector2)enemyRbOthers.transform.position - (Vector2)myTransform.position).normalized;
                 enemyRbOthers.AddForce(directionVector * forceMagnitudeForward2, ForceMode2D.Impulse);
             }
         }
+        StartCoroutine(DestroyComicBoomEffect());
         monsterHealth.TakeDamage(kamikazeDamageHimself);
     }
 
@@ -95,6 +102,17 @@ public class KamikazeAttack : MonoBehaviour
         // Dessiner le rayon de détection dans l'éditeur
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(detectionPosition, detectionRadius);
+    }
+
+    public IEnumerator DestroyComicBoomEffect()
+    {
+        comicBoom = Instantiate(ComicBoomEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
+        lighter = comicBoom.GetComponentInChildren<Light>();
+        yield return new WaitForSeconds(0.3f);
+        Destroy(comicBoom);
+        Destroy(lighter);
+        
+        yield return null;
     }
 
 }

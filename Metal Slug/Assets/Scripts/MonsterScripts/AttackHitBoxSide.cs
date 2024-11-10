@@ -17,36 +17,23 @@ public class AttackHitBoxSide : MonoBehaviour
     public bool isAttacking;
     public int direction;
 
+
+    private Color tempColor;
+    private Color newColor;
+    private Color currentColor;
+
     void Start()
     {
         enemyRb = GetComponentInParent<Rigidbody2D>();
         anim = GetComponentInParent<Animator>();
         isAttacking = false;
+        currentColor = GetComponentInParent<SpriteRenderer>().color;
     }
 
-    // Update est appelée une fois par frame
-    void Update()
-    {
-        
-        /* direction = enemyRb.transform.rotation.y == 0 ? 1 : -1;
-        
-        monsterAttack2 = GetComponentInParent<MonsterAttack2>(); 
-        if (direction == -1)
-        {
-            // Si le joueur est retourné, positionne la hitbox de mêlée à gauche du joueur
-            meleeHitbox.transform.localPosition = new Vector3(xGauche, 0f, 0f);
-        }
-        else
-        {
-            // Si le joueur n'est pas retourné, positionne la hitbox de mêlée à droite du joueur
-            meleeHitbox.transform.localPosition = new Vector3(xDroite, 0f, 0f);
-        } */
-        
-    }
 
     public void OnTriggerEnter2D(Collider2D coll)
     {                
-        if(coll.gameObject.CompareTag("Player") && gameObject != null)
+        if(gameObject != null && gameObject.activeInHierarchy && coll.gameObject.CompareTag("Player"))
         {
             StartCoroutine(AttackSpe());         
         }
@@ -55,17 +42,17 @@ public class AttackHitBoxSide : MonoBehaviour
     private IEnumerator AttackSpe()
     {
         isAttacking = true;
-        Color tempColor = GetComponentInParent<SpriteRenderer>().color;
+        /* tempColor = currentColor;
         Color.RGBToHSV(tempColor, out float h, out float s, out float v);
         s *= 0.25f;
-        Color newColor = Color.HSVToRGB(h, s, v);
-        GetComponentInParent<SpriteRenderer>().color = newColor;
+        newColor = Color.HSVToRGB(h, s, v);
+        currentColor = newColor; */
         anim.SetTrigger("SimpleAttackTrigger");
         yield return new WaitForSeconds(waitingForAttack);
         monsterAttack2.Attack();
         yield return null;
         isAttacking = false;
-        GetComponentInParent<SpriteRenderer>().color = tempColor;
+        /* currentColor = tempColor; */
     }
 }
 

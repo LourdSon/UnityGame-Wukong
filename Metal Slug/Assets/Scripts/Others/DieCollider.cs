@@ -13,7 +13,9 @@ public class DieCollider : MonoBehaviour
     
 
 
-
+    private PlayerHealth playerHealth;
+    private Vector3 respawnPosition;
+    
 
     // Fonction appelée lorsqu'un autre collider entre en contact avec ce collider
     private void OnTriggerEnter2D(Collider2D collision)
@@ -39,9 +41,9 @@ public class DieCollider : MonoBehaviour
     // Fonction pour réapparition du joueur
     private void RespawnPlayer(GameObject player)
     {
-        PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+        playerHealth = player.GetComponent<PlayerHealth>();
         playerHealth.TakeDamage(damage);
-        Vector3 respawnPosition = new Vector3(20f, 2f, 0f);
+        respawnPosition = new Vector3(20f, 2f, 0f);
         player.transform.position = respawnPosition;
     }
 }

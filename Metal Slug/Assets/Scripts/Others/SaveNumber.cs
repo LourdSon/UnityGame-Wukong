@@ -15,7 +15,7 @@ public class SaveNumber : MonoBehaviour
     void Start()
     {
         saveNumber = 0;
-        saveableNPCs = GameObject.FindObjectsOfType<SaveableNPC>();  // Trouver tous les NPC au début
+        saveableNPCs = FindObjectsOfType<SaveableNPC>();  // Trouver tous les NPC au début
         savedNPCs = new List<SaveableNPC>();  // Liste pour suivre les NPC déjà sauvés
     }
 

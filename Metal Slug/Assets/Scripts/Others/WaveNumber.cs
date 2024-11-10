@@ -9,22 +9,20 @@ public class WaveNumber : MonoBehaviour
 {
     public Text waveText;
     public WaveManager waveManager;
+    private int waveManagerNumber;
+    private string v;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        //waveManager = GetComponent<WaveManager>();
-    }
+    
 
-    // Update is called once per frame
+    
     void Update()
     {
         //waveManager = GetComponent<WaveManager>();
         if(waveManager != null)
         {
-            int waveManagerNumber = waveManager.numerOfWaveDone;
+            waveManagerNumber = waveManager.numerOfWaveDone;
             //int waveNumber = waveManager.currentWaveIndex;
-            string v = "Wave number : " + waveManagerNumber;
+            v = "Wave number : " + waveManagerNumber;
             waveText.text = v;
 
         }

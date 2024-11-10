@@ -12,11 +12,17 @@ public class NPCWalking : MonoBehaviour
     public Animator animator;
 
 
+
+    private Transform myTransform;
+
     void Start()
     {
         target = home.position; // Commencer au "home"
-        MoveToTarget();
+        
         animator = GetComponent<Animator>();
+        if(transform != null)
+        myTransform = transform;
+        MoveToTarget();
     }
     void Update()
     {
@@ -28,17 +34,17 @@ public class NPCWalking : MonoBehaviour
     private void MoveToTarget()
     {
         // Déplacer le NPC vers la cible
-        transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
-        if(transform.position.x > target.x)
+        myTransform.position = Vector3.MoveTowards(myTransform.position, target, speed * Time.deltaTime);
+        if(myTransform.position.x > target.x)
         {
-            transform.rotation = Quaternion.Euler(0f, -180f,0f);
+            myTransform.rotation = Quaternion.Euler(0f, -180f,0f);
         }else 
         {
-            transform.rotation = Quaternion.Euler(0f,0f,0f);
+            myTransform.rotation = Quaternion.Euler(0f,0f,0f);
         }
 
         // Vérifier si le NPC est proche de la cible
-        if (Vector3.Distance(transform.position, target) > 1f)
+        if (Vector3.Distance(myTransform.position, target) > 1f)
         {
             // Si pas encore arrivé, rappeler cette méthode dans la prochaine frame
             Invoke(nameof(MoveToTarget), Time.deltaTime);

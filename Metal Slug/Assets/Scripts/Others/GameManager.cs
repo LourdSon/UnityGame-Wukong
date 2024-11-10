@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour
     public bool onPause;
     public Button pauseButton;
     public GameObject pauseEventSystem;
+    public GameObject optionsEventSystem;
+    public GameObject optionsScreen;
     
     
     
@@ -30,20 +32,24 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        Time.timeScale = 0f;
+        Time.timeScale = 1f;
         playerHealth = FindObjectOfType<PlayerHealth>();
         playerHealth.OnDeath += HandleGameOver;
         gameOverScreen.SetActive(false);
-        pauseScreen.SetActive(true);
+        pauseScreen.SetActive(false);
+        if(optionsScreen != null)
+        optionsScreen.SetActive(false);
         // Sauvegarder la gravité par défaut
         defaultGravityR = Physics2D.gravity;
         // Ajoute un écouteur d'événements de clic sur le bouton de redémarrage
         restartButton.onClick.AddListener(RestartGame);
         gameOverEventSystem.SetActive(false);
         EventSystem.SetActive(false);
-        pauseEventSystem.SetActive(true);
+        pauseEventSystem.SetActive(false);
+        if(optionsEventSystem != null)
+        optionsEventSystem.SetActive(false);
         pauseButton.onClick.AddListener(DepauseGame);
-        onPause = true;
+        onPause = false;
         
 
     }
@@ -61,6 +67,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
        PauseGame();
+       PauseOnOptions();
     }
 
     void RestartGame()
@@ -90,6 +97,27 @@ public class GameManager : MonoBehaviour
         } else if (PlayerController.instance.playerInputActions.Player.PauseMenu.triggered && onPause == true)
         {
             DepauseGame();
+        }
+
+        if(optionsEventSystem != null && pauseScreen.activeSelf)
+        {
+            optionsEventSystem.SetActive(false);
+            pauseEventSystem.SetActive(true);
+
+        }
+    }
+
+    void PauseOnOptions()
+    {
+        if(optionsEventSystem != null && optionsScreen.activeSelf)
+        {
+            Time.timeScale = 0f;
+            pauseEventSystem.SetActive(false);
+            EventSystem.SetActive(false);
+            optionsEventSystem.SetActive(true);
+        } else if (optionsEventSystem != null && !optionsScreen.activeSelf)
+        {
+            optionsEventSystem.SetActive(false);
         }
     }
     

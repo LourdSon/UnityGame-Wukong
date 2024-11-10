@@ -2,6 +2,9 @@ using System;
 using System.Collections;
 using Cinemachine;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 
 
 public class PlayerAttack : MonoBehaviour
@@ -109,7 +112,30 @@ public class PlayerAttack : MonoBehaviour
     public GameObject ForceFieldParticlesDown;
     public GameObject ForceFieldParticlesUp;
     private PlayerHealth playerHealth;
+    public GameObject SlashEffect;
+    public GameObject PowEffect;
+    
 
+
+
+    private Vector2 moveInput;
+    private int direction;
+    private RaycastHit2D hit;
+    private Collider2D[] colliders;
+    private float newPitch;
+    private Rigidbody2D enemyRb;
+    private MonsterHealth monsterHealth;
+    private Vector2 directionVector;
+    private Collider2D[] collidersDown;
+    private GameObject comicBoom;
+    private Light lighter;
+    private GameObject destructionGroundObject;
+    private Vector3 offsetParticles, offsetParticles2, offsetParticles3;
+    private ParticleSystem punchPart, punchPart2, punchPart3;
+    private Transform myTransform;
+    public Volume volume;
+    private ColorAdjustments colorAdjustments;
+    public PlayerShooting playerShooting;
 
     void Start()
     {
@@ -138,11 +164,13 @@ public class PlayerAttack : MonoBehaviour
         attack7 = false;
         playerLevel = GetComponent<PlayerLevel>();
         playerHealth = GetComponent<PlayerHealth>();
+        myTransform = transform;
+        volume.profile.TryGet(out colorAdjustments);
     }
 
     void Update()
     {
-        if(!playerHealth.isHealing)
+        if(!playerHealth.isHealing && SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)
         {
             Attackp();
             HoldingSelectF();
@@ -152,7 +180,7 @@ public class PlayerAttack : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(!playerHealth.isHealing)
+        if(!playerHealth.isHealing && SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)
         {
             Attack1234();
         }
@@ -166,8 +194,7 @@ public class PlayerAttack : MonoBehaviour
             forceMagnitudeUpward += forceMagnitudeUpward/100;
             forceMagnitudeForward += forceMagnitudeForward/100;
             forceMagnitudeDownward += forceMagnitudeDownward/100;
-
-
+            playerShooting.bonusScale += 0.05f;
             damageIncreased = true;
         }else if (!playerLevel.isLevelingUp)
         {
@@ -176,13 +203,13 @@ public class PlayerAttack : MonoBehaviour
     }
     private void Attackp()
     {
-        Vector2 moveInput = PlayerController.instance.playerInputActions.Player.Move.ReadValue<Vector2>();
+        moveInput = PlayerController.instance.playerInputActions.Player.Move.ReadValue<Vector2>();
         upwardAttackKey = moveInput.y;
         horizontalInput = moveInput.x;
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
-        detectionPosition = (Vector2)transform.position + Vector2.right * direction * detectionOffset; 
-        detectionPositionDown = (Vector2)transform.position + Vector2.down * detectionOffsetAir.y + Vector2.right * direction * detectionOffsetAir.x;
-        detectionPositionAttract = (Vector2)transform.position + Vector2.right * direction * detectionOffsetAttract; 
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
+        detectionPosition = (Vector2)myTransform.position + Vector2.right * direction * detectionOffset; 
+        detectionPositionDown = (Vector2)myTransform.position + Vector2.down * detectionOffsetAir.y + Vector2.right * direction * detectionOffsetAir.x;
+        detectionPositionAttract = (Vector2)myTransform.position + Vector2.right * direction * detectionOffsetAttract; 
         
         rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
         
@@ -297,7 +324,7 @@ public class PlayerAttack : MonoBehaviour
     public bool IsGrounded()
     {
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayDistance, groundLayerMask);
+        hit = Physics2D.Raycast(transform.position, Vector2.down, rayDistance, groundLayerMask);
         // Dessiner le raycast dans la vue de scène pour le débogage
         Debug.DrawRay(transform.position, Vector2.down * rayDistance, Color.red);
         return hit.collider != null;
@@ -342,12 +369,12 @@ public class PlayerAttack : MonoBehaviour
 
     private IEnumerator Attack1Co()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
+        colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, enemyLayerMask);
         StartCoroutine(SpawnPunchParticles(1));
         StartCoroutine(particlesForceFieldAttack(1));
         if (colliders.Length >= 1)
         {
-            float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            newPitch = UnityEngine.Random.Range(0.8f,1.2f);
             audioSource.pitch = newPitch;
             Instantiate(hitEffect, detectionPosition, Quaternion.identity);
             playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
@@ -358,11 +385,11 @@ public class PlayerAttack : MonoBehaviour
         // Appliquer une force pour projeter les ennemis vers le haut
         foreach (Collider2D collider in colliders)
         {
-            Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+            enemyRb = collider.GetComponent<Rigidbody2D>();
+            monsterHealth = collider.GetComponent<MonsterHealth>();
             if (enemyRb != null)
             {
                 enemyRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
-                MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                 if (monsterHealth != null)
                 monsterHealth.TakeDamage(damage);
             }
@@ -373,14 +400,14 @@ public class PlayerAttack : MonoBehaviour
 
     private IEnumerator Attack2Co()
     {
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(detectionPosition, new Vector2(detectionRadius+5,detectionRadius+4), 0,enemyLayerMask);
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
+        colliders = Physics2D.OverlapBoxAll(detectionPosition, new Vector2(detectionRadius+5,detectionRadius+4), 0,enemyLayerMask);
         StartCoroutine(SpawnPunchParticles(2));
         StartCoroutine(particlesForceFieldAttack(2));
         if (colliders.Length >= 1)
             {
                 
-                float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+                newPitch = UnityEngine.Random.Range(0.8f,1.2f);
                 audioSource.pitch = newPitch;
                 Instantiate(hitEffect, detectionPosition, Quaternion.identity);
                 
@@ -395,13 +422,13 @@ public class PlayerAttack : MonoBehaviour
             // Appliquer une force pour projeter les ennemis vers l'avant
             foreach (Collider2D collider in colliders)
             {
-                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+                enemyRb = collider.GetComponent<Rigidbody2D>();
+                monsterHealth = collider.GetComponent<MonsterHealth>();
                 if (enemyRb != null)
                 {
-                    Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                    directionVector = ((Vector2)enemyRb.transform.position - (Vector2)myTransform.position).normalized;
                     enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
                     //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
-                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                     if (monsterHealth != null)
                     monsterHealth.TakeDamage(damage);
                 }
@@ -414,12 +441,12 @@ public class PlayerAttack : MonoBehaviour
 
     private IEnumerator Attack3Co()
     {
-        Collider2D[] collidersDown = Physics2D.OverlapCircleAll(detectionPositionDown, detectionRadius, enemyLayerMask);
+        collidersDown = Physics2D.OverlapCircleAll(detectionPositionDown, detectionRadius, enemyLayerMask);
         StartCoroutine(SpawnPunchParticles(3));
         StartCoroutine(particlesForceFieldAttack(3));
         if (collidersDown.Length >= 1)
             {
-                float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+                newPitch = UnityEngine.Random.Range(0.8f,1.2f);
                 audioSource.pitch = newPitch;
                 Instantiate(hitEffect, detectionPosition, Quaternion.identity);
                 playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
@@ -429,14 +456,14 @@ public class PlayerAttack : MonoBehaviour
             }
             foreach (Collider2D collider in collidersDown)
             {
-                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+                enemyRb = collider.GetComponent<Rigidbody2D>();
                 //Rigidbody2D bossRb = collider.GetComponentInChildren<Rigidbody2D>();
                 if (enemyRb != null)
                 {
                     enemyRb.AddForce(Vector2.down * forceMagnitudeDownward, ForceMode2D.Impulse);
                     //bossRb.AddForce(Vector2.down * forceMagnitudeDownward, ForceMode2D.Impulse);
 
-                    MonsterHealth monsterHealth = enemyRb.GetComponent<MonsterHealth>();
+                    monsterHealth = enemyRb.GetComponent<MonsterHealth>();
                     if (monsterHealth != null)
                     monsterHealth.TakeDamage(damage);
                     //monsterHealth.ContactDamage();
@@ -449,7 +476,7 @@ public class PlayerAttack : MonoBehaviour
     private IEnumerator WaitForLanding()
     {
         
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
         // Appliquer une force descendante aux ennemis
         playerRb.AddForce(Vector2.right * direction * slamForce + Vector2.down * slamForce, ForceMode2D.Impulse);
         CameraShakeManager.instance.CameraShake(impulseSource);
@@ -459,28 +486,28 @@ public class PlayerAttack : MonoBehaviour
         playerRb.velocity = Vector2.zero;
         Physics2D.IgnoreLayerCollision(9,11,false);
         // yield return new WaitForSeconds(doubleChocTimer);
-        Instantiate(slamParticles,transform.position,rotation);
+        Instantiate(slamParticles, myTransform.position,rotation);
         CameraShakeManager.instance.CameraShake(impulseSource);
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, detectionRadiusPique, enemyLayerMask);
+        colliders = Physics2D.OverlapCircleAll(myTransform.position, detectionRadiusPique, enemyLayerMask);
         if (colliders.Length >= 1)
         {
             //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
             Instantiate(hitEffect, detectionPosition, Quaternion.identity);
-            float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            newPitch = UnityEngine.Random.Range(0.8f,1.2f);
             audioSource.pitch = newPitch;
             audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
             CameraShakeManager.instance.CameraShake(impulseSource);
-            Instantiate(ComicBoomEffect, transform.position, Quaternion.Euler(0f,0f,0f));
+            Instantiate(PowEffect, myTransform.position, Quaternion.Euler(0f,0f,0f));
         }
         foreach (Collider2D collider in colliders)
         {
-            Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+            enemyRb = collider.GetComponent<Rigidbody2D>();
+            monsterHealth = collider.GetComponent<MonsterHealth>();
             if (enemyRb != null)
             {
-                Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                directionVector = ((Vector2)enemyRb.transform.position - (Vector2)myTransform.position).normalized;
                 enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
                 // Infliger des dégâts aux ennemis
-                MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                 if (monsterHealth != null)
                 {
                     monsterHealth.TakeDamage(damage);
@@ -496,28 +523,28 @@ public class PlayerAttack : MonoBehaviour
 
     private IEnumerator Attack5Co()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionAttract, detectionRadiusAttract, enemyLayerMask);
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
+        colliders = Physics2D.OverlapCircleAll(detectionPositionAttract, detectionRadiusAttract, enemyLayerMask);
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
         if (colliders.Length >= 1)
             {
                 /* Instantiate(hitEffect, detectionPosition, Quaternion.identity); */
                 //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
-                float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+                newPitch = UnityEngine.Random.Range(0.8f,1.2f);
                 audioSource.pitch = newPitch;
                 audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
                 
                 CameraShakeManager.instance.CameraShake(impulseSource);
-                Instantiate(ComicBoomEffect, transform.position, Quaternion.Euler(0f,0f,0f));
+                Instantiate(ComicBoomEffect, myTransform.position, Quaternion.Euler(0f,0f,0f));
             }
             foreach (Collider2D collider in colliders)
             {
-                Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+                enemyRb = collider.GetComponent<Rigidbody2D>();
+                monsterHealth = collider.GetComponent<MonsterHealth>();
                 if (enemyRb != null)
                 {
-                    Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                    directionVector = ((Vector2)enemyRb.transform.position - (Vector2)myTransform.position).normalized;
                     enemyRb.AddForce(directionVector * -forceMagnitudeForward , ForceMode2D.Impulse);
 
-                    MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                     Instantiate(hitEffect, enemyRb.transform.position, Quaternion.identity);
                     if (monsterHealth != null)
                     monsterHealth.TakeDamage(damage/2 * piqueRatio);
@@ -531,29 +558,30 @@ public class PlayerAttack : MonoBehaviour
     private IEnumerator SamouraiCo()
     {
         Time.timeScale = 0.77f;
+        StartCoroutine(EffectBlackAndWhite());
         Physics2D.IgnoreLayerCollision(9,11,true);
         //Collider2D[] colliders = Physics2D.OverlapCircleAll(detectionPositionAttract, detectionRadiusAttract, enemyLayerMask);
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
         playerRb.velocity = Vector2.zero;
-        positionTemp = playerRb.transform.position; 
-        playerRb.transform.position = new Vector3(playerRb.transform.position.x + detectionRadiusAttract*3 * direction, playerRb.transform.position.y, playerRb.transform.position.z);
-        attackCenter = new Vector2(playerRb.transform.position.x + detectionRadiusAttract*1.5f * -direction, playerRb.transform.position.y );
-        sizeAttack = playerRb.transform.position + positionTemp;
+        positionTemp = myTransform.position; 
+        myTransform.position = new Vector3(myTransform.position.x + detectionRadiusAttract*3 * direction, myTransform.position.y, myTransform.position.z);
+        attackCenter = new Vector2(myTransform.position.x + detectionRadiusAttract*1.5f * -direction, myTransform.position.y );
+        sizeAttack = myTransform.position + positionTemp;
         playerRb.velocity = Vector2.zero;
         yield return new WaitForSeconds(0.5f);
         
         playerRb.velocity = Vector2.zero;
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(attackCenter, new Vector2(detectionRadiusAttract*3f,detectionRadiusAttract), 0, enemyLayerMask);
+        colliders = Physics2D.OverlapBoxAll(attackCenter, new Vector2(detectionRadiusAttract*3f,detectionRadiusAttract), 0, enemyLayerMask);
         if (colliders.Length >= 1)
         {
             Instantiate(hitEffect, detectionPosition, Quaternion.identity);
             //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
-            float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            newPitch = UnityEngine.Random.Range(0.8f,1.2f);
             audioSource.pitch = newPitch;
             audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
             
             CameraShakeManager.instance.CameraShake(impulseSource);
-            Instantiate(ComicBoomEffect, transform.position, Quaternion.Euler(0f,0f,0f));
+            
         }
 
         foreach (Collider2D collider in colliders)
@@ -567,8 +595,9 @@ public class PlayerAttack : MonoBehaviour
                 //Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
                 //enemyRb.AddForce(directionVector * -forceMagnitudeForward , ForceMode2D.Impulse);
 
-                MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
+                monsterHealth = collider.GetComponent<MonsterHealth>();
                 Instantiate(hitEffect, collider.GetComponent<Rigidbody2D>().transform.position, Quaternion.identity);
+                Instantiate(SlashEffect, collider.GetComponent<Rigidbody2D>().transform.position, Quaternion.identity);
                 if (monsterHealth != null)
                 monsterHealth.TakeDamage(damage * samouraiRatio);
                 //monsterHealth.ContactDamage();
@@ -592,66 +621,75 @@ public class PlayerAttack : MonoBehaviour
 
     public IEnumerator DestroyComicBoomEffect()
     {
-        GameObject comicBoom = Instantiate(ComicBoomEffect,new Vector2(transform.position.x,transform.position.y + 2f), Quaternion.identity);
-        Light light = comicBoom.GetComponentInChildren<Light>();
+        comicBoom = Instantiate(ComicBoomEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
+        lighter = comicBoom.GetComponentInChildren<Light>();
         yield return new WaitForSeconds(0.3f);
         Destroy(comicBoom);
-        Destroy(light);
+        Destroy(lighter);
         
         yield return null;
     }
 
     public IEnumerator DestroyDestructionGroundEffect()
     {
-        GameObject destructionGroundObject = Instantiate(DestructionGroundEffect,new Vector2(transform.position.x,transform.position.y), Quaternion.Euler(0f,0f,0f));
+        destructionGroundObject = Instantiate(DestructionGroundEffect,new Vector2(myTransform.position.x, myTransform.position.y), Quaternion.Euler(0f,0f,0f));
         yield return new WaitForSeconds(1f);
         Destroy(destructionGroundObject);
         yield return null;
     }
 
+    private IEnumerator EffectBlackAndWhite()
+    {
+        colorAdjustments.hueShift.value = -180f;
+        yield return new WaitForSeconds(0.5f);
+        colorAdjustments.hueShift.value = 0f;
+        yield return null;
+        
+    }
+
     private IEnumerator SpawnPunchParticles(int attacknumber)
     {
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
         //Regular attack
         if (attacknumber == 2)
         {
-            Vector3 offsetParticles = new Vector3(offsetParticlesX,0,0);
-            Vector3 offsetParticles2 = new Vector3(offsetParticlesX*2.5f,0,0);
-            Vector3 offsetParticles3 = new Vector3(offsetParticlesX*5f,0,0);
+            offsetParticles = new Vector3(offsetParticlesX,0,0);
+            offsetParticles2 = new Vector3(offsetParticlesX*2.5f,0,0);
+            offsetParticles3 = new Vector3(offsetParticlesX*4f,0,0);
 
-            ParticleSystem punchPart = Instantiate(punchParticles,transform.position + offsetParticles * direction, Quaternion.Euler(0f, 0f, 180f));
+            punchPart = Instantiate(punchParticles, myTransform.position + offsetParticles3 * direction, Quaternion.Euler(0f, 0f, 180f));
             punchPart.transform.localScale = new Vector3(1, 1, 1);
             yield return new WaitForSeconds(0.05f);
-            ParticleSystem punchPart2 = Instantiate(punchParticles,transform.position + offsetParticles2 * direction, Quaternion.Euler(0f, 0f, 180f));
+            punchPart2 = Instantiate(punchParticles, myTransform.position + offsetParticles2 * direction, Quaternion.Euler(0f, 0f, 180f));
             punchPart2.transform.localScale = new Vector3(2, 2, 1);
             yield return new WaitForSeconds(0.05f);
-            ParticleSystem punchPart3 = Instantiate(punchParticles,transform.position + offsetParticles3 * direction, Quaternion.Euler(0f, 0f, 180f));
+            punchPart3 = Instantiate(punchParticles, myTransform.position + offsetParticles * direction, Quaternion.Euler(0f, 0f, 180f));
             punchPart3.transform.localScale = new Vector3(3, 3, 1);
             yield return null;
         }
         //Down attack
         if(attacknumber == 3)
         {
-            Vector3 offsetParticles = new Vector3(detectionOffsetAir.x * direction,-offsetParticlesX,0);
-            Vector3 offsetParticles2 = new Vector3(detectionOffsetAir.x * direction,-offsetParticlesX*2.5f,0);
+            offsetParticles = new Vector3(detectionOffsetAir.x * direction,-offsetParticlesX,0);
+            offsetParticles2 = new Vector3(detectionOffsetAir.x * direction,-offsetParticlesX*2.5f,0);
             
-            ParticleSystem punchPart = Instantiate(punchParticles,transform.position + offsetParticles, Quaternion.Euler(0f, 0f, 90f));
+            punchPart = Instantiate(punchParticles, myTransform.position + offsetParticles2, Quaternion.Euler(0f, 0f, 90f));
             punchPart.transform.localScale = new Vector3(1, 1, 1);
             yield return new WaitForSeconds(0.05f);
-            ParticleSystem punchPart2 = Instantiate(punchParticles,transform.position + offsetParticles2, Quaternion.Euler(0f, 0f, 90f));
+            punchPart2 = Instantiate(punchParticles, myTransform.position + offsetParticles, Quaternion.Euler(0f, 0f, 90f));
             punchPart2.transform.localScale = new Vector3(2, 2, 1);
             yield return null;
         }
         // Up attack
         if(attacknumber == 1)
         {
-            Vector3 offsetParticles = new Vector3(detectionOffset * direction,offsetParticlesX,0);
-            Vector3 offsetParticles2 = new Vector3(detectionOffset * direction,offsetParticlesX*2.5f,0);
+            offsetParticles = new Vector3(detectionOffset * direction,offsetParticlesX,0);
+            offsetParticles2 = new Vector3(detectionOffset * direction,offsetParticlesX*2.5f,0);
             
-            ParticleSystem punchPart = Instantiate(punchParticles,transform.position + offsetParticles, Quaternion.Euler(0f, 0f, 90f));
+            punchPart = Instantiate(punchParticles, myTransform.position + offsetParticles2, Quaternion.Euler(0f, 0f, 90f));
             punchPart.transform.localScale = new Vector3(1, 1, 1);
             yield return new WaitForSeconds(0.05f);
-            ParticleSystem punchPart2 = Instantiate(punchParticles,transform.position + offsetParticles2, Quaternion.Euler(0f, 0f, 90f));
+            punchPart2 = Instantiate(punchParticles, myTransform.position + offsetParticles, Quaternion.Euler(0f, 0f, 90f));
             punchPart2.transform.localScale = new Vector3(2, 2, 1);
             yield return null;
         }
@@ -679,5 +717,16 @@ public class PlayerAttack : MonoBehaviour
             yield return new WaitForSeconds(0.15f);
             ForceFieldParticlesDown.SetActive(false);
         }
+    }
+
+    public IEnumerator DestroySlashEffectEffect()
+    {
+        comicBoom = Instantiate(SlashEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
+        lighter = comicBoom.GetComponentInChildren<Light>();
+        yield return new WaitForSeconds(0.3f);
+        Destroy(comicBoom);
+        Destroy(lighter);
+        
+        yield return null;
     }
 }

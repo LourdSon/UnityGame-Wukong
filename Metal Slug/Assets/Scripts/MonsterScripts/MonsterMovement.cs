@@ -18,11 +18,19 @@ public class MonsterMovement : MonoBehaviour
 
     
 
+    private GameObject player;
+    private MonsterHealth monsterHealth;
+    private AttackHitBoxSide attackHitBoxSide;
+    private float distanceToPlayer;
+    private float newXPosition;
+    private Transform myTransform;
+    
+
     void Start()
     {
         
         // Trouve le joueur par son tag au démarrage
-        GameObject player = GameObject.FindWithTag("Player");
+        player = GameObject.FindWithTag("Player");
         if (player != null)
         {
             playerTransform = player.transform;
@@ -31,7 +39,9 @@ public class MonsterMovement : MonoBehaviour
         enemyRb = GetComponentInChildren<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        
+        monsterHealth = GetComponent<MonsterHealth>();
+        attackHitBoxSide = GetComponentInChildren<AttackHitBoxSide>();
+        myTransform = transform;
         
         
     }
@@ -42,15 +52,11 @@ public class MonsterMovement : MonoBehaviour
         DetectPlayer();
         
     }
-    void Update()
-    {
-        
-    }
+    
 
     private void DetectPlayer()
     {
-        MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
-        AttackHitBoxSide attackHitBoxSide = GetComponentInChildren<AttackHitBoxSide>();
+        
         if (playerTransform == null)
         {
             return;
@@ -59,20 +65,20 @@ public class MonsterMovement : MonoBehaviour
         {
             
             // Vérifie la distance entre l'ennemi et le joueur
-            float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);        
+            distanceToPlayer = Vector2.Distance(myTransform.position, playerTransform.position);        
             if (distanceToPlayer <= detectionRange)
             {
                 // Déplace l'ennemi vers le joueur uniquement sur l'axe X
-                float newXPosition = Mathf.MoveTowards(transform.position.x, playerTransform.position.x, speed * Time.deltaTime);
-                transform.position = new Vector2(newXPosition, transform.position.y);
+                newXPosition = Mathf.MoveTowards(myTransform.position.x, playerTransform.position.x, speed * Time.deltaTime);
+                myTransform.position = new Vector2(newXPosition, myTransform.position.y);
                 animator.SetFloat("Speed",Mathf.Abs(newXPosition));
                 animator.SetBool("IsWalking", true);
-                if(playerTransform.position.x > transform.position.x)
+                if(playerTransform.position.x > myTransform.position.x)
                 {
-                    transform.rotation = Quaternion.Euler(transform.rotation.x, 0f, transform.rotation.z);
+                    myTransform.rotation = Quaternion.Euler(myTransform.rotation.x, 0f, myTransform.rotation.z);
                 } else 
                 {
-                    transform.rotation = Quaternion.Euler(transform.rotation.x, 180f, transform.rotation.z);
+                    myTransform.rotation = Quaternion.Euler(myTransform.rotation.x, 180f, myTransform.rotation.z);
                 }
                 
             } else

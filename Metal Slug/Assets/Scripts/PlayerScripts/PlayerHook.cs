@@ -14,6 +14,9 @@ public class GrapplingHook : MonoBehaviour
     public DistanceJoint2D joint;
     public Camera mainCamera;
     
+    private Vector2 mousePos;
+    
+    
     void Start()
     {
         joint = gameObject.GetComponent<DistanceJoint2D>();
@@ -60,7 +63,7 @@ public class GrapplingHook : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.R))
         {
-            Vector2 mousePos = (Vector2)mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            mousePos = (Vector2)mainCamera.ScreenToWorldPoint(Input.mousePosition);
             rope.SetPosition(0, mousePos);
             rope.SetPosition(1, transform.position);
             joint.connectedAnchor = mousePos;

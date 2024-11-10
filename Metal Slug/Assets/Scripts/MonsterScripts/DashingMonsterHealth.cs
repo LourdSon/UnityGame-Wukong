@@ -37,6 +37,18 @@ public class DashingMonsterHealth : MonoBehaviour
     private SpriteRenderer playerSpriteRenderer;
     public float dashDistance = 50f;
 
+
+    private Vector2 dashDirection;
+    private int direction;
+    private Quaternion rotation;
+    private float impactForce;
+    private float additionalDamage;
+    private RaycastHit2D hit;
+    private Transform myTransform;
+    private Transform playerTransform;
+
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -53,8 +65,8 @@ public class DashingMonsterHealth : MonoBehaviour
         player = GameObject.FindWithTag("Player");
         playerRb = player.GetComponent<Rigidbody2D>();
         playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
-
-        
+        myTransform = transform;
+        playerTransform = playerRb.transform;
     }
 
     // Update is called once per frame
@@ -99,7 +111,7 @@ public class DashingMonsterHealth : MonoBehaviour
                 isTakingDamage = false;
                 knockBackCounter = 0;
                 enemyRb.velocity = Vector3.zero;
-                Vector2 dashDirection = (playerRb.transform.position - transform.position).normalized;
+                dashDirection = (playerTransform.position - myTransform.position).normalized;
                 enemyRb.AddForce(dashDirection * dashDistance, ForceMode2D.Impulse);
             }
         }
@@ -107,10 +119,10 @@ public class DashingMonsterHealth : MonoBehaviour
 
     private void SpawnDamageParticles()
     {
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
-        Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 180f : 0f);  
-        damageParticlesInstance = Instantiate(damageParticles,transform.position, rotation);
-        Instantiate(impactParticles,transform.position, rotation);
+        direction = playerTransform.rotation.y == 0 ? 1 : -1;
+        rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 180f : 0f);  
+        damageParticlesInstance = Instantiate(damageParticles,myTransform.position, rotation);
+        Instantiate(impactParticles,myTransform.position, rotation);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -119,8 +131,8 @@ public class DashingMonsterHealth : MonoBehaviour
         {
             if(enemyRb.velocity.magnitude > 15f)
             {
-                float impactForce = collision.relativeVelocity.magnitude;
-                float additionalDamage = impactForce * additionalDamageMultiplier;
+                impactForce = collision.relativeVelocity.magnitude;
+                additionalDamage = impactForce * additionalDamageMultiplier;
                 TakeDamage(normalDamage + additionalDamage);
             }
         }
@@ -131,14 +143,14 @@ public class DashingMonsterHealth : MonoBehaviour
 
         if(enemyRb.velocity.magnitude > 15f && !IsGrounded())
         {
-            StartCoroutine(DamageGrounded());
+            // StartCoroutine(DamageGrounded());
         }
     }
 
     public IEnumerator DamageGrounded()
     {
-        float impactForce = enemyRb.velocity.magnitude;
-        float additionalDamage =  impactForce * additionalDamageMultiplier;
+        impactForce = enemyRb.velocity.magnitude;
+        additionalDamage =  impactForce * additionalDamageMultiplier;
         yield return new WaitUntil(() => IsGrounded());
         TakeDamage(normalDamage + additionalDamage);
         yield return null;
@@ -154,9 +166,9 @@ public class DashingMonsterHealth : MonoBehaviour
     public bool IsGrounded()
     {
         
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayDistance, groundLayerMask);
+        hit = Physics2D.Raycast(myTransform.position, Vector2.down, rayDistance, groundLayerMask);
          // Dessiner le raycast dans la vue de scène pour le débogage
-        Debug.DrawRay(transform.position, Vector2.down * rayDistance, Color.red);
+        Debug.DrawRay(myTransform.position, Vector2.down * rayDistance, Color.red);
         return hit.collider != null;
     }
 }

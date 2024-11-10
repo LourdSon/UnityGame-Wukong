@@ -13,6 +13,10 @@ public class NPCMIssionGiver : MonoBehaviour
     public bool isListening;
     public GameObject wavenumber;
     public GameObject enemynumber;
+
+
+
+    
     
     // Start is called before the first frame update
     void Start()

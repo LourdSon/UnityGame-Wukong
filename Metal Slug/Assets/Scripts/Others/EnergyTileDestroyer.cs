@@ -8,23 +8,23 @@ using UnityEngine.Tilemaps;
 public class EnergyTileDestroyer : MonoBehaviour
 {
      //TilemapCollider2D tilemapCollider; // Référence au TilemapCollider2D
+    private TilemapCollider2D tilemapCollider;
+    private Vector3 hitPosition;
+    private Vector3Int cellPosition;
+    private 
 
-    void Start()
-    {
-        // Trouver le TilemapCollider2D dans la scène
-        //tilemapCollider = GameObject.FindObjectOfType<TilemapCollider2D>();
-    }
+
 
     void OnTriggerEnter2D(Collider2D other)
     {
 
-        TilemapCollider2D tilemapCollider = GameObject.FindObjectOfType<TilemapCollider2D>();
+        tilemapCollider = GameObject.FindObjectOfType<TilemapCollider2D>();
         if (other.gameObject.CompareTag("Ground")) // Vérifie si la collision est avec un objet tagué "Ground"
         {
 
-            Vector3 hitPosition = other.transform.position; // Utilisez la position de l'autre collider (Ground) comme position de collision
+            hitPosition = other.transform.position; // Utilisez la position de l'autre collider (Ground) comme position de collision
 
-            Vector3Int cellPosition = tilemapCollider.GetComponent<Tilemap>().WorldToCell(hitPosition); // Convertit la position du monde en position de cellule de Tilemap
+            cellPosition = tilemapCollider.GetComponent<Tilemap>().WorldToCell(hitPosition); // Convertit la position du monde en position de cellule de Tilemap
 
             // Détruire une seule tuile à l'emplacement de la collision
             tilemapCollider.GetComponent<Tilemap>().SetTile(cellPosition, null);

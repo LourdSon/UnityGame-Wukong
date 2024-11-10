@@ -11,13 +11,19 @@ public class Parallax : MonoBehaviour
     public GameObject cam;
     public float parallaxEffect;
 
+    private float tempx;
+    private float distancex, distancey;
+    private Transform myTransform;
+
     // Start is called before the first frame update
     void Start()
     {
-        startposx = transform.position.x;
+        myTransform = transform;
+        startposx = myTransform.position.x;
         lengthx = GetComponent<SpriteRenderer>().bounds.size.x;
 
-        startposy = transform.position.y;
+        startposy = myTransform.position.y;
+
 
     }
 
@@ -30,12 +36,12 @@ public class Parallax : MonoBehaviour
     
     private void parallaxF()
     {
-        float tempx = cam.transform.position.x * (1 - parallaxEffect);
-        float distancex = cam.transform.position.x * parallaxEffect;
-        float distancey = cam.transform.position.y * parallaxEffect;
+        tempx = cam.transform.position.x * (1 - parallaxEffect);
+        distancex = cam.transform.position.x * parallaxEffect;
+        distancey = cam.transform.position.y * parallaxEffect;
 
         
-        transform.position  = new Vector3(startposx + distancex, startposy + distancey, transform.position.z);
+        myTransform.position  = new Vector3(startposx + distancex, startposy + distancey, myTransform.position.z);
 
         if(tempx > startposx + lengthx) 
         {

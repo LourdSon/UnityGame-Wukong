@@ -26,6 +26,20 @@ public class PlayerHealth : MonoBehaviour
     public bool isHealing;
     public float secondsBeforeHeal = 1;
     public GameObject HealCharging;
+    public GameObject HitEffect;
+    public float newAlpha = 0.25f;
+
+
+    private float targetFillAmount;
+    private GameObject comicBoom;
+    private Light lighter;
+    private Transform myTransform;
+    private Color tempColor;
+    private Color newColor;
+    private Color currentColor;
+    public GameObject healUpEffect;
+    private GameObject healUp;
+
     
     // Start is called before the first frame update
     void Start()
@@ -40,6 +54,8 @@ public class PlayerHealth : MonoBehaviour
         playerKi = GetComponent<PlayerMovement>();
         playerAttack = GetComponent<PlayerAttack>();
         isHealing = false;
+        myTransform = transform;
+        currentColor = GetComponentInParent<SpriteRenderer>().color;
     }
 
     // Update is called once per frame
@@ -61,6 +77,8 @@ public class PlayerHealth : MonoBehaviour
             UpdateHealthBar();
             health = Mathf.Clamp(health, 0, maxHealth);
             CameraShakeManager.instance.CameraShake(impulseSource);
+            StartCoroutine(DestroyHitEffect());
+            StartCoroutine(PlayerBlinking());
         }
         if (health <= 0)
         {       
@@ -90,7 +108,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void UpdateHealthBar()
     {
-        float targetFillAmount = health / maxHealth;
+        targetFillAmount = health / maxHealth;
         healthBarFill.fillAmount = targetFillAmount;
         
     }
@@ -117,6 +135,7 @@ public class PlayerHealth : MonoBehaviour
     public IEnumerator WaitBeforeHeal(float sec)
     {
         isHealing = true;
+        StartCoroutine(DestroyHealUpEffect());
         HealCharging.gameObject.SetActive(true);
         yield return new WaitForSeconds(sec);
         HealCharging.gameObject.SetActive(false);
@@ -128,7 +147,63 @@ public class PlayerHealth : MonoBehaviour
         isHealing = false;
         
     }
+
+    public IEnumerator DestroyHitEffect()
+    {
+        comicBoom = Instantiate(HitEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
+        lighter = comicBoom.GetComponentInChildren<Light>();
+        yield return new WaitForSeconds(0.3f);
+        Destroy(comicBoom);
+        Destroy(lighter);
+        
+        yield return null;
+    }
+
+    public IEnumerator DestroyHealUpEffect()
+    {
+        healUp = Instantiate(healUpEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
+        lighter = healUp.GetComponentInChildren<Light>();
+        yield return new WaitForSeconds(0.3f);
+        Destroy(healUp);
+        Destroy(lighter);
+        
+        yield return null;
+    }
     
+    private IEnumerator PlayerBlinking()
+    {
+        tempColor = currentColor;
+        Color.RGBToHSV(tempColor, out float h, out float s, out float v);
+        newColor = Color.HSVToRGB(h, s, v);
+        newColor.a = newAlpha;
+        currentColor = newColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = tempColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = newColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = tempColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = tempColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = newColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = tempColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = tempColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = newColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = tempColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = tempColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = newColor;
+        yield return new WaitForSeconds(knockBackDuration/12);
+        currentColor = tempColor;
+        currentColor = tempColor;
+        yield return null;
+    }
     
         //tileDestroyer.DestructionMouse();
         

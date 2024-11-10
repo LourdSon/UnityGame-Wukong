@@ -12,6 +12,11 @@ public class NPCDirectionIndicator : MonoBehaviour
     public PlayerMovement playerMovement;
     public GameObject npcBattler;
 
+    private Vector2 direction;
+    private float angle;
+
+
+
     void Update()
     {
         npcfirst = GameObject.FindGameObjectWithTag("NPCs");
@@ -34,10 +39,10 @@ public class NPCDirectionIndicator : MonoBehaviour
                 arrowUI.enabled = true;  // Affiche la flèche
 
                 // Calcul de la direction du PNJ par rapport au joueur
-                Vector2 direction = (npc.position - player.position).normalized;
+                direction = (npc.position - player.position).normalized;
 
                 // Calcul de l'angle de rotation pour la flèche
-                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
                 // Applique la rotation à la flèche
                 arrowUI.rectTransform.rotation = Quaternion.Euler(0f, 0f, angle );
@@ -55,10 +60,10 @@ public class NPCDirectionIndicator : MonoBehaviour
                 arrowUI.enabled = true;  // Affiche la flèche
 
                 // Calcul de la direction du PNJ par rapport au joueur
-                Vector2 direction = (npcBattler.transform.position - player.position).normalized;
+                direction = (npcBattler.transform.position - player.position).normalized;
 
                 // Calcul de l'angle de rotation pour la flèche
-                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
                 // Applique la rotation à la flèche
                 arrowUI.rectTransform.rotation = Quaternion.Euler(0f, 0f, angle );

@@ -16,10 +16,27 @@ public class PlayerDamage : MonoBehaviour
     public bool damageIncreased;
 
 
+
+
+    private SpriteRenderer enemySr;
+    private MonsterHealth monsterHealth;
+    private int direction;
+    private Quaternion rotation;
+    private EnergyBallDestroyEffectScript destroyEffect;
+    private Rigidbody2D enemyRb;
+    private Vector2 directionVector;
+    private Transform myTransform;
+    
+    
+
+
     // Start is called before the first frame update
     void Start()
     {
-       
+        enemySr = GetComponentInChildren<SpriteRenderer>();
+        monsterHealth = GetComponent<MonsterHealth>();
+        enemyRb = GetComponentInChildren<Rigidbody2D>();
+        myTransform = transform;
     }
 
     // Update is called once per frame
@@ -47,12 +64,10 @@ public class PlayerDamage : MonoBehaviour
     {
         if(other.gameObject.tag == "EnergyBall" && tag == "Enemy")
         {
-            SpriteRenderer enemySr = GetComponentInChildren<SpriteRenderer>();
-            MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
             monsterHealth.TakeDamage2(damage);
-            int direction = transform.rotation.y == 0f ? 1 : -1;
-            Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
-            EnergyBallDestroyEffectScript destroyEffect = other.GetComponent<EnergyBallDestroyEffectScript>();
+            direction = myTransform.rotation.y == 0f ? 1 : -1;
+            rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
+            destroyEffect = other.GetComponent<EnergyBallDestroyEffectScript>();
             destroyEffect.OnInstanceDestroy(other.gameObject);
             Instantiate(impactParticles, other.transform.position, Quaternion.identity);
             Destroy(other.gameObject);
@@ -60,14 +75,10 @@ public class PlayerDamage : MonoBehaviour
             
         } if(other.gameObject.tag == "EnergyBall2" && tag == "Enemy")
         {
-            SpriteRenderer enemySr = GetComponentInChildren<SpriteRenderer>();
-            Rigidbody2D enemyRb = GetComponentInChildren<Rigidbody2D>();
-            MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
             monsterHealth.TakeDamage(damage*multipUltim);
-            int direction = transform.rotation.y == 0f ? 1 : -1;
-            Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
-            
-            Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)other.transform.position).normalized;
+            direction = myTransform.rotation.y == 0f ? 1 : -1;
+            rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
+            directionVector = ((Vector2)enemyRb.transform.position - (Vector2)other.transform.position).normalized;
             enemyRb.AddForce(directionVector * forceMagnitudeUpward, ForceMode2D.Impulse);
             Instantiate(impactParticles, other.transform.position, rotation);
             Instantiate(comicBoomEffect, other.transform.position, Quaternion.identity);
@@ -75,19 +86,15 @@ public class PlayerDamage : MonoBehaviour
         }
         if(other.gameObject.tag == "EnergyBall3" && tag == "Enemy")
         {
-            SpriteRenderer enemySr = GetComponentInChildren<SpriteRenderer>();
-            MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
             monsterHealth.TakeDamage(damage*multipBeerus);
-            int direction = transform.rotation.y == 0f ? 1 : -1;
-            Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
+            direction = myTransform.rotation.y == 0f ? 1 : -1;
+            rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
             Instantiate(impactParticles, other.transform.position, rotation);
-            EnergyBallDestroyEffectScript destroyEffect = other.GetComponent<EnergyBallDestroyEffectScript>();
+            destroyEffect = other.GetComponent<EnergyBallDestroyEffectScript>();
             destroyEffect.OnInstanceDestroy(other.gameObject);
             other.gameObject.SetActive(false);
             Instantiate(comicBoomEffect, other.transform.position, Quaternion.identity);
             //Destroy(other.gameObject);
-
-            
         }
     }
 }

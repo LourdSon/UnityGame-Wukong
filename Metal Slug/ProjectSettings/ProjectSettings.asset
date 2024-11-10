@@ -42,7 +42,7 @@ PlayerSettings:
   m_SplashScreenLogos:
   - logo: {fileID: 10404, guid: 0000000000000000f000000000000000, type: 0}
     duration: 2
-  - logo: {fileID: 21300000, guid: eb81fd4060888ed4c81990408bd5f1fe, type: 3}
+  - logo: {fileID: 21300000, guid: 6eced64d9a0865b48a7d9caca59d63e2, type: 3}
     duration: 2
   - logo: {fileID: 21300000, guid: bb50eb7e913ba784fa9fce16c0ca44be, type: 3}
     duration: 4
@@ -339,7 +339,8 @@ PlayerSettings:
   openGLRequireES31: 0
   openGLRequireES31AEP: 0
   openGLRequireES32: 0
-  m_TemplateCustomTags: {}
+  m_TemplateCustomTags:
+    PRODUCT_DESCRIPTION: 
   mobileMTRendering:
     Android: 1
     iPhone: 1

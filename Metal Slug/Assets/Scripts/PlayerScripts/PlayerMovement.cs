@@ -7,6 +7,7 @@ using UnityEngine;
 using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 
 
 
@@ -127,8 +128,35 @@ public class PlayerMovement : MonoBehaviour
     public GameObject ForceFieldParticles;
     private PlayerHealth playerHealth;
     public float volumeScaleFootstep;
+    public GameObject ChargeUpEffect;
+    public GameObject LevelUpEffect;
     
     
+    private Vector2 moveInput;
+    private float horizontalMove;
+    private float newPitch;
+    private Vector2 dashMovement;
+    private float defaultSpeed;
+    private float angleInRadians;
+    private float angleInDegrees;
+    private float targetKiFillAmount;
+    private Collider2D[] colliders;
+    private Rigidbody2D enemyRb;
+    private Vector2 directionVector;
+    private MonsterHealth monsterHealth;
+    private Vector2 instantDashDirection;
+    private Vector2 inputPlayer;
+    private Vector2 newPosition;
+    private ThorHammer thorHammer;
+    private RaycastHit2D hit;
+    private GameObject destructionGroundObject;
+    private GameObject comicBoom;
+    private Light lighter;
+    private Transform myTransform;
+    public GameObject chargeMaxEffect;
+    private GameObject chargeMax;
+    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -146,22 +174,22 @@ public class PlayerMovement : MonoBehaviour
 
         impulseSource = GetComponent<CinemachineImpulseSource>();
         playerAttack = GetComponent<PlayerAttack>();
-        
-        wantToFight = false;
+        if(SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)
+        wantToFight = true;
         //tileDestroyer = GetComponentInChildren<TileDestroyer>();
         Physics2D.IgnoreLayerCollision(9,16,true);
 
         playerLevel = GetComponent<PlayerLevel>();
         ForceFieldParticles.SetActive(false);
         playerHealth = GetComponent<PlayerHealth>();
-        
+        myTransform = transform;
         
     }
 
 
     void Update()
     {
-        if(/* !EndMission.isCutsceneon || */ !playerHealth.isHealing)  
+        if(/* !EndMission.isCutsceneon || */ !playerHealth.isHealing && SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)  
         {  
             ReadInputMove();
             ReadInputJump();
@@ -177,7 +205,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(/* !EndMission.isCutsceneon || */ !playerHealth.isHealing)  
+        if(/* !EndMission.isCutsceneon || */ !playerHealth.isHealing && SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)  
         {  
                
             MovePlayer();
@@ -199,7 +227,7 @@ public class PlayerMovement : MonoBehaviour
             jumpForce += jumpForce/100;
             // playerHealth.health = playerHealth.maxHealth; 
             forceIncreased = true;
-
+            StartCoroutine(DestroyLevelUpEffect());
         }else if (!playerLevel.isLevelingUp)
         {
             forceIncreased = false;
@@ -211,13 +239,13 @@ public class PlayerMovement : MonoBehaviour
         if(isDashing == false)
         {
             //Get Axis from Unity
-            Vector2 moveInput = PlayerController.instance.playerInputActions.Player.Move.ReadValue<Vector2>();
+            moveInput = PlayerController.instance.playerInputActions.Player.Move.ReadValue<Vector2>();
             horizontalInput = moveInput.x;
             verticalInput = moveInput.y;
-            float horizontalMove = horizontalInput * moveSpeed;
+            horizontalMove = horizontalInput * moveSpeed;
             movement = new Vector2(horizontalMove, verticalInput);
             animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
-            playerRb.transform.position = new Vector3(playerRb.transform.position.x,playerRb.transform.position.y,0f);
+            myTransform.position = new Vector3(myTransform.position.x, myTransform.position.y,0f);
 
             //Flip sprite
             if (horizontalInput != 0)
@@ -227,11 +255,11 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("IsIdling", false);
                 if (horizontalInput < 0)
                 {
-                    playerRb.transform.rotation = Quaternion.Euler(playerRb.transform.rotation.x, 180f, playerRb.transform.rotation.z);
+                    myTransform.rotation = Quaternion.Euler(myTransform.rotation.x, 180f, myTransform.rotation.z);
                     direction = -1;
                 } else if (horizontalInput > 0)
                 {
-                    playerRb.transform.rotation = Quaternion.Euler(playerRb.transform.rotation.x, 0f,playerRb.transform.rotation.z);
+                    myTransform.rotation = Quaternion.Euler(myTransform.rotation.x, 0f,myTransform.rotation.z);
                     direction = 1;
                 }
             } else
@@ -248,7 +276,7 @@ public class PlayerMovement : MonoBehaviour
         footstepTimer += Time.deltaTime;
         if (footstepTimer >= footstepDelay && isGrounded)
         {
-            float newPitch = UnityEngine.Random.Range(0.9f,1.1f);
+            newPitch = UnityEngine.Random.Range(0.9f,1.1f);
             audioSource2.pitch = newPitch;
             audioSource2.PlayOneShot(walkSound, volumeScaleFootstep); 
             footstepTimer = 0f;                      
@@ -259,7 +287,7 @@ public class PlayerMovement : MonoBehaviour
     {
         
             //Move the character
-            transform.Translate(Vector2.right * Time.deltaTime * moveSpeed * direction * horizontalInput);
+            myTransform.Translate(Vector2.right * Time.deltaTime * moveSpeed * direction * horizontalInput);
             //playerRb.AddForce(Vector2.right * movement.x);
             //playerRb.velocity = new Vector2(movement.x, playerRb.velocity.y);       
             //playerRb.MovePosition((Vector2) transform.position + movement * Time.deltaTime);
@@ -327,7 +355,7 @@ public class PlayerMovement : MonoBehaviour
         //Reset Player position
         if(PlayerController.instance.playerInputActions.Player.ResetPosition.triggered)
         {
-            transform.position = new Vector2(70,2);
+            myTransform.position = new Vector2(70,2);
         }
     }
 
@@ -373,14 +401,13 @@ public class PlayerMovement : MonoBehaviour
     {
         
         // Déterminer la direction du dash en fonction des entrées du joueur
-        Vector2 dashMovement = new Vector2(horizontalInput, verticalInput).normalized;
-        SpriteRenderer playerSpriteRenderer = GetComponent<SpriteRenderer>();
+        dashMovement = new Vector2(horizontalInput, verticalInput).normalized;
         //GameObject playerGameObject = GetComponent<GameObject>();
-        float defaultSpeed = moveSpeed;
+        defaultSpeed = moveSpeed;
         moveSpeed += dashForce;
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
-        float angleInRadians = Mathf.Atan2(dashMovement.y, dashMovement.x);
-        float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
+        angleInRadians = Mathf.Atan2(dashMovement.y, dashMovement.x);
+        angleInDegrees = angleInRadians * Mathf.Rad2Deg;
         // 2. Calcul de l'angle en fonction du vecteur de mouvement
         if(angleInDegrees > 45 && angleInDegrees < 115)
         {
@@ -388,33 +415,33 @@ public class PlayerMovement : MonoBehaviour
             {
                 if(direction == 1)
                 {
-                    rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees-90);
+                    rotation = Quaternion.Euler(0f, myTransform.rotation.y, angleInDegrees-90);
                 }
                 if(direction == -1)
                 {
-                    rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, angleInDegrees-90);
+                    rotation = Quaternion.Euler(0f, myTransform.rotation.y + 180, angleInDegrees-90);
                 }
-                // playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
-                playerRb.transform.rotation = rotation;
+                // myTransform.rotation = Quaternion.Lerp(myTransform.rotation, rotation, 0.3f);
+                myTransform.rotation = rotation;
             } else
             {
                 //playerRb.velocity = new Vector2(dashMovement.x * dashForce, dashMovement.y * dashForce);
                 rotation = Quaternion.Euler(0f, 0f, angleInDegrees -90);
-                playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
+                myTransform.rotation = Quaternion.Lerp(myTransform.rotation, rotation, 0.3f);
             }
         } 
         if(angleInDegrees == -90)
         {
             if(direction == 1)
             {
-                rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, angleInDegrees+90);
+                rotation = Quaternion.Euler(0f, myTransform.rotation.y, angleInDegrees+90);
             }
             if(direction == -1)
             {
-                rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, angleInDegrees+90);
+                rotation = Quaternion.Euler(0f, myTransform.rotation.y + 180, angleInDegrees+90);
             }
-            // playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
-            playerRb.transform.rotation = rotation;
+            // myTransform.rotation = Quaternion.Lerp(myTransform.rotation, rotation, 0.3f);
+            myTransform.rotation = rotation;
 
         }
         playerRb.AddForce(dashMovement * dashForce,ForceMode2D.Impulse);       
@@ -431,17 +458,18 @@ public class PlayerMovement : MonoBehaviour
         //playerRb.velocity = Vector2.zero;
         animator.SetBool("IsDashing", false);       
         isDashing = false;
+        moveSpeed = defaultSpeed;
         
 
         if(direction == 1)
         {
-            rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y, 0f);
+            rotation = Quaternion.Euler(0f, myTransform.rotation.y, 0f);
         }
         if(direction == -1)
         {
-            rotation = Quaternion.Euler(0f, playerRb.transform.rotation.y + 180, 0f);
+            rotation = Quaternion.Euler(0f, myTransform.rotation.y + 180, 0f);
         }
-        // playerRb.transform.rotation = Quaternion.Lerp(playerRb.transform.rotation, rotation, 0.3f);
+        // myTransform.rotation = Quaternion.Lerp(myTransform.rotation, rotation, 0.3f);
         //jumpCounter = 1;
         //moveSpeed -= dashForce;
         StartCoroutine(ReduceSpeedGradually(defaultSpeed, speedReductionDuration));
@@ -471,6 +499,7 @@ public class PlayerMovement : MonoBehaviour
         {
             StartCoroutine(particlesForceField());
             StartCoroutine(KiChargingCo());
+            
             isCharging = false;
         }
     }
@@ -499,11 +528,15 @@ public class PlayerMovement : MonoBehaviour
         //tileDestroyer.DestructionMouse();
         if (KiCharging.gameObject.activeSelf)
         {
-            float newPitch = UnityEngine.Random.Range(0.9f,1.1f);
+            newPitch = UnityEngine.Random.Range(0.9f,1.1f);
             audioSource.pitch = newPitch;
             audioSource.PlayOneShot(soundEffect, 0.1f);
-            Instantiate(slamParticles,transform.position,Quaternion.identity);
+            Instantiate(slamParticles, myTransform.position,Quaternion.identity);
         }
+        if(currentKi < maxKi)
+        StartCoroutine(DestroyChargeUpEffect());
+        if(currentKi >= maxKi)
+        StartCoroutine(DestroyChargeMaxEffect());
         playerRb.velocity = new Vector2(0f,0f);
         EnemiesStepBackCharging();
         yield return new WaitForSeconds(chargeDuration);
@@ -514,7 +547,8 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("IsCharging", false);
         if(currentKi >= maxKi)
         {
-            float newPitch = UnityEngine.Random.Range(0.9f,1.1f);
+            
+            newPitch = UnityEngine.Random.Range(0.9f,1.1f);
             audioSource.pitch = newPitch;
             audioSource.loop = true;
             audioSource.clip = KiAura;
@@ -531,7 +565,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void UpdateKiBar()
     {
-        float targetKiFillAmount = currentKi / maxKi;
+        targetKiFillAmount = currentKi / maxKi;
         KiBarFill.fillAmount = targetKiFillAmount;
     }
 
@@ -539,16 +573,16 @@ public class PlayerMovement : MonoBehaviour
     {
         
          // Détecter les ennemis dans la zone d'attaque
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, detectionBoxKi, enemyLayerMask);
+        colliders = Physics2D.OverlapCircleAll(myTransform.position, detectionBoxKi, enemyLayerMask);
         foreach (Collider2D collider in colliders)
         {
-            Rigidbody2D enemyRb = collider.GetComponent<Rigidbody2D>();
+            enemyRb = collider.GetComponent<Rigidbody2D>();
+            monsterHealth = collider.GetComponent<MonsterHealth>();
             if (enemyRb != null)
             {
-                Vector2 directionVector = ((Vector2)enemyRb.transform.position - (Vector2)transform.position).normalized;
+                directionVector = ((Vector2)enemyRb.transform.position - (Vector2)myTransform.position).normalized;
                 enemyRb.AddForce(directionVector * forceMagnitudeForward/0.75f, ForceMode2D.Impulse);
                 // Infliger des dégâts aux ennemis
-                MonsterHealth monsterHealth = collider.GetComponent<MonsterHealth>();
                 if (monsterHealth != null)
                 {
                     monsterHealth.TakeDamage(0f);
@@ -563,17 +597,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void SpawnDashParticles()
     {
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
-        Vector2 inputPlayer = new Vector2(horizontalInput, verticalInput).normalized;
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
+        inputPlayer = new Vector2(horizontalInput, verticalInput).normalized;
         
         // 2. Calcul de l'angle en fonction du vecteur de mouvement
         
-        float angleInRadians = Mathf.Atan2(inputPlayer.y, inputPlayer.x);
-        float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+        angleInRadians = Mathf.Atan2(inputPlayer.y, inputPlayer.x);
+        angleInDegrees = angleInRadians * Mathf.Rad2Deg;
         rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f + angleInDegrees + 180 : -180f + angleInDegrees);
         //trueRotation = Quaternion.Euler() 
         //Instantiate(dashParticles,new Vector2(transform.position.x, transform.position.y -2), rotation);
-        Instantiate(dashExplosionParticles,transform.position, rotation);
+        Instantiate(dashExplosionParticles,myTransform.position, rotation);
 
     }
     
@@ -583,7 +617,7 @@ public class PlayerMovement : MonoBehaviour
         rotation = Quaternion.Euler(0f, 0f, 90f);
         //trueRotation = Quaternion.Euler() 
         //Instantiate(dashParticles,new Vector2(transform.position.x, transform.position.y -2), rotation);
-        Instantiate(dashExplosionParticles,transform.position, rotation);
+        Instantiate(dashExplosionParticles,myTransform.position, rotation);
 
     }
 
@@ -614,11 +648,11 @@ public class PlayerMovement : MonoBehaviour
         
 
         // Déterminer la direction du dash en fonction des entrées du joueur
-        Vector2 instantDashDirection = new Vector2(horizontalInput, verticalInput).normalized;
+        instantDashDirection = new Vector2(horizontalInput, verticalInput).normalized;
 
         // Appliquer une force pour le dash
-        Vector2 newPosition = (Vector2)transform.position + instantDashDirection * instantDashForce;
-        transform.position = newPosition;
+        newPosition = (Vector2)myTransform.position + instantDashDirection * instantDashForce;
+        myTransform.position = newPosition;
         // Attendre la durée du dash
         yield return new WaitForSeconds(instantDashDuration);
 
@@ -630,7 +664,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void ThorTest()
     {
-        ThorHammer thorHammer = GetComponent<ThorHammer>();
+        thorHammer = GetComponent<ThorHammer>();
         if (Input.GetKeyDown(KeyCode.R))
                 {
                     thorHammer.ReturnObject();
@@ -641,9 +675,9 @@ public class PlayerMovement : MonoBehaviour
     public bool IsGrounded()
     {
         
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayDistance, groundLayerMask);
+        hit = Physics2D.Raycast(myTransform.position, Vector2.down, rayDistance, groundLayerMask);
          // Dessiner le raycast dans la vue de scène pour le débogage
-        Debug.DrawRay(transform.position, Vector2.down * rayDistance, Color.red);
+        Debug.DrawRay(myTransform.position, Vector2.down * rayDistance, Color.red);
         if(hit.collider == null)
         {
             animator.SetBool("IsGrounded()", false);
@@ -669,9 +703,40 @@ public class PlayerMovement : MonoBehaviour
     public IEnumerator DestroyDestructionGroundEffect()
     {
         
-        UnityEngine.Object destructionGroundObject = Instantiate(DestructionGroundEffect,new Vector2(transform.position.x,transform.position.y), Quaternion.Euler(0f,0f,0f));
+        destructionGroundObject = Instantiate(DestructionGroundEffect,new Vector2(myTransform.position.x, myTransform.position.y), Quaternion.Euler(0f,0f,0f));
         yield return new WaitForSeconds(1f);
         Destroy(destructionGroundObject);
+        yield return null;
+    }
+
+    public IEnumerator DestroyChargeUpEffect()
+    {
+        comicBoom = Instantiate(ChargeUpEffect,new Vector2(myTransform.position.x, myTransform.position.y + 10f), Quaternion.identity);
+        lighter = comicBoom.GetComponentInChildren<Light>();
+        yield return new WaitForSeconds(0.3f);
+        Destroy(comicBoom);
+        Destroy(lighter);
+        
+        yield return null;
+    }
+    public IEnumerator DestroyChargeMaxEffect()
+    {
+        chargeMax = Instantiate(chargeMaxEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
+        lighter = chargeMax.GetComponentInChildren<Light>();
+        yield return new WaitForSeconds(0.3f);
+        Destroy(chargeMax);
+        Destroy(lighter);
+        
+        yield return null;
+    }
+
+    public IEnumerator DestroyLevelUpEffect()
+    {
+        comicBoom = Instantiate(LevelUpEffect,new Vector2(myTransform.position.x, myTransform.position.y + 10f), Quaternion.identity);
+        lighter = comicBoom.GetComponentInChildren<Light>();
+        yield return new WaitForSeconds(0.3f);
+        Destroy(comicBoom);
+        Destroy(lighter);
         
         yield return null;
     }

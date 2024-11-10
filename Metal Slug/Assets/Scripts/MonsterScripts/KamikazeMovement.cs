@@ -19,6 +19,19 @@ public class KamikazeMovement : MonoBehaviour
     public float separationRadius = 5f; // Rayon pour éviter la superposition
     public float separationForce = 15f; // Force pour éviter la superposition
 
+
+
+
+
+
+    private MonsterHealth monsterHealth;
+    private AttackHitBoxKamikaze attackHitBoxKamikaze;
+    private float distanceToPlayer;
+    private Collider2D[] enemiesNearby;
+    private Vector3 repelDirection;
+    private float distance;
+    private Transform myTransform;
+
     void Start()
     {
         
@@ -27,7 +40,9 @@ public class KamikazeMovement : MonoBehaviour
         enemyRb = GetComponentInChildren<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        
+        monsterHealth = GetComponent<MonsterHealth>();
+        attackHitBoxKamikaze = GetComponentInChildren<AttackHitBoxKamikaze>();
+        myTransform = transform;
         
         
     }
@@ -49,8 +64,7 @@ public class KamikazeMovement : MonoBehaviour
 
     public void DetectPlayer()
     {
-        MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
-        AttackHitBoxKamikaze attackHitBoxKamikaze = GetComponentInChildren<AttackHitBoxKamikaze>();
+        
         if (playerTransform == null && player != null)
         {
             playerTransform = player.transform;
@@ -59,19 +73,19 @@ public class KamikazeMovement : MonoBehaviour
         {
             
             // Vérifie la distance entre l'ennemi et le joueur
-            float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);        
+            distanceToPlayer = Vector2.Distance(myTransform.position, playerTransform.position);        
             if (distanceToPlayer <= detectionRange)
             {
                 // Déplace l'ennemi vers le joueur uniquement sur l'axe X
-                transform.position = Vector2.MoveTowards(transform.position, playerTransform.position, speed * Time.deltaTime);
+                myTransform.position = Vector2.MoveTowards(myTransform.position, playerTransform.position, speed * Time.deltaTime);
                 animator.SetFloat("Speed",Mathf.Abs(speed * Time.deltaTime));
                 animator.SetBool("IsWalking", true);
-                if(playerTransform.position.x > transform.position.x)
+                if(playerTransform.position.x > myTransform.position.x)
                 {
-                    transform.rotation = Quaternion.Euler(transform.rotation.x, 0f, transform.rotation.z);
+                    myTransform.rotation = Quaternion.Euler(myTransform.rotation.x, 0f, myTransform.rotation.z);
                 } else 
                 {
-                    transform.rotation = Quaternion.Euler(transform.rotation.x, 180f, transform.rotation.z);
+                    myTransform.rotation = Quaternion.Euler(myTransform.rotation.x, 180f, myTransform.rotation.z);
                 }
                 
             } else
@@ -86,20 +100,20 @@ public class KamikazeMovement : MonoBehaviour
     void SeparateFromOtherEnemies()
     {
         // Récupère tous les ennemis dans un rayon autour de cet ennemi
-        Collider2D[] enemiesNearby = Physics2D.OverlapCircleAll(transform.position, separationRadius);
+        enemiesNearby = Physics2D.OverlapCircleAll(myTransform.position, separationRadius);
 
         foreach (Collider2D other in enemiesNearby)
         {
             if (other != null && other.gameObject != this.gameObject && other.CompareTag("Enemy"))
             {
                 // Calcule une force de répulsion si trop proche
-                Vector3 repelDirection = transform.position - other.transform.position;
-                float distance = repelDirection.magnitude;
+                repelDirection = myTransform.position - other.transform.position;
+                distance = repelDirection.magnitude;
 
                 // Applique la force de répulsion
                 if (distance < separationRadius)
                 {
-                    transform.position += repelDirection.normalized * separationForce * Time.deltaTime;
+                    myTransform.position += repelDirection.normalized * separationForce * Time.deltaTime;
                 }
             }
         }

@@ -13,6 +13,8 @@ public class MonsterDamage : MonoBehaviour
     public Rigidbody2D playerRb;
     public SpriteRenderer spriteRenderer;
     public PlayerHealth playerHealth;
+    private int direction;
+    private Transform myTransform;
     
 
 
@@ -22,20 +24,16 @@ public class MonsterDamage : MonoBehaviour
         playerRb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         playerHealth = GetComponent<PlayerHealth>();
+        myTransform = transform;
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
 
-        int direction = transform.rotation.y == 0f ? 1 : -1;
+        direction = myTransform.rotation.y == 0f ? 1 : -1;
         
 
         if(collision.gameObject.tag == "Enemy" || collision.gameObject.tag == "Boss")

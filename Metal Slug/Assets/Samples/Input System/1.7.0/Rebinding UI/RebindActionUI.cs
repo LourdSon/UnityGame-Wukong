@@ -12,11 +12,13 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
     /// <summary>
     /// A reusable component with a self-contained UI for rebinding a single action.
     /// </summary>
+    
     public class RebindActionUI : MonoBehaviour
     {
         /// <summary>
         /// Reference to the action that is to be rebound.
         /// </summary>
+        
         public InputActionReference actionReference
         {
             get => m_Action;
@@ -234,6 +236,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         /// Initiate an interactive rebind that lets the player actuate a control to choose a new binding
         /// for the action.
         /// </summary>
+        
         public void StartInteractiveRebind()
         {
             if (!ResolveActionAndBinding(out var action, out var bindingIndex))
@@ -255,18 +258,26 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         private void PerformInteractiveRebind(InputAction action, int bindingIndex, bool allCompositeParts = false)
         {
             m_RebindOperation?.Cancel(); // Will null out m_RebindOperation.
-
+            
             void CleanUp()
             {
                 m_RebindOperation?.Dispose();
                 m_RebindOperation = null;
             }
 
+            //-----------------------------------------------------Start : Added by myself----------------------------------------------------
+            action.Disable();
+            //-----------------------------------------------------End : Added by myself----------------------------------------------------
+
+            
             // Configure the rebind.
             m_RebindOperation = action.PerformInteractiveRebinding(bindingIndex)
                 .OnCancel(
                     operation =>
                     {
+                        //-----------------------------------------------------Start : Added by myself----------------------------------------------------
+                        action.Enable();
+                        //-----------------------------------------------------End : Added by myself----------------------------------------------------
                         m_RebindStopEvent?.Invoke(this, operation);
                         m_RebindOverlay?.SetActive(false);
                         UpdateBindingDisplay();
@@ -275,6 +286,9 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
                 .OnComplete(
                     operation =>
                     {
+                        //-----------------------------------------------------Start : Added by myself----------------------------------------------------
+                        action.Enable();
+                        //-----------------------------------------------------End : Added by myself----------------------------------------------------
                         m_RebindOverlay?.SetActive(false);
                         m_RebindStopEvent?.Invoke(this, operation);
                         UpdateBindingDisplay();

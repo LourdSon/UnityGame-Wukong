@@ -28,7 +28,10 @@ public class EndMission : MonoBehaviour
     public GameObject winningEventSystem;
     public GameObject EventSystem;
 
-
+    private GameObject player;
+    private int count;
+    private int countB;
+    private 
 
     // Start is called before the first frame update
     void Start()
@@ -44,7 +47,7 @@ public class EndMission : MonoBehaviour
         isCutsceneon = false;
         playedOnce = false;
         winningEventSystem.SetActive(false);
-        EventSystem.SetActive(true);
+        EventSystem.SetActive(false);
     }
 
     // Update is called once per frame
@@ -80,13 +83,13 @@ public class EndMission : MonoBehaviour
     {
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
         bosses = GameObject.FindGameObjectsWithTag("Boss");
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        player = GameObject.FindGameObjectWithTag("Player");
         if(player != null)
         {
             playerTransform = player.GetComponent<Transform>();
         }
-        int count = enemies.Length;
-        int countB = bosses.Length;
+        count = enemies.Length;
+        countB = bosses.Length;
         
         if(!playedOnce && count == 0 && GetComponent<WaveManager>().currentWaveIndex == GetComponent<WaveManager>().waves.Count)
         {

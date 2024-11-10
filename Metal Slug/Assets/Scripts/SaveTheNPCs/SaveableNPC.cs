@@ -16,6 +16,10 @@ public class SaveableNPC : MonoBehaviour
     public GameObject XpForPlayer;
     public Text text;
 
+
+    private int minutes, seconds, milliseconds;
+    private Transform myTransform;
+
     void Start()
     {
         if (saveIndicator != null)
@@ -24,6 +28,7 @@ public class SaveableNPC : MonoBehaviour
             saveIndicator.value = 0f;  // Réinitialise le slider
         }
         currentLimitTime = timeRequired;
+        myTransform = transform;
     }
 
     void Update()
@@ -77,18 +82,18 @@ public class SaveableNPC : MonoBehaviour
 
     void SaveNPC()
     {
-        Instantiate(XpForPlayer, transform.position, Quaternion.identity);
-        Instantiate(XpForPlayer, transform.position, Quaternion.identity);
-        Instantiate(XpForPlayer, transform.position, Quaternion.identity);
-        Instantiate(XpForPlayer, transform.position, Quaternion.identity);
+        Instantiate(XpForPlayer, myTransform.position, Quaternion.identity);
+        Instantiate(XpForPlayer, myTransform.position, Quaternion.identity);
+        Instantiate(XpForPlayer, myTransform.position, Quaternion.identity);
+        Instantiate(XpForPlayer, myTransform.position, Quaternion.identity);
         Destroy(gameObject); 
     }
 
     void UpdateTimerText()
     {
-        int minutes = Mathf.FloorToInt(currentLimitTime / 60F);
-        int seconds = Mathf.FloorToInt(currentLimitTime % 60F);
-        int milliseconds = Mathf.FloorToInt((currentLimitTime * 1000F) % 1000F);
+        minutes = Mathf.FloorToInt(currentLimitTime / 60F);
+        seconds = Mathf.FloorToInt(currentLimitTime % 60F);
+        milliseconds = Mathf.FloorToInt((currentLimitTime * 1000F) % 1000F);
         text.text = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, milliseconds);
     }
 }

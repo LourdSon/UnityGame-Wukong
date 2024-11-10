@@ -1,161 +1,98 @@
-
-
-
 using UnityEngine;
 
 public class FlyingMonsterMovement : MonoBehaviour
 {
-
     public float detectionRange = 500f;
-    public float speed = 20f; // Vitesse de déplacement de l'ennemi
+    public float speed = 20f;  // Vitesse de déplacement de l'ennemi
+    public Transform player;
+    public GameObject npcTarget;
+    public float separationRadius = 1f;
+    public float separationForce = 1f;
 
     public Transform target;
-        
     private Rigidbody2D enemyRb;
     private Animator animator;
-    private SpriteRenderer spriteRenderer;
-    private GameObject npcTarget;
-    public GameObject player;
-    public SaveableNPC saveableNPC;
-    
-    public float separationRadius = 1f; // Rayon pour éviter la superposition
-    public float separationForce = 1f; // Force pour éviter la superposition
-
-
-    
+    private MonsterHealth monsterHealth;
+    private AttackHitBoxSide attackHitBoxSide;
+    private EnemyShoot enemyShoot;
+    private Collider2D[] enemiesNearby;
+    private Transform myTransform;
+    private Vector3 repelDirection;
+    private float distance;
+    private float distanceToTarget;
 
     void Start()
     {
-        
-        // Trouve le joueur par son tag au démarrage
-        
-        target = player.transform;
-        
-        
+        myTransform = transform;
+        target = player?.transform;
         enemyRb = GetComponentInChildren<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-
-        
-        
-        
-        
+        monsterHealth = GetComponent<MonsterHealth>();
+        attackHitBoxSide = GetComponentInChildren<AttackHitBoxSide>();
+        enemyShoot = GetComponentInChildren<EnemyShoot>();
+        npcTarget = GameObject.FindGameObjectWithTag("NPCs");
     }
 
     void FixedUpdate()
     {
-        // Si un PNJ est présent, les ennemis le ciblent
-        npcTarget = GameObject.FindGameObjectWithTag("NPCs");
-        
-
-        if (npcTarget != null && player != null)
+        UpdateTarget();
+        if (target != null)
         {
-            saveableNPC = npcTarget.GetComponent<SaveableNPC>();
-            if(!saveableNPC.playerInZone)
-            {
-                target = npcTarget.transform;
-            }
-            else if(saveableNPC.playerInZone)
-            {
-                target = player.transform;
-            }
-        } 
-        if(npcTarget == null && player != null)
-        {
-            target = player.transform;
+            MoveTowardsTarget();
         }
-
-        DetectPlayer();
         SeparateFromOtherEnemies();
-        
     }
-   
 
-    public void DetectPlayer()
+    private void UpdateTarget()
     {
-        MonsterHealth monsterHealth = GetComponent<MonsterHealth>();
-        AttackHitBoxSide attackHitBoxSide = GetComponentInChildren<AttackHitBoxSide>();
-        EnemyShoot enemyShoot = GetComponentInChildren<EnemyShoot>();
-        if(player != null)
+        if (npcTarget != null)
         {
-
-        
-            if(attackHitBoxSide != null)
-            {
-                if(!monsterHealth.isTakingDamage  && attackHitBoxSide.isAttacking == false)
-                {
-                    
-                    // Vérifie la distance entre l'ennemi et le joueur
-                    float distanceToPlayer = Vector2.Distance(transform.position, target.position);        
-                    if (distanceToPlayer <= detectionRange)
-                    {
-                        // Déplace l'ennemi vers le joueur uniquement sur l'axe X
-                        transform.position = Vector2.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
-                        animator.SetFloat("Speed",Mathf.Abs(speed * Time.deltaTime));
-                        animator.SetBool("IsWalking", true);
-                        if(target.position.x > transform.position.x)
-                        {
-                            transform.rotation = Quaternion.Euler(transform.rotation.x, 0f, transform.rotation.z);
-                        } else 
-                        {
-                            transform.rotation = Quaternion.Euler(transform.rotation.x, 180f, transform.rotation.z);
-                        }
-                        
-                    } else
-                    {
-                        animator.SetBool("IsWalking", false);
-                    }
-                    
-                }
-            }
-            if(enemyShoot != null)
-            {
-                if(!monsterHealth.isTakingDamage && enemyShoot.isShooting == false)
-                {
-                    
-                    // Vérifie la distance entre l'ennemi et le joueur
-                    float distanceToPlayer = Vector2.Distance(transform.position, target.position);        
-                    if (distanceToPlayer <= detectionRange)
-                    {
-                        // Déplace l'ennemi vers le joueur uniquement sur l'axe X
-                        transform.position = Vector2.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
-                        animator.SetFloat("Speed",Mathf.Abs(speed * Time.deltaTime));
-                        animator.SetBool("IsWalking", true);
-                        if(target.position.x > transform.position.x)
-                        {
-                            transform.rotation = Quaternion.Euler(transform.rotation.x, 0f, transform.rotation.z);
-                        } else 
-                        {
-                            transform.rotation = Quaternion.Euler(transform.rotation.x, 180f, transform.rotation.z);
-                        }
-                        
-                    } else
-                    {
-                        animator.SetBool("IsWalking", false);
-                    }
-                    
-                }
-            }
+            SaveableNPC saveableNPC = npcTarget.GetComponent<SaveableNPC>();
+            target = saveableNPC != null && !saveableNPC.playerInZone ? npcTarget.transform : player.transform;
+        }
+        else
+        {
+            target = player?.transform;
         }
     }
 
-    void SeparateFromOtherEnemies()
+    private void MoveTowardsTarget()
     {
-        // Récupère tous les ennemis dans un rayon autour de cet ennemi
-        Collider2D[] enemiesNearby = Physics2D.OverlapCircleAll(transform.position, separationRadius);
+        if (monsterHealth.isTakingDamage || 
+            (attackHitBoxSide != null && attackHitBoxSide.isAttacking) || 
+            (enemyShoot != null && enemyShoot.isShooting))
+        {
+            animator.SetBool("IsWalking", false);
+            return;
+        }
+
+        distanceToTarget = Vector2.Distance(myTransform.position, target.position);
+        if (distanceToTarget <= detectionRange)
+        {
+            myTransform.position = Vector2.MoveTowards(myTransform.position, target.position, speed * Time.deltaTime);
+            animator.SetBool("IsWalking", true);
+            myTransform.rotation = target.position.x > myTransform.position.x ? Quaternion.identity : Quaternion.Euler(0, 180f, 0);
+        }
+        else
+        {
+            animator.SetBool("IsWalking", false);
+        }
+    }
+
+    private void SeparateFromOtherEnemies()
+    {
+        enemiesNearby = Physics2D.OverlapCircleAll(myTransform.position, separationRadius);
 
         foreach (Collider2D other in enemiesNearby)
         {
-            if (other != null && other.gameObject != this.gameObject && other.CompareTag("Enemy"))
+            if (other != null && other.gameObject != gameObject && other.CompareTag("Enemy"))
             {
-                // Calcule une force de répulsion si trop proche
-                Vector3 repelDirection = transform.position - other.transform.position;
-                float distance = repelDirection.magnitude;
+                repelDirection = myTransform.position - other.transform.position;
+                distance = repelDirection.magnitude;
 
-                // Applique la force de répulsion
                 if (distance < separationRadius)
                 {
-                    transform.position += repelDirection.normalized * separationForce * Time.deltaTime;
+                    myTransform.position += repelDirection.normalized * separationForce * Time.deltaTime;
                 }
             }
         }

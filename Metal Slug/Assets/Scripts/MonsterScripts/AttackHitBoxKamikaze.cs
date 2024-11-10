@@ -16,34 +16,25 @@ public class AttackHitBoxKamikaze : MonoBehaviour
     private Animator anim;
     public bool isAttacking;
 
+
+    private Color tempColor;
+    private Color newColor;
+    private Color currentColor;
+
     void Start()
     {
         enemyRb = GetComponentInParent<Rigidbody2D>();
         anim = GetComponentInParent<Animator>();
         isAttacking = false;
-          
+        kamikazeAttack = GetComponentInParent<KamikazeAttack>();  
+        currentColor = GetComponentInParent<SpriteRenderer>().color;
     }
 
-    // Update est appelée une fois par frame
-    void Update()
-    {
-        kamikazeAttack = GetComponentInParent<KamikazeAttack>(); 
-        if (enemyRb.transform.rotation.y == 180)
-        {
-            // Si le joueur est retourné, positionne la hitbox de mêlée à gauche du joueur
-            meleeHitbox.transform.localPosition = new Vector3(xGauche, 0f, 0f);
-        }
-        else
-        {
-            // Si le joueur n'est pas retourné, positionne la hitbox de mêlée à droite du joueur
-            meleeHitbox.transform.localPosition = new Vector3(xDroite, 0f, 0f);
-        }
-        
-    }
+    
 
     public void OnTriggerEnter2D(Collider2D coll)
     {                
-        if(coll.gameObject.CompareTag("Player"))
+        if(gameObject != null && gameObject.activeInHierarchy && coll.gameObject.CompareTag("Player"))
         {
             StartCoroutine(AttackSpe());         
         }
@@ -52,17 +43,17 @@ public class AttackHitBoxKamikaze : MonoBehaviour
     private IEnumerator AttackSpe()
     {
         isAttacking = true;
-        Color tempColor = GetComponentInParent<SpriteRenderer>().color;
+        /* tempColor = currentColor;
         Color.RGBToHSV(tempColor, out float h, out float s, out float v);
         s *= 0.25f;
-        Color newColor = Color.HSVToRGB(h, s, v);
-        GetComponentInParent<SpriteRenderer>().color = newColor;
+        newColor = Color.HSVToRGB(h, s, v);
+        currentColor = newColor; */
         anim.SetTrigger("SimpleAttackTrigger");
         yield return new WaitForSeconds(waitingForAttack);
         kamikazeAttack.Attack();
         yield return null;
         isAttacking = false;
-        GetComponentInParent<SpriteRenderer>().color = tempColor;
+        /* currentColor = tempColor; */
     }
 }
 

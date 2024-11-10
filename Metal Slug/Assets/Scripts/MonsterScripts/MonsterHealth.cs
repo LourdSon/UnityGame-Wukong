@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections;
 
 using Cinemachine;
@@ -47,13 +48,44 @@ public class MonsterHealth : MonoBehaviour
     public GameObject enemyPrefab;
     public GameObject attackHitBox;
 
+    private AttackHitBoxSide attackHitBoxSide;
+    private AttackHitBoxKamikaze attackHitBoxKamikaze;
+    private Vector2 dashDirection;
+    private float angleInRadians;
+    private float angleInDegrees;
+    private MonsterHealth otherEnemy;
+    private float impactForce;
+    private float additionalDamage;
+    private GameObject comicBoom;
+    private Light lighter;
+    private RaycastHit2D hit;
+    private Transform myTransform;
+    public GameObject shield;
+    public GameObject shieldSprite;
+    public float maxShield = 500;
+    public float currentShield;
+    public int levelThreshold;
+    public GameObject guardBreakEffect;
+    private GameObject guardBreak;
+    public Timer timer;
+    public int bonusSeconds = 5;
+
+
     // Start is called before the first frame update
     void Start()
     {
         health = maxHealth;
+        
         healthBar = GetComponentInChildren<MonsterHealthBar>();
         healthBar.UpdateHealthBar(health, maxHealth);
-        
+        if(shield != null)
+        {
+            shield.SetActive(false);
+            shieldSprite.SetActive(false);
+            currentShield = maxShield;
+            healthBar.UpdateShieldBar(currentShield, maxShield);
+        }
+
         impulseSource = GetComponentInChildren<CinemachineImpulseSource>();
         isTakingDamage = false;
         
@@ -64,6 +96,9 @@ public class MonsterHealth : MonoBehaviour
         playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         playerLevel = player.GetComponent<PlayerLevel>();
+        myTransform = transform;
+        
+        
         
     }
 
@@ -72,7 +107,7 @@ public class MonsterHealth : MonoBehaviour
     {
         Physics2D.IgnoreLayerCollision(11,14,true);
         knockBackTest();
-        direction = enemyRb.transform.rotation.y == 0 ? 1 : -1;
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
         moreLevelMoreHealth();
         
     }
@@ -90,35 +125,49 @@ public class MonsterHealth : MonoBehaviour
         {
             damageIncreased = false;
         }
+
+        if(playerLevel.currentLvl >= levelThreshold)
+        {
+            if(shield != null && currentShield > 0)
+            {
+                shield.SetActive(true);
+                shieldSprite.SetActive(true);
+            }
+        }
     }
 
     public void TakeDamage(float damage)
     {
         knockBackCounter = 0;
         isTakingDamage = true;
-         
-        knockBackTest();
-        //CameraShakeManager.instance.CameraShake(impulseSource);
-
+        
         SpawnDamageParticles();
-
-        //ContactDamage();
-        //StartCoroutine(FlashCoroutine());
-
-        health -= damage;
-        healthBar.UpdateHealthBar(health,maxHealth);
-        health = Mathf.Clamp(health, 0, maxHealth);
-
+        if(shield != null && !shield.activeSelf)
+        {
+            knockBackTest();
+            health -= damage;
+            healthBar.UpdateHealthBar(health,maxHealth);
+            health = Mathf.Clamp(health, 0, maxHealth);
+        } else if(shield.activeSelf)
+        {
+            currentShield -= damage;
+            healthBar.UpdateShieldBar(currentShield, maxShield);
+            currentShield = Mathf.Clamp(currentShield, 0, maxShield);
+        }
+        if(currentShield <= 0 && shield.activeSelf)
+        {
+            StartCoroutine(DestroyGuardBreakEffect());
+            shield.SetActive(false);
+            shieldSprite.SetActive(false);
+        }
         if (health <= 0)
         {
-            Instantiate(XpForPlayer, transform.position, Quaternion.identity);
-            // Destroy(gameObject);
-            // envoyer l'ennemi au pool une fois vaincu
-            // EnemyPoolManager.Instance.ReturnEnemyToPool(gameObject, enemyPrefab);
-            // gameObject.SetActive(false);
+            Instantiate(XpForPlayer, myTransform.position, Quaternion.identity);
+            if(gameObject.activeSelf)
+            StartCoroutine(timer.bonusTimer(bonusSeconds));
             EnemyPoolManager.Instance.ReturnEnemyToPool(gameObject);
-            AttackHitBoxSide attackHitBoxSide = attackHitBox.GetComponent<AttackHitBoxSide>();
-            AttackHitBoxKamikaze attackHitBoxKamikaze = attackHitBox.GetComponent<AttackHitBoxKamikaze>();
+            attackHitBoxSide = attackHitBox.GetComponent<AttackHitBoxSide>();
+            attackHitBoxKamikaze = attackHitBox.GetComponent<AttackHitBoxKamikaze>();
             if (attackHitBoxSide != null)
             {
                 attackHitBoxSide.isAttacking = false;
@@ -134,26 +183,40 @@ public class MonsterHealth : MonoBehaviour
     public void TakeDamage2(float damage)
     {
         knockBackCounter = 0;
-        // isTakingDamage = true;
-         
-        // knockBackTest();
-        //CameraShakeManager.instance.CameraShake(impulseSource);
-
+        
+        
         SpawnDamageParticles();
-
-        //ContactDamage();
-        //StartCoroutine(FlashCoroutine());
-
-        health -= damage;
-        healthBar.UpdateHealthBar(health,maxHealth);
-        health = Mathf.Clamp(health, 0, maxHealth);
-
+        if(shield != null && !shield.activeSelf)
+        {
+            health -= damage;
+            healthBar.UpdateHealthBar(health,maxHealth);
+            health = Mathf.Clamp(health, 0, maxHealth);
+        } else if(shield.activeSelf)
+        {
+            currentShield -= damage;
+            healthBar.UpdateShieldBar(currentShield, maxShield);
+            currentShield = Mathf.Clamp(currentShield, 0, maxShield);
+        }
+        if(currentShield <= 0 && shield.activeSelf)
+        {
+            StartCoroutine(DestroyGuardBreakEffect());
+            shield.SetActive(false);
+            shieldSprite.SetActive(false);
+        }
         if (health <= 0)
         {
-            Instantiate(XpForPlayer, transform.position, Quaternion.identity);
-            // Destroy(gameObject);
-            // gameObject.SetActive(false);
+            Instantiate(XpForPlayer, myTransform.position, Quaternion.identity);
             EnemyPoolManager.Instance.ReturnEnemyToPool(gameObject);
+            attackHitBoxSide = attackHitBox.GetComponent<AttackHitBoxSide>();
+            attackHitBoxKamikaze = attackHitBox.GetComponent<AttackHitBoxKamikaze>();
+            if (attackHitBoxSide != null)
+            {
+                attackHitBoxSide.isAttacking = false;
+            }
+            if (attackHitBoxKamikaze != null)
+            {
+                attackHitBoxKamikaze.isAttacking = false;
+            }
         }
         
     }
@@ -169,7 +232,7 @@ public class MonsterHealth : MonoBehaviour
             {
                 Physics2D.IgnoreLayerCollision(11,14,false);
             }
-            if(knockBackCounter >= knockBackDuration)
+            if(knockBackCounter >= knockBackDuration && playerRb != null)
             {
                 enemyRb.velocity = Vector3.zero;
                 isTakingDamage = false;
@@ -177,11 +240,11 @@ public class MonsterHealth : MonoBehaviour
                 
 
 
-                Vector2 dashDirection = (playerRb.transform.position - transform.position).normalized;
-                float angleInRadians = Mathf.Atan2(dashDirection.y, dashDirection.x);
-                float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+                dashDirection = (playerRb.transform.position - myTransform.position).normalized;
+                angleInRadians = Mathf.Atan2(dashDirection.y, dashDirection.x);
+                angleInDegrees = angleInRadians * Mathf.Rad2Deg;
                 rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f + angleInDegrees + 180 : 180f + angleInDegrees);
-                Instantiate(dashExplosionParticles,transform.position, rotation);
+                Instantiate(dashExplosionParticles, myTransform.position, rotation);
                 enemyRb.AddForce(dashDirection * dashDistance, ForceMode2D.Impulse);
                 
             }
@@ -190,10 +253,10 @@ public class MonsterHealth : MonoBehaviour
 
     private void SpawnDamageParticles()
     {
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
-        Quaternion rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 180f : 0f);  
-        damageParticlesInstance = Instantiate(damageParticles,transform.position, rotation);
-        Instantiate(impactParticles,transform.position, rotation);
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
+        rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 180f : 0f);  
+        damageParticlesInstance = Instantiate(damageParticles, myTransform.position, rotation);
+        Instantiate(impactParticles, myTransform.position, rotation);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -201,11 +264,11 @@ public class MonsterHealth : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             // Vérifie si la collision est suffisamment forte pour causer des dégâts supplémentaires
-            MonsterHealth otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
+            otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
             if (enemyRb != null && enemyRb.velocity.magnitude > 20f && otherEnemy != null)
             {               
-                float impactForce = collision.relativeVelocity.magnitude;
-                float additionalDamage = impactForce * additionalDamageMultiplier;
+                impactForce = collision.relativeVelocity.magnitude;
+                additionalDamage = impactForce * additionalDamageMultiplier;
                 otherEnemy.TakeDamage(normalDamage + additionalDamage);    
                 StartCoroutine(DestroyComicBoomEffect());                           
             }
@@ -213,10 +276,11 @@ public class MonsterHealth : MonoBehaviour
         {
             if(enemyRb.velocity.magnitude > 20f)
             {
-                float impactForce = collision.relativeVelocity.magnitude;
-                float additionalDamage = impactForce * additionalDamageMultiplier;
+                impactForce = collision.relativeVelocity.magnitude;
+                additionalDamage = impactForce * additionalDamageMultiplier;
                 TakeDamage(normalDamage + additionalDamage);
-                StartCoroutine(DestroyComicBoomEffect());
+                // StartCoroutine(DestroyComicBoomEffect());
+                Instantiate(ComicBoomEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
 
             }
         }
@@ -224,11 +288,22 @@ public class MonsterHealth : MonoBehaviour
 
     public IEnumerator DestroyComicBoomEffect()
     {
-        GameObject comicBoom = Instantiate(ComicBoomEffect,new Vector2(transform.position.x,transform.position.y + 2f), Quaternion.identity);
-        Light light = comicBoom.GetComponentInChildren<Light>();
+        comicBoom = Instantiate(ComicBoomEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
+        lighter = comicBoom.GetComponentInChildren<Light>();
         yield return new WaitForSeconds(0.3f);
         Destroy(comicBoom);
-        Destroy(light);
+        Destroy(lighter);
+        
+        yield return null;
+    }
+
+    public IEnumerator DestroyGuardBreakEffect()
+    {
+        guardBreak = Instantiate(guardBreakEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
+        lighter = guardBreak.GetComponentInChildren<Light>();
+        yield return new WaitForSeconds(0.3f);
+        Destroy(guardBreak);
+        Destroy(lighter);
         
         yield return null;
     }
@@ -243,8 +318,8 @@ public class MonsterHealth : MonoBehaviour
 
     public IEnumerator DamageGrounded()
     {
-        float impactForce = enemyRb.velocity.magnitude;
-        float additionalDamage =  impactForce * additionalDamageMultiplier;
+        impactForce = enemyRb.velocity.magnitude;
+        additionalDamage =  impactForce * additionalDamageMultiplier;
         yield return new WaitUntil(() => IsGrounded());
         TakeDamage(normalDamage + additionalDamage);
         yield return null;
@@ -260,9 +335,9 @@ public class MonsterHealth : MonoBehaviour
     public bool IsGrounded()
     {
         
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayDistance, groundLayerMask);
+        hit = Physics2D.Raycast(myTransform.position, Vector2.down, rayDistance, groundLayerMask);
          // Dessiner le raycast dans la vue de scène pour le débogage
-        Debug.DrawRay(transform.position, Vector2.down * rayDistance, Color.red);
+        Debug.DrawRay(myTransform.position, Vector2.down * rayDistance, Color.red);
         return hit.collider != null;
     }
 

@@ -10,6 +10,10 @@ public class Chronometer : MonoBehaviour
     public float elapsedTime;
     public bool isRunning;
 
+
+    private int minutes;
+    private int seconds;
+    private int milliseconds;
     void Start()
     {
         elapsedTime = 0f;
@@ -27,9 +31,9 @@ public class Chronometer : MonoBehaviour
 
     void UpdateTimerText()
     {
-        int minutes = Mathf.FloorToInt(elapsedTime / 60F);
-        int seconds = Mathf.FloorToInt(elapsedTime % 60F);
-        int milliseconds = Mathf.FloorToInt((elapsedTime * 1000F) % 1000F);
+        minutes = Mathf.FloorToInt(elapsedTime / 60F);
+        seconds = Mathf.FloorToInt(elapsedTime % 60F);
+        milliseconds = Mathf.FloorToInt((elapsedTime * 1000F) % 1000F);
         timerText.text = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, milliseconds);
     }
 

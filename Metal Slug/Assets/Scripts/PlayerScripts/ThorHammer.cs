@@ -20,10 +20,18 @@ public class ThorHammer : MonoBehaviour
     public GameObject hammerInstance;
     public SpriteRenderer spriteRenderer;
 
+
+    private int direction2;
+    private Vector2 throwDirection;
+    private Vector2 direction;
+    private Transform myTransform;
+
+
     void Start()
     {
         //rb = GetComponent<Rigidbody2D>();
         initialPosition = transform.position;
+        myTransform = transform;
     }
 
     void Update()
@@ -48,10 +56,10 @@ public class ThorHammer : MonoBehaviour
 
     public void ThrowObject()
     {
-        int direction2 = spriteRenderer.flipX ? -1 : 1;
-        Vector2 throwDirection = (Vector2.right * direction2).normalized;
+        direction2 = spriteRenderer.flipX ? -1 : 1;
+        throwDirection = (Vector2.right * direction2).normalized;
 
-        hammerInstance = Instantiate(Hammer, transform.position, Quaternion.identity);
+        hammerInstance = Instantiate(Hammer, myTransform.position, Quaternion.identity);
         rb = hammerInstance.GetComponent<Rigidbody2D>();
         rb.velocity = throwDirection * throwSpeed;
         isThrown = true;
@@ -65,10 +73,10 @@ public class ThorHammer : MonoBehaviour
 
     void MoveTowardsPlayer()
     {
-        Vector2 direction = ((Vector2)transform.position - rb.position).normalized;
+        direction = ((Vector2)myTransform.position - rb.position).normalized;
         rb.velocity = direction * returnSpeed;
 
-        if (Vector2.Distance(rb.position, transform.position) < 0.5f)
+        if (Vector2.Distance(rb.position, myTransform.position) < 0.5f)
         {
             isReturning = false;
             isThrown = false;

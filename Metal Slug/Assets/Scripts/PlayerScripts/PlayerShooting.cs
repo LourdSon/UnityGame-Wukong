@@ -3,6 +3,9 @@ using System.Collections;
 
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.SceneManagement;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering;
 
 
 public class PlayerShooting : MonoBehaviour
@@ -26,6 +29,7 @@ public class PlayerShooting : MonoBehaviour
     private Vector2 shootDirection;
     private int direction;
     private float scaleMultiplier;
+    public float bonusScale = 1f;
     private GameObject energyBall;
     private GameObject energyBall2;
     public GameObject energyBallPrefab2;
@@ -57,6 +61,36 @@ public class PlayerShooting : MonoBehaviour
     private float horizontalInput;
     private float verticalInput;
     private PlayerHealth playerHealth;
+    
+
+
+
+    private Vector2 moveInput;
+    private bool mouseRight;
+    private float cKi;
+    private float mkI;
+    private int numberOfBalls;
+    private int setsOfBalls;
+    private float newPitch;
+    private float angleStep;
+    private int totalBalls;
+    private int index;
+    private float angle;
+    private Vector3 position;
+    private GameObject pooledEnergyBall;
+    private Vector2 directionVector;
+    private float angleRad, x, y;
+    private Vector2 inputPlayer;
+    private float angleInRadians, angleInDegrees;
+    private Transform myTransform;
+    private ColorAdjustments colorAdjustments;
+    public Volume volume;
+    
+
+    
+
+
+
 
 
     void Start()
@@ -75,14 +109,16 @@ public class PlayerShooting : MonoBehaviour
         playerAttack = GetComponent<PlayerAttack>();
         objectPool = GetComponent<ObjectPool>();
         playerHealth = GetComponent<PlayerHealth>();
-
+        myTransform = transform;
+        volume.profile.TryGet(out colorAdjustments);
+        
         // Obtenir la direction actuelle du sprite du joueur
     }
 
     // Update est appelée une fois par frame
     void Update()
     {
-        if(!playerHealth.isHealing)
+        if(!playerHealth.isHealing && SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)
         {
             ReadInputShooting();
         }
@@ -90,7 +126,7 @@ public class PlayerShooting : MonoBehaviour
     }
     void FixedUpdate()
     {
-        if(!playerHealth.isHealing)
+        if(!playerHealth.isHealing && SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)
         {
             Shooting();
         }
@@ -99,16 +135,16 @@ public class PlayerShooting : MonoBehaviour
     public void ReadInputShooting()
     {
         // Obtient les valeurs des entrées horizontales et verticales
-        Vector2 moveInput = PlayerController.instance.playerInputActions.Player.Move.ReadValue<Vector2>();
+        moveInput = PlayerController.instance.playerInputActions.Player.Move.ReadValue<Vector2>();
         horizontalInput = moveInput.x;
         verticalInput = moveInput.y;
-        bool mouseRight = PlayerController.instance.playerInputActions.Player.Shoot.triggered;
-        direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
+        mouseRight = PlayerController.instance.playerInputActions.Player.Shoot.triggered;
+        direction = myTransform.rotation.y == 0 ? 1 : -1;
 
         
-        float cKi = playerKi.currentKi;
-        float mkI = playerKi.maxKi;
-        scaleMultiplier = 1 + (cKi / mkI);
+        cKi = playerKi.currentKi;
+        mkI = playerKi.maxKi;
+        scaleMultiplier = bonusScale + (cKi / mkI);
         // Calcule la direction de tir en fonction des entrées horizontales et verticales
         shootDirection = new Vector2(horizontalInput, verticalInput).normalized;
 
@@ -117,7 +153,7 @@ public class PlayerShooting : MonoBehaviour
         if (horizontalInput != 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy && !playerAttack.isHoldingSelect|| verticalInput != 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy && !playerAttack.isHoldingSelect)
         {
             SpawnShootingParticles();
-            energyBall = Instantiate(energyBallPrefab, transform.position, Quaternion.identity);
+            energyBall = Instantiate(energyBallPrefab, myTransform.position, Quaternion.identity);
             energyrb = energyBall.GetComponent<Rigidbody2D>();
             energyBall.transform.localScale *= scaleMultiplier;
             animator.SetTrigger("SimpleShootingTrigger");
@@ -129,7 +165,7 @@ public class PlayerShooting : MonoBehaviour
         } else if(horizontalInput == 0 && verticalInput == 0 && mouseRight && attackTimeCounter <= 0f && cKi >= costEnergy && !playerAttack.isHoldingSelect)
         {
             SpawnShootingParticles();
-            energyBall = Instantiate(energyBallPrefab, new Vector2(transform.position.x + (offset.x*direction), transform.position.y + offset.y), Quaternion.identity);
+            energyBall = Instantiate(energyBallPrefab, new Vector2(myTransform.position.x + (offset.x*direction), myTransform.position.y + offset.y), Quaternion.identity);
             energyrb = energyBall.GetComponent<Rigidbody2D>();
             energyBall.transform.localScale *= scaleMultiplier;
             animator.SetTrigger("SimpleShootingTrigger");
@@ -142,7 +178,7 @@ public class PlayerShooting : MonoBehaviour
         {
             SpawnShootingParticles();
             //energyBall2 = Instantiate(energyBallPrefab2, transform.position + offsetGenki, Quaternion.identity);
-            energyBall2.transform.position = new Vector3(transform.position.x + offsetGenki.x * horizontalInput, transform.position.y + offsetGenki.y * verticalInput, transform.position.z);
+            energyBall2.transform.position = new Vector3(myTransform.position.x + offsetGenki.x * horizontalInput, myTransform.position.y + offsetGenki.y * verticalInput, myTransform.position.z);
             energyBall2.SetActive(true);
             energyrb2 = energyBall2.GetComponent<Rigidbody2D>();
             energyBall2.transform.localScale = new Vector3(10f,10f,10f);
@@ -155,8 +191,8 @@ public class PlayerShooting : MonoBehaviour
 
         } else if(playerAttack.holdingTime >= playerAttack.requiredHoldingTime && mouseRight && attackTimeCounter3 <= 0f && cKi >= costExplosion)
         {
-            int numberOfBalls = 10; // Nombre de EnergyBalls à instancier
-            int setsOfBalls = 5;
+            numberOfBalls = 10; // Nombre de EnergyBalls à instancier
+            setsOfBalls = 5;
             StartCoroutine(SpawnAndShootEnergyBalls(numberOfBalls,setsOfBalls,delay));
             animator.SetTrigger("SimpleShootingTrigger");
             playerKi.currentKi -= costExplosion;
@@ -199,7 +235,7 @@ public class PlayerShooting : MonoBehaviour
 
     private IEnumerator Shooting1()
     {
-        float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+        newPitch = Random.Range(0.8f,1.2f);
         audioSource.pitch = newPitch;
         audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
         energyrb.velocity = shootDirection * energyBallSpeed;
@@ -210,7 +246,7 @@ public class PlayerShooting : MonoBehaviour
     }
     private IEnumerator Shooting2()
     {
-        float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+        newPitch = Random.Range(0.8f,1.2f);
         audioSource.pitch = newPitch;
         audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
         energyrb.velocity = direction * Vector2.right * energyBallSpeed;
@@ -222,12 +258,16 @@ public class PlayerShooting : MonoBehaviour
     private IEnumerator Shooting3()
     {
         CameraShakeManager.instance.CameraShake(impulseSource);
-        Rigidbody2D playerRb = GetComponent<Rigidbody2D>();
+        playerRb = GetComponent<Rigidbody2D>();
         playerRb.velocity = Vector2.zero;
+        
+        // StartCoroutine(EffectBlackAndWhite());
+        colorAdjustments.contrast.value = 100f;
         yield return new WaitForSeconds(0.3f);
+        colorAdjustments.contrast.value = 0f;
         if(shootDirection!= null)
         {
-            float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            newPitch = Random.Range(0.8f,1.2f);
             audioSource.pitch = newPitch;
             playerRb.AddForce(Vector2.right * selfForceMagnitudeForward/5 * -direction, ForceMode2D.Impulse);
             audioSource.PlayOneShot(energySoundEffect, volumeSoundEffect);
@@ -240,7 +280,7 @@ public class PlayerShooting : MonoBehaviour
 
         }else if(shootDirection == null)
         {
-            float newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            newPitch = UnityEngine.Random.Range(0.8f,1.2f);
             audioSource.pitch = newPitch;
             playerRb.AddForce(Vector2.right * selfForceMagnitudeForward/5 * -direction, ForceMode2D.Impulse);
             energyrb2.AddForce(direction * Vector2.right * energyBallSpeed2, ForceMode2D.Impulse);
@@ -255,14 +295,22 @@ public class PlayerShooting : MonoBehaviour
         yield return null;
     }
 
+    private IEnumerator EffectBlackAndWhite()
+    {
+        colorAdjustments.contrast.value = 100f;
+        yield return new WaitForSeconds(0.2f);
+        colorAdjustments.contrast.value = 0f;
+        yield return null;
+        
+    }
     
     private IEnumerator SpawnAndShootEnergyBalls(int numberOfBalls, int setsOfBalls, float delay)
     {
-        float angleStep = 360f / numberOfBalls; // L'angle entre chaque EnergyBall
-        int totalBalls = numberOfBalls * setsOfBalls;
+        angleStep = 360f / numberOfBalls; // L'angle entre chaque EnergyBall
+        totalBalls = numberOfBalls * setsOfBalls;
         energyballrb3 = new Rigidbody2D[totalBalls]; // Initialiser le tableau avec la bonne taille
-        int index = 0;
-        Rigidbody2D playerRb = GetComponent<Rigidbody2D>();
+        index = 0;
+        playerRb = GetComponent<Rigidbody2D>();
         for (int j = 0; j < setsOfBalls; j++)
         {
             
@@ -272,9 +320,9 @@ public class PlayerShooting : MonoBehaviour
             // Générer un ensemble de boules d'énergie
             for (int i = 0; i < numberOfBalls; i++)
             {
-                float angle = i * angleStep;
-                Vector3 position = GetPositionAroundHero(angle);
-                GameObject pooledEnergyBall = objectPool.GetPooledObject(); // Obtenir un objet du pool
+                angle = i * angleStep;
+                position = GetPositionAroundHero(angle);
+                pooledEnergyBall = objectPool.GetPooledObject(); // Obtenir un objet du pool
                 pooledEnergyBall.transform.position = position;
                 pooledEnergyBall.transform.rotation = Quaternion.identity;
                 pooledEnergyBall.transform.localScale = Vector3.one * scaleMultiplier;
@@ -286,7 +334,7 @@ public class PlayerShooting : MonoBehaviour
             // Projeter l'ensemble de boules d'énergie
             for (int i = j * numberOfBalls; i < (j + 1) * numberOfBalls; i++)
             {
-                Vector2 directionVector = ((Vector2)energyballrb3[i].transform.position - (Vector2)transform.position).normalized;
+                directionVector = ((Vector2)energyballrb3[i].transform.position - (Vector2)myTransform.position).normalized;
                 energyballrb3[i].velocity = directionVector * energyBallSpeed;
             }
 
@@ -299,24 +347,24 @@ public class PlayerShooting : MonoBehaviour
     public Vector3 GetPositionAroundHero(float angle)
     {
         // Convertir l'angle en radians
-        float angleRad = angle * Mathf.Deg2Rad;
+        angleRad = angle * Mathf.Deg2Rad;
 
         // Calculer la position autour du héros
-        float x = transform.position.x + Mathf.Cos(angleRad) * radius;
-        float y = transform.position.y + Mathf.Sin(angleRad) * radius;
+        x = myTransform.position.x + Mathf.Cos(angleRad) * radius;
+        y = myTransform.position.y + Mathf.Sin(angleRad) * radius;
 
         // Retourner la nouvelle position avec la même hauteur que le héros
-        return new Vector3(x, y, transform.position.z);
+        return new Vector3(x, y, myTransform.position.z);
     }
 
     private void SpawnShootingParticles()
     {
-        GameObject player = GameObject.FindWithTag("Player");
-        SpriteRenderer playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
-        int direction = playerRb.transform.rotation.y == 0 ? 1 : -1;
-        Vector2 inputPlayer = new Vector2(horizontalInput, verticalInput).normalized;
-        float angleInRadians = Mathf.Atan2(inputPlayer.y, inputPlayer.x);
-        float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+        
+        
+        
+        inputPlayer = new Vector2(horizontalInput, verticalInput).normalized;
+        angleInRadians = Mathf.Atan2(inputPlayer.y, inputPlayer.x);
+        angleInDegrees = angleInRadians * Mathf.Rad2Deg;
         if(inputPlayer != new Vector2(0,0))
             shootingEffect.transform.rotation = Quaternion.Euler(0f, 0f, angleInDegrees - 45f); 
         shootingEffect.SetActive(true);

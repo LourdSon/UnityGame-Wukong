@@ -7,12 +7,16 @@ public class ObjectPool : MonoBehaviour
     public int poolSize = 20;
     private List<GameObject> pool;
 
+
+    private GameObject obj;
+    
+
     void Start()
     {
         pool = new List<GameObject>();
         for (int i = 0; i < poolSize; i++)
         {
-            GameObject obj = Instantiate(energyBallPrefab,new Vector3(-500f, -500f, 0f), Quaternion.identity);
+            obj = Instantiate(energyBallPrefab,new Vector3(-500f, -500f, 0f), Quaternion.identity);
             obj.SetActive(false);
             pool.Add(obj);
         }
