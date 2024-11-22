@@ -68,7 +68,7 @@ public class PlayerDamage : MonoBehaviour
             direction = myTransform.rotation.y == 0f ? 1 : -1;
             rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
             destroyEffect = other.GetComponent<EnergyBallDestroyEffectScript>();
-            destroyEffect.OnInstanceDestroy(other.gameObject);
+            destroyEffect.OnInstanceDestroyParticle(other.gameObject);
             Instantiate(impactParticles, other.transform.position, Quaternion.identity);
             Destroy(other.gameObject);
 
@@ -91,7 +91,7 @@ public class PlayerDamage : MonoBehaviour
             rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f : 180f);
             Instantiate(impactParticles, other.transform.position, rotation);
             destroyEffect = other.GetComponent<EnergyBallDestroyEffectScript>();
-            destroyEffect.OnInstanceDestroy(other.gameObject);
+            destroyEffect.OnInstanceDestroyParticle(other.gameObject);
             other.gameObject.SetActive(false);
             Instantiate(comicBoomEffect, other.transform.position, Quaternion.identity);
             //Destroy(other.gameObject);

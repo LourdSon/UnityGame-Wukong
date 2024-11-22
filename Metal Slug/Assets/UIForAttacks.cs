@@ -40,11 +40,11 @@ public class UIForAttacks : MonoBehaviour
         {
             StartCoroutine(UIBlinking(imageAttack3, timer3));
         }
-        else if(imageAttack1.activeSelf /* && playerAttack.attack7 == true */ && playerAttack.attackTimeCounterSamourai > 0)
+        if(imageAttack1.activeSelf /* && playerAttack.attack7 == true */ && playerAttack.attackTimeCounterSamourai > 0)
         {
             StartCoroutine(UIBlinking(imageAttack1, timer1));
         }
-        else if(imageAttack2.activeSelf /* && playerShooting.isShooting4 == true */ && playerShooting.attackTimeCounter3 > 0)
+        if(imageAttack2.activeSelf /* && playerShooting.isShooting4 == true */ && playerShooting.attackTimeCounter3 > 0)
         {
             StartCoroutine(UIBlinking(imageAttack2, timer2));
         }
@@ -55,5 +55,6 @@ public class UIForAttacks : MonoBehaviour
         image.SetActive(false);
         yield return new WaitForSeconds(timer);
         image.SetActive(true);
+        yield return null;
     }
 }

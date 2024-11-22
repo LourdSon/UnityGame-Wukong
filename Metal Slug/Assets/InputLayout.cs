@@ -13,7 +13,7 @@ public class InputLayout : MonoBehaviour
         pauseMenu = gameObject;
 
     }
-    // Update is called once per frame
+
     void Update()
     {
         if(pauseMenu.activeSelf)
@@ -27,6 +27,8 @@ public class InputLayout : MonoBehaviour
             {
                 image1.SetActive(false);
                 image2.SetActive(true);
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
             }
         }
     }

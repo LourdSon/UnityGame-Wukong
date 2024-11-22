@@ -8,12 +8,12 @@ public class NPCSavedText : MonoBehaviour
     public SaveableNPC saveableNPC;
     public Text text;
     public GameObject[] npcfirst;
-    private bool someoneTosave;
+    
     // Start is called before the first frame update
     void Start()
     {
         text = GetComponent<Text>();
-        someoneTosave = false;
+        
     }
     void Update()
     {
@@ -25,7 +25,7 @@ public class NPCSavedText : MonoBehaviour
         npcfirst = GameObject.FindGameObjectsWithTag("NPCs");
         if (npcfirst.Length > 0)
         {
-            someoneTosave = true;
+            
             text.text = "A citizen needs your help, Go save him !";
         }
         

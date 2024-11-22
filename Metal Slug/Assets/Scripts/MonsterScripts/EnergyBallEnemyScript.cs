@@ -33,12 +33,12 @@ public class EnergyBallEnemyScript : MonoBehaviour
             EnergyBallDestroyEffectScript otherDestroyEffect = other.GetComponent<EnergyBallDestroyEffectScript>();
             if (otherDestroyEffect != null)
             {
-                otherDestroyEffect.OnInstanceDestroy(other.gameObject);
+                otherDestroyEffect.OnInstanceDestroyParticle(other.gameObject);
             }
 
             if (destroyEffect != null)
             {
-                destroyEffect.OnInstanceDestroy(gameObject);
+                destroyEffect.OnInstanceDestroyParticle(gameObject);
             }
             if(other.CompareTag("EnergyBall") || other.CompareTag("EnergyBall3"))
             {
@@ -52,7 +52,7 @@ public class EnergyBallEnemyScript : MonoBehaviour
             // Détruit seulement cette boule d'énergie si elle touche le sol
             if (destroyEffect != null)
             {
-                destroyEffect.OnInstanceDestroy(gameObject);
+                destroyEffect.OnInstanceDestroyParticle(gameObject);
             }
             gameObject.SetActive(false);
         }

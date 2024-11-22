@@ -134,6 +134,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Validate"",
+                    ""type"": ""Button"",
+                    ""id"": ""6f7053d8-b6a0-446b-bc2e-b49db6700068"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -596,6 +605,28 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
                     ""action"": ""ResetPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a211f3fd-5a3f-458c-b0f2-a28dabc91ce6"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Validate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a43601b8-22cf-476d-86ab-2bb34e3cb06a"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Validate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1157,6 +1188,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_SuperShot = m_Player.FindAction("SuperShot", throwIfNotFound: true);
         m_Player_Hold = m_Player.FindAction("Hold", throwIfNotFound: true);
         m_Player_ResetPosition = m_Player.FindAction("ResetPosition", throwIfNotFound: true);
+        m_Player_Validate = m_Player.FindAction("Validate", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1242,6 +1274,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_SuperShot;
     private readonly InputAction m_Player_Hold;
     private readonly InputAction m_Player_ResetPosition;
+    private readonly InputAction m_Player_Validate;
     public struct PlayerActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -1258,6 +1291,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @SuperShot => m_Wrapper.m_Player_SuperShot;
         public InputAction @Hold => m_Wrapper.m_Player_Hold;
         public InputAction @ResetPosition => m_Wrapper.m_Player_ResetPosition;
+        public InputAction @Validate => m_Wrapper.m_Player_Validate;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1303,6 +1337,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ResetPosition.started += instance.OnResetPosition;
             @ResetPosition.performed += instance.OnResetPosition;
             @ResetPosition.canceled += instance.OnResetPosition;
+            @Validate.started += instance.OnValidate;
+            @Validate.performed += instance.OnValidate;
+            @Validate.canceled += instance.OnValidate;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1343,6 +1380,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ResetPosition.started -= instance.OnResetPosition;
             @ResetPosition.performed -= instance.OnResetPosition;
             @ResetPosition.canceled -= instance.OnResetPosition;
+            @Validate.started -= instance.OnValidate;
+            @Validate.performed -= instance.OnValidate;
+            @Validate.canceled -= instance.OnValidate;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1510,6 +1550,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnSuperShot(InputAction.CallbackContext context);
         void OnHold(InputAction.CallbackContext context);
         void OnResetPosition(InputAction.CallbackContext context);
+        void OnValidate(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

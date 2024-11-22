@@ -33,7 +33,7 @@ public class EnemyDamageShooting : MonoBehaviour
             destroyEffect = other.GetComponent<EnergyBallDestroyEffectScript>();
             if (destroyEffect != null)
             {
-                destroyEffect.OnInstanceDestroy(other.gameObject);
+                destroyEffect.OnInstanceDestroyParticle(other.gameObject);
             }
 
             // Activer les particules d’impact

@@ -64,6 +64,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Charging Ki")]
     public GameObject KiCharging;
+    public GameObject KiCharging2;
     public float chargeDuration = 1.3f; // La durée du dash
     public float chargeCooldown = 1f; // Le temps de recharge du dash
     private float nextChargeTime;
@@ -101,7 +102,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 movement;
     private Vector2 jumpVelocity;
     private bool jumpBool;
-    private bool isCharging;
+    public bool isCharging;
 
     public LayerMask playerLayerMask;
     public float detectionRadius = 5f;
@@ -155,6 +156,7 @@ public class PlayerMovement : MonoBehaviour
     private Transform myTransform;
     public GameObject chargeMaxEffect;
     private GameObject chargeMax;
+    public TutorialScript tutorialScript;
     
 
     // Start is called before the first frame update
@@ -174,7 +176,7 @@ public class PlayerMovement : MonoBehaviour
 
         impulseSource = GetComponent<CinemachineImpulseSource>();
         playerAttack = GetComponent<PlayerAttack>();
-        if(SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)
+        if(SceneManager.GetActiveScene().buildIndex == 2)
         wantToFight = true;
         //tileDestroyer = GetComponentInChildren<TileDestroyer>();
         Physics2D.IgnoreLayerCollision(9,16,true);
@@ -189,7 +191,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if(/* !EndMission.isCutsceneon || */ !playerHealth.isHealing && SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)  
+        if(/* !EndMission.isCutsceneon || */ !tutorialScript.isInTutorialText && !playerHealth.isHealing && SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)  
         {  
             ReadInputMove();
             ReadInputJump();
@@ -205,7 +207,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(/* !EndMission.isCutsceneon || */ !playerHealth.isHealing && SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)  
+        if(/* !EndMission.isCutsceneon || */ !tutorialScript.isInTutorialText && !playerHealth.isHealing && SceneManager.GetActiveScene().buildIndex != 0 && SceneManager.GetActiveScene().buildIndex != 1)  
         {  
                
             MovePlayer();
@@ -524,9 +526,10 @@ public class PlayerMovement : MonoBehaviour
         currentKi += 20;
         currentKi = Mathf.Clamp(currentKi, 0, maxKi);
         UpdateKiBar();
-        KiCharging.gameObject.SetActive(true);
+        // KiCharging.gameObject.SetActive(true);
+        KiCharging2.gameObject.SetActive(true);
         //tileDestroyer.DestructionMouse();
-        if (KiCharging.gameObject.activeSelf)
+        if (KiCharging2.gameObject.activeSelf)
         {
             newPitch = UnityEngine.Random.Range(0.9f,1.1f);
             audioSource.pitch = newPitch;
@@ -541,7 +544,8 @@ public class PlayerMovement : MonoBehaviour
         EnemiesStepBackCharging();
         yield return new WaitForSeconds(chargeDuration);
         
-        KiCharging.gameObject.SetActive(false);
+        // KiCharging.gameObject.SetActive(false);
+        KiCharging2.gameObject.SetActive(false);
         audioSource.Stop();
         
         animator.SetBool("IsCharging", false);
@@ -554,9 +558,11 @@ public class PlayerMovement : MonoBehaviour
             audioSource.clip = KiAura;
             audioSource.volume = 0.05f;
             audioSource.Play();
-            KiCharging.gameObject.SetActive(true);
-            yield return new WaitForSeconds(5f);
-            KiCharging.gameObject.SetActive(false);
+            // KiCharging.gameObject.SetActive(true);
+            KiCharging2.gameObject.SetActive(true);
+            yield return new WaitForSeconds(10f);
+            // KiCharging.gameObject.SetActive(false);
+            KiCharging2.gameObject.SetActive(false);
             audioSource.Stop();
             audioSource.loop = false;
         }

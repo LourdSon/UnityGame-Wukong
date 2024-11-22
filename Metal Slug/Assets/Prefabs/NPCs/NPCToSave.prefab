@@ -109,7 +109,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.7, y: 8.6}
+  m_AnchoredPosition: {x: -0.3, y: 3.7}
   m_SizeDelta: {x: 476.8549, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5563858540638351412
@@ -146,7 +146,7 @@ MonoBehaviour:
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 0
-    m_MaxSize: 97
+    m_MaxSize: 50
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -347,7 +347,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: -1.8581467, y: 0}
   serializedVersion: 2
-  m_Radius: 35.0457
+  m_Radius: 50
 --- !u!212 &2572431028775440186
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -540,8 +540,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slider: {fileID: 4253280309924408108}
+  slider2: {fileID: 0}
   target: {fileID: 3010347829948100399}
   offset: {x: 0, y: 2, z: 0}
+  offset2: {x: 0, y: 0, z: 0}
 --- !u!114 &4933774750788773398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -615,7 +617,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.021330357, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.5031409, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

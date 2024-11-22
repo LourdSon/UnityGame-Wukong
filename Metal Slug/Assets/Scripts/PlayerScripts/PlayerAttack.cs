@@ -136,6 +136,7 @@ public class PlayerAttack : MonoBehaviour
     public Volume volume;
     private ColorAdjustments colorAdjustments;
     public PlayerShooting playerShooting;
+    public Vector3 offsetTest, offsetTestUp, offsetTestDown;
 
     void Start()
     {
@@ -190,10 +191,10 @@ public class PlayerAttack : MonoBehaviour
     {
         if(playerLevel.isLevelingUp && !damageIncreased)
         {
-            damage += damage/10;
-            forceMagnitudeUpward += forceMagnitudeUpward/100;
-            forceMagnitudeForward += forceMagnitudeForward/100;
-            forceMagnitudeDownward += forceMagnitudeDownward/100;
+            damage += damage/15;
+            forceMagnitudeUpward += forceMagnitudeUpward/125;
+            forceMagnitudeForward += forceMagnitudeForward/125;
+            forceMagnitudeDownward += forceMagnitudeDownward/125;
             playerShooting.bonusScale += 0.05f;
             damageIncreased = true;
         }else if (!playerLevel.isLevelingUp)
@@ -374,7 +375,7 @@ public class PlayerAttack : MonoBehaviour
         StartCoroutine(particlesForceFieldAttack(1));
         if (colliders.Length >= 1)
         {
-            newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            newPitch = UnityEngine.Random.Range(1f,1.4f);
             audioSource.pitch = newPitch;
             Instantiate(hitEffect, detectionPosition, Quaternion.identity);
             playerRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
@@ -389,6 +390,7 @@ public class PlayerAttack : MonoBehaviour
             monsterHealth = collider.GetComponent<MonsterHealth>();
             if (enemyRb != null)
             {
+                playerRb.transform.position = enemyRb.transform.position - offsetTest * direction;
                 enemyRb.AddForce(Vector2.up * forceMagnitudeUpward, ForceMode2D.Impulse);
                 if (monsterHealth != null)
                 monsterHealth.TakeDamage(damage);
@@ -402,12 +404,12 @@ public class PlayerAttack : MonoBehaviour
     {
         direction = myTransform.rotation.y == 0 ? 1 : -1;
         colliders = Physics2D.OverlapBoxAll(detectionPosition, new Vector2(detectionRadius+5,detectionRadius+4), 0,enemyLayerMask);
-        StartCoroutine(SpawnPunchParticles(2));
+        // StartCoroutine(SpawnPunchParticles(2));
         StartCoroutine(particlesForceFieldAttack(2));
         if (colliders.Length >= 1)
             {
                 
-                newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+                newPitch = UnityEngine.Random.Range(1f,1.4f);
                 audioSource.pitch = newPitch;
                 Instantiate(hitEffect, detectionPosition, Quaternion.identity);
                 
@@ -415,6 +417,7 @@ public class PlayerAttack : MonoBehaviour
                 playerRb.AddForce(Vector2.right * selfForceMagnitudeForward * -direction, ForceMode2D.Impulse);
                 audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
                 CameraShakeManager.instance.CameraShake(impulseSource);
+                
                 // StartCoroutine(DestroyDestructionGroundEffect());
 
   
@@ -424,9 +427,12 @@ public class PlayerAttack : MonoBehaviour
             {
                 enemyRb = collider.GetComponent<Rigidbody2D>();
                 monsterHealth = collider.GetComponent<MonsterHealth>();
+                
                 if (enemyRb != null)
                 {
+                    
                     directionVector = ((Vector2)enemyRb.transform.position - (Vector2)myTransform.position).normalized;
+                    playerRb.transform.position = enemyRb.transform.position - offsetTest * direction;
                     enemyRb.AddForce(directionVector * forceMagnitudeForward, ForceMode2D.Impulse);
                     //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
                     if (monsterHealth != null)
@@ -446,7 +452,7 @@ public class PlayerAttack : MonoBehaviour
         StartCoroutine(particlesForceFieldAttack(3));
         if (collidersDown.Length >= 1)
             {
-                newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+                newPitch = UnityEngine.Random.Range(1f,1.4f);
                 audioSource.pitch = newPitch;
                 Instantiate(hitEffect, detectionPosition, Quaternion.identity);
                 playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
@@ -460,6 +466,7 @@ public class PlayerAttack : MonoBehaviour
                 //Rigidbody2D bossRb = collider.GetComponentInChildren<Rigidbody2D>();
                 if (enemyRb != null)
                 {
+                    playerRb.transform.position = enemyRb.transform.position - offsetTest * direction;
                     enemyRb.AddForce(Vector2.down * forceMagnitudeDownward, ForceMode2D.Impulse);
                     //bossRb.AddForce(Vector2.down * forceMagnitudeDownward, ForceMode2D.Impulse);
 
@@ -481,6 +488,7 @@ public class PlayerAttack : MonoBehaviour
         playerRb.AddForce(Vector2.right * direction * slamForce + Vector2.down * slamForce, ForceMode2D.Impulse);
         CameraShakeManager.instance.CameraShake(impulseSource);
         Physics2D.IgnoreLayerCollision(9,11,true);
+        StartCoroutine(particlesForceFieldAttack(2));
         yield return new WaitForSeconds(distancePique);
         
         playerRb.velocity = Vector2.zero;
@@ -493,7 +501,7 @@ public class PlayerAttack : MonoBehaviour
         {
             //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
             Instantiate(hitEffect, detectionPosition, Quaternion.identity);
-            newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            newPitch = UnityEngine.Random.Range(1f,1.4f);
             audioSource.pitch = newPitch;
             audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
             CameraShakeManager.instance.CameraShake(impulseSource);
@@ -529,7 +537,7 @@ public class PlayerAttack : MonoBehaviour
             {
                 /* Instantiate(hitEffect, detectionPosition, Quaternion.identity); */
                 //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
-                newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+                newPitch = UnityEngine.Random.Range(1f,1.4f);
                 audioSource.pitch = newPitch;
                 audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
                 
@@ -576,7 +584,7 @@ public class PlayerAttack : MonoBehaviour
         {
             Instantiate(hitEffect, detectionPosition, Quaternion.identity);
             //playerRb.AddForce(Vector2.up * selfForceMagnitudeForward/1.5f, ForceMode2D.Impulse);
-            newPitch = UnityEngine.Random.Range(0.8f,1.2f);
+            newPitch = UnityEngine.Random.Range(1f,1.4f);
             audioSource.pitch = newPitch;
             audioSource.PlayOneShot(punchSoundEffect, volumeSoundEffect);
             
@@ -653,12 +661,12 @@ public class PlayerAttack : MonoBehaviour
         //Regular attack
         if (attacknumber == 2)
         {
-            offsetParticles = new Vector3(offsetParticlesX,0,0);
+            // offsetParticles = new Vector3(offsetParticlesX,0,0);
             offsetParticles2 = new Vector3(offsetParticlesX*2.5f,0,0);
             offsetParticles3 = new Vector3(offsetParticlesX*4f,0,0);
 
-            punchPart = Instantiate(punchParticles, myTransform.position + offsetParticles3 * direction, Quaternion.Euler(0f, 0f, 180f));
-            punchPart.transform.localScale = new Vector3(1, 1, 1);
+            // punchPart = Instantiate(punchParticles, myTransform.position + offsetParticles3 * direction, Quaternion.Euler(0f, 0f, 180f));
+            // punchPart.transform.localScale = new Vector3(1, 1, 1);
             yield return new WaitForSeconds(0.05f);
             punchPart2 = Instantiate(punchParticles, myTransform.position + offsetParticles2 * direction, Quaternion.Euler(0f, 0f, 180f));
             punchPart2.transform.localScale = new Vector3(2, 2, 1);

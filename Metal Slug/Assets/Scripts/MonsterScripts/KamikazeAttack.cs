@@ -34,6 +34,7 @@ public class KamikazeAttack : MonoBehaviour
     public GameObject ComicBoomEffect;
     private GameObject comicBoom;
     private Light lighter;
+    public GameObject circleArea;
     
 
     
@@ -46,6 +47,7 @@ public class KamikazeAttack : MonoBehaviour
         kamikazeDamageHimself = monsterHealth.maxHealth/2;
         rotation = Quaternion.Euler(0f, 0f, 0f);
         myTransform = transform;
+        circleArea.SetActive(false);
     }
 
 
@@ -55,6 +57,7 @@ public class KamikazeAttack : MonoBehaviour
         direction = myTransform.rotation.y == 0f ? 1 : -1;
         detectionPosition = (Vector2)myTransform.position + Vector2.right * direction * detectionOffset;
         colliders = Physics2D.OverlapCircleAll(detectionPosition, detectionRadius, playerLayerMask);
+        
         Instantiate(explosionParticles, myTransform.position, rotation);
         if (colliders.Length >= 1)
         {
@@ -69,35 +72,28 @@ public class KamikazeAttack : MonoBehaviour
             {
                 playerRb = collider.GetComponent<Rigidbody2D>();
                 playerHealth = collider.GetComponent<PlayerHealth>();
+
+                directionVector = ((Vector2)playerRb.transform.position - (Vector2)myTransform.position).normalized;
+                playerRb.AddForce(directionVector * forceMagnitudeForward2, ForceMode2D.Impulse);
+                //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
+                playerHealth.TakeDamage(damage);
+                
             }
             if(collider.gameObject.CompareTag("Enemy"))
             {
                 enemyRbOthers = collider.GetComponent<Rigidbody2D>();
-            }
-         
-            if (playerRb != null)
-            {
-                directionVector = ((Vector2)playerRb.transform.position - (Vector2)myTransform.position).normalized;
-                playerRb.AddForce(directionVector * forceMagnitudeForward2, ForceMode2D.Impulse);
-                //playerRb.AddForce(Vector2.right * -selfForceMagnitudeForward, ForceMode2D.Impulse);
-                
-                
-                playerHealth.TakeDamage(damage);
-                
-                
-            }
-            if (enemyRbOthers != null)
-            {
                 directionVector = ((Vector2)enemyRbOthers.transform.position - (Vector2)myTransform.position).normalized;
                 enemyRbOthers.AddForce(directionVector * forceMagnitudeForward2, ForceMode2D.Impulse);
             }
+         
+            
         }
         StartCoroutine(DestroyComicBoomEffect());
         monsterHealth.TakeDamage(kamikazeDamageHimself);
     }
 
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         // Dessiner le rayon de détection dans l'éditeur
         Gizmos.color = Color.green;
@@ -108,7 +104,9 @@ public class KamikazeAttack : MonoBehaviour
     {
         comicBoom = Instantiate(ComicBoomEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
         lighter = comicBoom.GetComponentInChildren<Light>();
+        
         yield return new WaitForSeconds(0.3f);
+        circleArea.SetActive(false);
         Destroy(comicBoom);
         Destroy(lighter);
         

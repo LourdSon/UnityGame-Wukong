@@ -16,6 +16,7 @@ public class PlayerLevel : MonoBehaviour
 
 
     private float targetKiFillAmount;
+    public PlayerScore playerScore;
     
     
 
@@ -30,6 +31,7 @@ public class PlayerLevel : MonoBehaviour
             UpdateExpBar();
         } else if(currentExp >= maxExp && !isLevelingUp)
         {
+            playerScore.playerLevelMax += 1;
             isLevelingUp = true;
             anouncementText.text = "Level " + currentLvl + " !";
             UIlvlInBar.text = "Lvl." + currentLvl;

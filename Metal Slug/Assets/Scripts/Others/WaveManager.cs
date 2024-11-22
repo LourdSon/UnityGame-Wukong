@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class WaveManager : MonoBehaviour
 {
@@ -39,8 +40,17 @@ public class WaveManager : MonoBehaviour
     private MonsterHealth monsterHealth;
     private float randomValue;
     private EnemyCircleSpawner spawner;
+    public Camera myCamera;
+    private Color tempColor;
+    public float redA, redB, redC;
+    public PlayerScore playerScore;
     
 
+    void Start()
+    {
+        if(myCamera != null)
+        tempColor = myCamera.backgroundColor;
+    }
     void Update()
     {
         enemiesRemainingAlive = GameObject.FindGameObjectsWithTag("Enemy");
@@ -67,6 +77,15 @@ public class WaveManager : MonoBehaviour
                 EnemyPoolManager.Instance.ReturnEnemyToPool(enemy);
             }
         }
+
+        if(currentWaveIndex == 5 || currentWaveIndex == 11)
+        {
+            myCamera.backgroundColor = new Color(redA, redB, redC);
+            
+        } else
+        {
+            myCamera.backgroundColor = tempColor;
+        }
     }
 
     IEnumerator SpawnWave()
@@ -74,7 +93,9 @@ public class WaveManager : MonoBehaviour
         spawningEnemies = true;
         wave = waves[currentWaveIndex];
         enemiesRemainingToSpawn = wave.numberOfEnemies;
-
+        playerScore.roundsMax += 1;
+        currentWaveIndex++;
+        numerOfWaveDone++;
         for (int i = 0; i < enemiesRemainingToSpawn; i++)
         {
             SpawnEnemy(wave.enemyPrefab[Random.Range(0, wave.enemyPrefab.Length)]);
@@ -82,8 +103,7 @@ public class WaveManager : MonoBehaviour
         }
 
         spawningEnemies = false;
-        currentWaveIndex++;
-        numerOfWaveDone++;
+        
 
         if (currentWaveIndex < waves.Count && numerOfWaveDone >= 6 && currentWaveIndex != 5 && currentWaveIndex != 11)
         {
@@ -94,6 +114,8 @@ public class WaveManager : MonoBehaviour
             Debug.Log("All waves completed!");
             yield return null;
         }
+
+        
     }
 
     void SpawnEnemy(GameObject enemyPrefab)

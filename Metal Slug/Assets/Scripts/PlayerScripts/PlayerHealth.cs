@@ -39,6 +39,9 @@ public class PlayerHealth : MonoBehaviour
     private Color currentColor;
     public GameObject healUpEffect;
     private GameObject healUp;
+    private Animator animator;
+    public PlayerScore playerScore;
+    public FinalScore finalScore;
 
     
     // Start is called before the first frame update
@@ -56,6 +59,7 @@ public class PlayerHealth : MonoBehaviour
         isHealing = false;
         myTransform = transform;
         currentColor = GetComponentInParent<SpriteRenderer>().color;
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -118,8 +122,7 @@ public class PlayerHealth : MonoBehaviour
         
         if (OnDeath != null)
         {
-            
-            
+            finalScore.BestScore();
             Destroy(gameObject);
             OnDeath.Invoke();
         }
@@ -129,6 +132,8 @@ public class PlayerHealth : MonoBehaviour
         if (PlayerController.instance.playerInputActions.Player.Heal.triggered && playerKi.currentKi >= healCost && health != maxHealth && !isHealing)
         {
             StartCoroutine(WaitBeforeHeal(secondsBeforeHeal));
+            animator.SetBool("IsCharging", true);
+            animator.SetTrigger("ChargingTrigger");
             
         }
     }
@@ -138,6 +143,9 @@ public class PlayerHealth : MonoBehaviour
         StartCoroutine(DestroyHealUpEffect());
         HealCharging.gameObject.SetActive(true);
         yield return new WaitForSeconds(sec);
+        if(playerScore != null)
+        playerScore.healed += 1;
+        animator.SetBool("IsCharging", false);
         HealCharging.gameObject.SetActive(false);
         health += 10;
         UpdateHealthBar();

@@ -388,7 +388,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7c98d9b968549284c951ab2d20c47602, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2b2271bca77a72c4d8229d4378ae8208, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -463,7 +463,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 6767c36fe448a22468a9e9b6f7b6cd7c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 61972f37f5884bc4ba6e6cc261681955, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -494,6 +494,7 @@ GameObject:
   - component: {fileID: 1430738836}
   - component: {fileID: 1430738835}
   - component: {fileID: 1430738839}
+  - component: {fileID: 1430738840}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -622,6 +623,18 @@ PlayableDirector:
     value: {fileID: 1729235410}
   m_ExposedReferences:
     m_References: []
+--- !u!114 &1430738840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430738834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d44c8b9ec94f7499ab8df30c86748a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1485675213
 GameObject:
   m_ObjectHideFlags: 0
@@ -647,7 +660,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1485675213}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 9c27d0785b08835458bef0b5f2d0819c, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: ef9b6f845287cb44fa0dab7791e068e7, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 609232354}
@@ -661,12 +674,14 @@ VideoPlayer:
   m_TimeUpdateMode: 2
   m_PlaybackSpeed: 1
   m_AudioOutputMode: 0
-  m_TargetAudioSources: []
-  m_DirectAudioVolumes: []
+  m_TargetAudioSources:
+  - {fileID: 0}
+  m_DirectAudioVolumes:
+  - 1
   m_Url: 
-  m_EnabledAudioTracks: 
-  m_DirectAudioMutes: 
-  m_ControlledAudioTrackCount: 0
+  m_EnabledAudioTracks: 01
+  m_DirectAudioMutes: 00
+  m_ControlledAudioTrackCount: 1
   m_PlayOnAwake: 1
   m_SkipOnDrop: 0
   m_Looping: 1

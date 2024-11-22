@@ -22,7 +22,7 @@ public class WaveNumber : MonoBehaviour
         {
             waveManagerNumber = waveManager.numerOfWaveDone;
             //int waveNumber = waveManager.currentWaveIndex;
-            v = "Wave number : " + waveManagerNumber;
+            v = "Round : " + waveManagerNumber;
             waveText.text = v;
 
         }

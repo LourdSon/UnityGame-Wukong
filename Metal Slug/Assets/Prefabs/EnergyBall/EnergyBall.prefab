@@ -127,7 +127,7 @@ TrailRenderer:
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
-  m_MotionVectors: 0
+  m_MotionVectors: 1
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
@@ -155,8 +155,8 @@ TrailRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1402264379
   m_SortingLayer: 1
-  m_SortingOrder: 19
-  m_Time: 0.1
+  m_SortingOrder: 49
+  m_Time: 0.25
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
@@ -166,29 +166,29 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.66666603
-        inSlope: 0
-        outSlope: 0
+        value: 0
+        inSlope: 13.351648
+        outSlope: 13.351648
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.33333334
+        outWeight: 0.0074074073
       - serializedVersion: 3
-        time: 1
+        time: 0.5086365
         value: 0
-        inSlope: 0
-        outSlope: 0
+        inSlope: -0.96408314
+        outSlope: -0.96408314
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0
+        inWeight: 0.51111114
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.93725497, g: 0.93725497, b: 0.5019608, a: 1}
-      key1: {r: 1, g: 1, b: 1, a: 0.60784316}
+      key0: {r: 0.9960785, g: 0.9960785, b: 0.7058824, a: 1}
+      key1: {r: 0.9960785, g: 0.9960785, b: 0.7058824, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -204,7 +204,7 @@ TrailRenderer:
       ctime6: 0
       ctime7: 0
       atime0: 0
-      atime1: 38165
+      atime1: 13107
       atime2: 65535
       atime3: 0
       atime4: 0
@@ -222,7 +222,7 @@ TrailRenderer:
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
-  m_MinVertexDistance: 0.1
+  m_MinVertexDistance: 0.03
   m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
@@ -900,7 +900,7 @@ MonoBehaviour:
   - {x: 0.14137983, y: -1.3607874, z: 0}
   m_ShapePathHash: 134706494
   m_Mesh: {fileID: 0}
-  m_InstanceId: -3312
+  m_InstanceId: -12111588
   m_LocalBounds:
     m_Center: {x: -0.034838796, y: -0.6691382, z: 0}
     m_Extent: {x: 1.3622335, y: 0.6916492, z: 0}

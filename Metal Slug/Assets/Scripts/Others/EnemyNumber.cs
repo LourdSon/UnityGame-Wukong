@@ -18,7 +18,7 @@ public class EnemyNumber : MonoBehaviour
     void Update()
     {
         numberOfEnemies = waveManager.enemiesRemainingAlive.Length;
-        v = "Enemy number : " + numberOfEnemies;
+        v = "Foes : " + numberOfEnemies;
         enemyText.text = v;
     }
 }

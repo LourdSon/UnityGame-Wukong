@@ -343,7 +343,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2890ccb8c8f9e834582276137fed9a07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyOnImpact: {fileID: 1700858474745564155, guid: 28e11080954861246b02f1cdf4d06166, type: 3}
+  destroyOnImpact: {fileID: 4951168702405954493, guid: ea0a7cbee85354c4b8d272a9c0b482da, type: 3}
   self: {fileID: 621955619548887334}
 --- !u!114 &8372434012996737232
 MonoBehaviour:

@@ -31,6 +31,10 @@ public class KamikazeMovement : MonoBehaviour
     private Vector3 repelDirection;
     private float distance;
     private Transform myTransform;
+    private float nextSeparationCheckTime = 0f;
+    private float separationCheckInterval = 0.1f;
+    private float separationRadiusSqr;
+    private float distanceSqr;
 
     void Start()
     {
@@ -97,7 +101,7 @@ public class KamikazeMovement : MonoBehaviour
         
     }
 
-    void SeparateFromOtherEnemies()
+    /* void SeparateFromOtherEnemies()
     {
         // Récupère tous les ennemis dans un rayon autour de cet ennemi
         enemiesNearby = Physics2D.OverlapCircleAll(myTransform.position, separationRadius);
@@ -114,6 +118,29 @@ public class KamikazeMovement : MonoBehaviour
                 if (distance < separationRadius)
                 {
                     myTransform.position += repelDirection.normalized * separationForce * Time.deltaTime;
+                }
+            }
+        }
+    } */
+
+    private void SeparateFromOtherEnemies()
+    {
+        if (Time.time < nextSeparationCheckTime) return; // Éviter la vérification à chaque frame
+        nextSeparationCheckTime = Time.time + separationCheckInterval;
+
+        enemiesNearby = Physics2D.OverlapCircleAll(myTransform.position, separationRadius);
+
+        separationRadiusSqr = separationRadius * separationRadius; // Évite le recalcul du rayon au carré
+        foreach (Collider2D other in enemiesNearby)
+        {
+            if (other != null && other.gameObject != gameObject && other.CompareTag("Enemy"))
+            {
+                repelDirection = myTransform.position - other.transform.position;
+                distanceSqr = repelDirection.sqrMagnitude; // Utilisation de sqrMagnitude au lieu de magnitude
+
+                if (distanceSqr < separationRadiusSqr) // Comparaison avec la distance au carré
+                {
+                    myTransform.position += (Vector3)(repelDirection.normalized * separationForce * Time.deltaTime);
                 }
             }
         }

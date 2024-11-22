@@ -69,6 +69,8 @@ public class MonsterHealth : MonoBehaviour
     private GameObject guardBreak;
     public Timer timer;
     public int bonusSeconds = 5;
+    public GameObject circleArea;
+    public PlayerScore playerScore;
 
 
     // Start is called before the first frame update
@@ -88,7 +90,6 @@ public class MonsterHealth : MonoBehaviour
 
         impulseSource = GetComponentInChildren<CinemachineImpulseSource>();
         isTakingDamage = false;
-        
         knockBackCounter = 0;
         enemyRb = GetComponent<Rigidbody2D>();
         player = GameObject.FindWithTag("Player");
@@ -116,7 +117,7 @@ public class MonsterHealth : MonoBehaviour
     {
         if(playerLevel.isLevelingUp && !damageIncreased)
         {
-            maxHealth += maxHealth/percentage;
+            maxHealth *= percentage;
             // health = maxHealth;
             healthBar.UpdateHealthBar(health,maxHealth);
             // health = Mathf.Clamp(health, 0, maxHealth); 
@@ -162,6 +163,7 @@ public class MonsterHealth : MonoBehaviour
         }
         if (health <= 0)
         {
+            playerScore.enemiesKilled += 1;
             Instantiate(XpForPlayer, myTransform.position, Quaternion.identity);
             if(gameObject.activeSelf)
             StartCoroutine(timer.bonusTimer(bonusSeconds));
@@ -172,8 +174,9 @@ public class MonsterHealth : MonoBehaviour
             {
                 attackHitBoxSide.isAttacking = false;
             }
-            if (attackHitBoxKamikaze != null)
+            if (attackHitBoxKamikaze != null && circleArea != null)
             {
+                circleArea.SetActive(false);
                 attackHitBoxKamikaze.isAttacking = false;
             }
         }
@@ -213,8 +216,9 @@ public class MonsterHealth : MonoBehaviour
             {
                 attackHitBoxSide.isAttacking = false;
             }
-            if (attackHitBoxKamikaze != null)
+            if (attackHitBoxKamikaze != null && circleArea != null)
             {
+                circleArea.SetActive(false);
                 attackHitBoxKamikaze.isAttacking = false;
             }
         }
@@ -237,16 +241,12 @@ public class MonsterHealth : MonoBehaviour
                 enemyRb.velocity = Vector3.zero;
                 isTakingDamage = false;
                 knockBackCounter = 0;
-                
-
-
                 dashDirection = (playerRb.transform.position - myTransform.position).normalized;
                 angleInRadians = Mathf.Atan2(dashDirection.y, dashDirection.x);
                 angleInDegrees = angleInRadians * Mathf.Rad2Deg;
                 rotation = Quaternion.Euler(0f, 0f, direction > 0 ? 0f + angleInDegrees + 180 : 180f + angleInDegrees);
                 Instantiate(dashExplosionParticles, myTransform.position, rotation);
                 enemyRb.AddForce(dashDirection * dashDistance, ForceMode2D.Impulse);
-                
             }
         }
     }
@@ -261,28 +261,9 @@ public class MonsterHealth : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (enemyRb.velocity.magnitude > 15f)
         {
-            // Vérifie si la collision est suffisamment forte pour causer des dégâts supplémentaires
-            otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
-            if (enemyRb != null && enemyRb.velocity.magnitude > 20f && otherEnemy != null)
-            {               
-                impactForce = collision.relativeVelocity.magnitude;
-                additionalDamage = impactForce * additionalDamageMultiplier;
-                otherEnemy.TakeDamage(normalDamage + additionalDamage);    
-                StartCoroutine(DestroyComicBoomEffect());                           
-            }
-        } else if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
-        {
-            if(enemyRb.velocity.magnitude > 20f)
-            {
-                impactForce = collision.relativeVelocity.magnitude;
-                additionalDamage = impactForce * additionalDamageMultiplier;
-                TakeDamage(normalDamage + additionalDamage);
-                // StartCoroutine(DestroyComicBoomEffect());
-                Instantiate(ComicBoomEffect,new Vector2(myTransform.position.x, myTransform.position.y + 2f), Quaternion.identity);
-
-            }
+            ContactDamage(collision);
         }
     }
 
@@ -307,23 +288,41 @@ public class MonsterHealth : MonoBehaviour
         
         yield return null;
     }
-    public void ContactDamage()
-    {
 
-        if(enemyRb.velocity.magnitude > 30f && !IsGrounded())
+    public void ContactDamage(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
         {
-            StartCoroutine(DamageGrounded());
+            if (enemyRb.velocity.magnitude > 15f && !IsGrounded())
+            {
+                StartCoroutine(HandleCollisionDamage(collision));
+            }
         }
     }
 
-    public IEnumerator DamageGrounded()
+    private IEnumerator HandleCollisionDamage(Collision2D collision)
     {
         impactForce = enemyRb.velocity.magnitude;
-        additionalDamage =  impactForce * additionalDamageMultiplier;
-        yield return new WaitUntil(() => IsGrounded());
-        TakeDamage(normalDamage + additionalDamage);
+        additionalDamage = impactForce * additionalDamageMultiplier;
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            MonsterHealth otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
+            if (otherEnemy != null)
+            {
+                otherEnemy.TakeDamage(normalDamage + additionalDamage);
+                Instantiate(ComicBoomEffect, new Vector2(transform.position.x, transform.position.y + 2f), Quaternion.identity);
+            }
+        }
+        else if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
+        {
+            yield return new WaitUntil(() => IsGrounded());
+            TakeDamage(normalDamage + additionalDamage);
+            Instantiate(ComicBoomEffect, new Vector2(transform.position.x, transform.position.y + 2f), Quaternion.identity);
+        }
+
         yield return null;
     }
+
 
     public IEnumerator FlashCoroutine()
     {

@@ -20,6 +20,7 @@ public class AttackHitBoxKamikaze : MonoBehaviour
     private Color tempColor;
     private Color newColor;
     private Color currentColor;
+    public GameObject circleArea;
 
     void Start()
     {
@@ -28,6 +29,7 @@ public class AttackHitBoxKamikaze : MonoBehaviour
         isAttacking = false;
         kamikazeAttack = GetComponentInParent<KamikazeAttack>();  
         currentColor = GetComponentInParent<SpriteRenderer>().color;
+        
     }
 
     
@@ -36,12 +38,14 @@ public class AttackHitBoxKamikaze : MonoBehaviour
     {                
         if(gameObject != null && gameObject.activeInHierarchy && coll.gameObject.CompareTag("Player"))
         {
+            circleArea.SetActive(true);
             StartCoroutine(AttackSpe());         
         }
     }
 
     private IEnumerator AttackSpe()
     {
+        
         isAttacking = true;
         /* tempColor = currentColor;
         Color.RGBToHSV(tempColor, out float h, out float s, out float v);
@@ -51,8 +55,8 @@ public class AttackHitBoxKamikaze : MonoBehaviour
         anim.SetTrigger("SimpleAttackTrigger");
         yield return new WaitForSeconds(waitingForAttack);
         kamikazeAttack.Attack();
-        yield return null;
         isAttacking = false;
+        yield return null;
         /* currentColor = tempColor; */
     }
 }

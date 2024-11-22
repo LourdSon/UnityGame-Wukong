@@ -46,6 +46,7 @@ public class DashingMonsterHealth : MonoBehaviour
     private RaycastHit2D hit;
     private Transform myTransform;
     private Transform playerTransform;
+    public GameObject ComicBoomEffect;
 
 
 
@@ -127,32 +128,42 @@ public class DashingMonsterHealth : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
-        {
-            if(enemyRb.velocity.magnitude > 15f)
+        if (enemyRb.velocity.magnitude > 15f)
             {
-                impactForce = collision.relativeVelocity.magnitude;
-                additionalDamage = impactForce * additionalDamageMultiplier;
-                TakeDamage(normalDamage + additionalDamage);
+                ContactDamage(collision);
+            }
+    }
+
+    public void ContactDamage(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
+        {
+            if (enemyRb.velocity.magnitude > 15f && !IsGrounded())
+            {
+                StartCoroutine(HandleCollisionDamage(collision));
             }
         }
     }
 
-    public void ContactDamage()
-    {
-
-        if(enemyRb.velocity.magnitude > 15f && !IsGrounded())
-        {
-            // StartCoroutine(DamageGrounded());
-        }
-    }
-
-    public IEnumerator DamageGrounded()
+    private IEnumerator HandleCollisionDamage(Collision2D collision)
     {
         impactForce = enemyRb.velocity.magnitude;
-        additionalDamage =  impactForce * additionalDamageMultiplier;
-        yield return new WaitUntil(() => IsGrounded());
-        TakeDamage(normalDamage + additionalDamage);
+        additionalDamage = impactForce * additionalDamageMultiplier;
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            MonsterHealth otherEnemy = collision.gameObject.GetComponent<MonsterHealth>();
+            if (otherEnemy != null)
+            {
+                otherEnemy.TakeDamage(normalDamage + additionalDamage);
+            }
+        }
+        else if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Roofs"))
+        {
+            yield return new WaitUntil(() => IsGrounded());
+            TakeDamage(normalDamage + additionalDamage);
+            Instantiate(ComicBoomEffect, new Vector2(transform.position.x, transform.position.y + 2f), Quaternion.identity);
+        }
+
         yield return null;
     }
 

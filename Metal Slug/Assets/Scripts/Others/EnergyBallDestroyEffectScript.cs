@@ -10,7 +10,7 @@ public class EnergyBallDestroyEffectScript : MonoBehaviour
     public GameObject self;
     
 
-    public void OnInstanceDestroy(GameObject others)
+    public void OnInstanceDestroyParticle(GameObject others)
     {
         instanceDestroy = Instantiate(destroyOnImpact, others.transform.position, Quaternion.identity);       
     }   
@@ -18,21 +18,21 @@ public class EnergyBallDestroyEffectScript : MonoBehaviour
     {
         if(other.gameObject.tag == "Ground" && self.tag == "EnergyBall")
         {
-            OnInstanceDestroy(self);
+            OnInstanceDestroyParticle(self);
             Destroy(self);
         }
         if(other.gameObject.tag == "Ground" && self.tag == "EnergyBall3")
         {
-            OnInstanceDestroy(self);
+            OnInstanceDestroyParticle(self);
             self.SetActive(false);
         } 
         if(other.gameObject.tag == "Ground" && self.tag == "EnergyBall2")
         {
-            OnInstanceDestroy(self);
+            OnInstanceDestroyParticle(self);
         }
         if(other.gameObject.tag == "Roofs")
         {
-            OnInstanceDestroy(self);
+            OnInstanceDestroyParticle(self);
         }
     }
 }
